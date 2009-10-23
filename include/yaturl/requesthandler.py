@@ -5,7 +5,7 @@
 from BaseHTTPServer import BaseHTTPRequestHandler
 import socket
 import cgi
-import yaturltemplate
+import yaturlTemplate
 
 class YuRequestHandler(BaseHTTPRequestHandler):
 
@@ -32,10 +32,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.server.accesslog.info(format%args)
 
     #----------------------------------------------------------------------
-    def _get_text(self, method):
-        return text % { 'path': self.path, 'method': method }
-
-    #----------------------------------------------------------------------
     def _send_head(self, text):
         self.send_response(200)
         self.send_header('Content-Type', 'text/html')
@@ -44,7 +40,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_GET(self):
-        text = yaturltemplate.template(self.server.config.get('templates', 'statichomepage'),
+        text = yaturltemplate.template(
+            self.server.config.get('main','statichomepage'),
             path=self.path, method="get")
         self._send_head(text)
         self.wfile.write(text)
@@ -56,9 +53,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             headers=self.headers,
             environ={'REQUEST_METHOD':'POST'})
 
-        ## Begin the response
+        # Begin the response
         self.send_response(200)
-        text = yaturltemplate.template(self.server.config.get('templates', 'staticresultpage'),
+        text = yaturltemplate.template(
+            self.server.config.get('main','staticresultpage'),
             URL=form['URL'].value)
         self._send_head(text)
         self.end_headers()
@@ -68,5 +66,4 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     def do_HEAD(self):
         text = self._get_text('head')
         self._send_head(text)
-
 
