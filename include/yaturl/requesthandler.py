@@ -5,33 +5,7 @@
 from BaseHTTPServer import BaseHTTPRequestHandler
 import socket
 import cgi
-
-
-text = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-
-<head>
-    <title>yatURL</title>
-    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-    <meta name="generator" content="Geany 0.19" />
-</head>
-
-<body>
-    Heyho, I'm a service.<br/>
-    <br/>
-    Method: %(method)s
-    Path: %(path)s
-    <form action="http://localhost:24882" method="post">
-        <input name="testpost" type="text" size="30" maxlength="30">
-    </form>
-
-</body>
-
-</html>
-"""
-
-
+import yaturltemplate
 
 class YuRequestHandler(BaseHTTPRequestHandler):
 
@@ -70,7 +44,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_GET(self):
-        text = self._get_text('get')
+        text = yaturltemplate.template(self.server.config.get('main','statichomepage'),
+            {'path': self.path,
+            'method': "get" })
         self._send_head(text)
         self.wfile.write(text)
 
@@ -83,9 +59,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         ## Begin the response
         self.send_response(200)
+        text = yaturltemplate.template(self.server.config.get('main','staticresultpage'),
+            {'URL': form['URL'].value})
+        self._send_head(text)
         self.end_headers()
-
-        self.wfile.write(form['testpost'].value)
+        self.wfile.write(text)
 
     #----------------------------------------------------------------------
     def do_HEAD(self):
