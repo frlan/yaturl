@@ -1,0 +1,62 @@
+#!/bin/sh
+# yaturl startup script
+#
+# Copyright (C) 2009 Franky
+#
+### BEGIN INIT INFO
+# Provides:          yaturl
+# Required-Start:    $network $local_fs $syslog
+# Required-Stop:     $network $local_fs $syslog
+# Should-Start:      yaturl
+# Should-Stop:       yaturl
+# Default-Start:     2 3 4 5
+# Default-Stop:      1
+# Short-Description: Start the yaturl server
+### END INIT INFO
+
+DAEMON=/opt/projects/yaturl/bin/yaturl_service.py
+PIDFILE=/opt/projects/yaturl/run/yaturl.pid
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+PYTHONPATH="/opt/projects/yaturl/include:${PYTHONPATH}"
+LC_ALL="en_US.UTF-8"
+
+test -x "${DAEMON}" || exit 0
+
+. /lib/lsb/init-functions
+
+server_start () {
+    log_begin_msg "Starting yaturl daemon"
+    export LC_ALL PYTHONPATH
+    start-stop-daemon --start --pidfile "${PIDFILE}" --startas "${DAEMON}"
+    log_end_msg "${?}"
+}
+
+server_stop () {
+    log_begin_msg "Stopping yaturl daemon"
+    start-stop-daemon --stop --oknodo --pidfile "${PIDFILE}" --retry TERM/90/TERM/10 &&\
+    rm -f "${PIDFILE}"
+    log_end_msg "${?}"
+}
+
+case "$1" in
+    start|stop)
+        server_${1}
+        ;;
+    restart)
+        server_stop && \
+        server_start
+        ;;
+    status)
+        pidofproc -p "${PIDFILE}" "${DAEMON}" >/dev/null
+        status="${?}"
+        if [ "${status}" -eq "0" ]; then
+                log_success_msg "Service is running."
+        else
+                log_failure_msg "Service is not running."
+        fi
+        exit "${status}"
+        ;;
+    *)  echo "Usage: ${0} {start|stop|restart|status}"
+        exit 1
+        ;;
+esac
