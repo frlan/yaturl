@@ -4,6 +4,7 @@
 
 from BaseHTTPServer import BaseHTTPRequestHandler
 import socket
+import cgi
 
 
 text = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -21,6 +22,10 @@ text = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     <br/>
     Method: %(method)s
     Path: %(path)s
+    <form action="http://localhost:24882" method="post">
+        <input name="testpost" type="text" size="30" maxlength="30">
+    </form>
+
 </body>
 
 </html>
@@ -68,6 +73,19 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         text = self._get_text('get')
         self._send_head(text)
         self.wfile.write(text)
+
+    #----------------------------------------------------------------------
+    def do_POST(self):
+        form = cgi.FieldStorage(
+            fp=self.rfile,
+            headers=self.headers,
+            environ={'REQUEST_METHOD':'POST'})
+
+        ## Begin the response
+        self.send_response(200)
+        self.end_headers()
+
+        self.wfile.write(form['testpost'].value)
 
     #----------------------------------------------------------------------
     def do_HEAD(self):
