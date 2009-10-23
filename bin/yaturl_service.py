@@ -114,6 +114,8 @@ def main():
     signal(SIGINT,  signal_handler)
     signal(SIGTERM, signal_handler)
 
+    errorlog.info('Server started')
+
     # loop forever listening to connections.
     sc = YuServer(config, errorlog, accesslog)
     sc.serve_forever()
