@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 from BaseHTTPServer import BaseHTTPRequestHandler
 import socket
 import cgi
 import yaturlTemplate
+import linkHash
+import hashlib
+
 
 class YuRequestHandler(BaseHTTPRequestHandler):
 
@@ -40,8 +42,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_GET(self):
-        text = yaturltemplate.template(
-            self.server.config.get('main','statichomepage'),
+        text = yaturlTemplate.template(
+            self.server.config.get('templates','statichomepage'),
             path=self.path, method="get")
         self._send_head(text)
         self.wfile.write(text)
@@ -53,11 +55,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             headers=self.headers,
             environ={'REQUEST_METHOD':'POST'})
 
+        # Calculating the output
+        link = linkHash.linkHash(newlink = form['URL'].value)
+
         # Begin the response
         self.send_response(200)
-        text = yaturltemplate.template(
-            self.server.config.get('main','staticresultpage'),
-            URL=form['URL'].value)
+        text = yaturlTemplate.template(
+            self.server.config.get('templates','staticresultpage'),
+            URL=link.hash)
         self._send_head(text)
         self.end_headers()
         self.wfile.write(text)
