@@ -22,5 +22,7 @@ class YuServer(ThreadingMixIn, HTTPServer):
         self.errorlog = errorlog
         self.accesslog = accesslog
         self.resolve_clients = config.get('http', 'resolve_clients')
+        # create a database object, the connection is established automatically when needed
+        self.db = YuDb(config)
 
 

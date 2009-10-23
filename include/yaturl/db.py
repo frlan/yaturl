@@ -22,6 +22,7 @@ class YuDb(object):
         self._user = config.get('database', 'user')
         self._passwd = config.get('database', 'password')
         self._host = config.get('database', 'host')
+        self._port = config.getint('database', 'port')
         self._conn = None
         # if the database connection died, retry it twice, then give up
         self._conn_retry_count = 3
@@ -38,11 +39,11 @@ class YuDb(object):
         """
         try:
             conn = MySQLdb.connect(host=hostname, db=database, user=self._user, passwd=self._passwd,
-                use_unicode=True, init_command='SET NAMES utf8')
+                port=self._port, use_unicode=True, init_command='SET NAMES utf8')
             c = conn.cursor()
             self._conn_retry_count = 3
         except MySQLdb.DatabaseError, e:
-            raise JaDbError('Database error: %s' % e)
+            raise YuDbError('Database error: %s' % e)
 
         return (conn, c)
 
@@ -69,34 +70,18 @@ class YuDb(object):
             pass
 
     #----------------------------------------------------------------------
-    def log_executed_task(self, task, xml_query, xml_response, router):
+    def do_something(self):
         """
-        Log executed tasks into the database for later review (log query and response at once)
-
-        @param task (JaTask)
-        @param xml_query (str)
-        @param xml_response (str)
-        @param router (Router)
+        Do Something
         """
-        if not task:
-            return -1
-
         try:
             conn, c = self._get_connection()
-            router_id = 0
-            c.execute('''''' %
-                         (task.id, task.type, router.router_id, task.username, XNM_LOG_TYPE_QUERY, \
-                          xml_query.strip().replace('\'', '\\\''),
-                          task.id, task.type, router.router_id, task.username, XNM_LOG_TYPE_RESPONSE, \
-                          xml_response.strip().replace('\'', '\\\'')))
-            conn.commit()
-        #except MySQLdb.OperationalError, e:
-
+            c.execute('''SELECT `field` FROM `database`.`table` WHERE `field` = `%s`''' % (condition))
         except MySQLdb.DatabaseError, e:
             if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
                 self._conn_retry_count -= 1
                 # trigger establishing a new connection on the next run
                 self._conn_ax1 = None
-                return self.log_executed_task(task, xml_query, xml_response, router)
+                return self.do_something()
             else:
-                raise JaDbError('Database error: %s' % e)
+                raise YuDbError('Database error: %s' % e)
