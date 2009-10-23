@@ -45,8 +45,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     #----------------------------------------------------------------------
     def do_GET(self):
         text = yaturltemplate.template(self.server.config.get('main','statichomepage'),
-            {'path': self.path,
-            'method': "get" })
+            path=self.path, method="get")
         self._send_head(text)
         self.wfile.write(text)
 
@@ -60,7 +59,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         ## Begin the response
         self.send_response(200)
         text = yaturltemplate.template(self.server.config.get('main','staticresultpage'),
-            {'URL': form['URL'].value})
+            URL=form['URL'].value)
         self._send_head(text)
         self.end_headers()
         self.wfile.write(text)
