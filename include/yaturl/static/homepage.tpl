@@ -3,20 +3,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-    <title>yatURL</title>
+    <title>yatURL.net - Yet another tiny URL service</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <meta name="generator" content="Geany 0.19" />
 </head>
 
 <body>
-    Heyho, I'm a service.<br/>
-    <br/>
-    Method: %(method)s
-    Path: %(path)s
-    <form action="http://localhost:24882" method="post">
-        <input name="URL" type="text" size="30" maxlength="30">
-    </form>
-
+    <p>Please insert you URL here:</p>
+        <form action="http://localhost:24882" method="post">
+            <p><input name="URL" type="text" size="30" maxlength="30"/>
+            <input type="submit" value="Absenden"/></p>
+        </form>
 </body>
 
 </html>
