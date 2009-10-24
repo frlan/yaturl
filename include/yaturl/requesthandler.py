@@ -73,7 +73,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 		if self.path.endswith("/"):
 			text = yaturlTemplate.template(
 				self.server.config.get('templates','statichomepage'),
-				msg="")
+				msg="",
+				host=self.server.config.get('host','hosturl'))
 
 		# Every other page
 		else:
@@ -108,7 +109,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 		else:
 			text = yaturlTemplate.template(
 			self.server.config.get('templates','statichomepage'),
-				msg="Please specify any input")
+				msg="Please specify any input",
+				host=self.server.config.get('host','hosturl'))
+				
 		self._send_head(text)
 		self.end_headers()
 		self.wfile.write(text)
