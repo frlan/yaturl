@@ -68,11 +68,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_GET(self):
-		# Homepage
+		# Homepage and other path ending with /
+		# Needs to be extended later with things like FAQ etc.
 		if self.path.endswith("/"):
 			text = yaturlTemplate.template(
-				self.server.config.get('templates','statichomepage'),
-				path=self.path, method="get")
+				self.server.config.get('templates','statichomepage'))
+
 		# Every other page
 		else:
 			if self.path[1:] in hashtable:
