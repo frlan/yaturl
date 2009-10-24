@@ -40,11 +40,19 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_GET(self):
-        text = yaturlTemplate.template(
-            self.server.config.get('templates','statichomepage'),
-            path=self.path, method="get")
-        self._send_head(text)
-        self.wfile.write(text)
+		# Homepage
+		if self.path.endswith("/"):
+			text = yaturlTemplate.template(
+				self.server.config.get('templates','statichomepage'),
+				path=self.path, method="get")
+		# Every other page
+		else:
+			text = yaturlTemplate.template(
+				self.server.config.get('templates','resultpage'),
+				URL=self.path, method="get")
+		
+		self._send_head(text)
+		self.wfile.write(text)
 
     #----------------------------------------------------------------------
     def do_POST(self):
