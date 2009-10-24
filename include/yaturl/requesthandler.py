@@ -6,8 +6,6 @@ import socket
 import cgi
 import yaturlTemplate
 import linkHash
-import hashlib
-
 
 class YuRequestHandler(BaseHTTPRequestHandler):
 
