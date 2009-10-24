@@ -102,10 +102,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
 			# Begin the response
 			self.send_response(200)
-			add_hash(link.hash, link.link)
+			add_hash(link.hash.lower(), link.link)
 			text = yaturlTemplate.template(
 				self.server.config.get('templates','staticresultpage'),
-				URL=link.hash)
+				URL=link.hash.lower())
 		else:
 			text = yaturlTemplate.template(
 			self.server.config.get('templates','statichomepage'),
