@@ -7,6 +7,34 @@ import cgi
 import yaturlTemplate
 import linkHash
 
+hashtable = {
+	"a": "http://foo.de",
+	"b": "http://baa.de",
+	"c": "ftp://ftp.debian.org/"
+}
+
+def is_hash_in_table(hash):
+	if hash in hashtable:
+		print "yepp, we already have it"
+		return get_link_from_hash(hash)
+	else:
+		print "well,not yet"
+		return None
+
+def get_link_from_hash(hash):
+	if hash in hashtable:
+		return hashtable[hash]
+	else:
+		return None
+
+#def get_hash_from_link(link):
+def add_hash(hash, link):
+	if is_hash_in_table(hash) is not None:
+		print "not adding"
+	else:
+		print "Should be added, but nothing done"
+	
+
 class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
@@ -47,9 +75,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 				path=self.path, method="get")
 		# Every other page
 		else:
-			text = yaturlTemplate.template(
+			if self.path[1:] in hashtable:
+				text = yaturlTemplate.template(
 				self.server.config.get('templates','resultpage'),
-				URL=self.path, method="get")
+				URL=get_link_from_hash(self.path[1:]), method="get")
+			else:
+				text = yaturlTemplate.template(
+					self.server.config.get('templates','corruptlink'),
+					URL=get_link_from_hash(self.path[1:]))
 		
 		self._send_head(text)
 		self.wfile.write(text)
@@ -60,12 +93,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             fp=self.rfile,
             headers=self.headers,
             environ={'REQUEST_METHOD':'POST'})
-
+		
         # Calculating the output
         link = linkHash.linkHash(newlink = form['URL'].value)
 
         # Begin the response
         self.send_response(200)
+        add_hash(link.hash, link.link)
         text = yaturlTemplate.template(
             self.server.config.get('templates','staticresultpage'),
             URL=link.hash)

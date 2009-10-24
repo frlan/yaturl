@@ -9,4 +9,4 @@ class linkHash:
 		if newlink is not None:
 			self.link = newlink
 			self.hash = hashlib.sha1(newlink).hexdigest()
-
+	
