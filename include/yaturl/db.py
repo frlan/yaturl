@@ -71,7 +71,6 @@ class YuDb(object):
             pass
 
     #----------------------------------------------------------------------
-
     def get_link_from_db(self, hash):
         """
         Fetches the link from database based on given hash
@@ -80,13 +79,66 @@ class YuDb(object):
             conn, c = self._get_connection()
             c.execute('''SELECT l.link_link
                          FROM %s.link as l
-                         WHERE l.link_shorthash=%s LIMIT 1''' % (self._database, hash))
+                         WHERE l.link_shorthash='%s' LIMIT 1''' % (self._database, hash))
             return c.fetchone()
         except MySQLdb.DatabaseError, e:
             if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
                 self._conn_retry_count -= 1
                 # trigger establishing a new connection on the next run
                 self._conn_ax1 = None
-                return self.do_something()
+                return self.get_link_from_db(hash)
+            else:
+                raise YuDbError('Database error: %s' % e)
+
+    #-------------------------------------------------------------------
+    def is_hash_in_db(self, hash):
+        try:
+            conn, c = self._get_connection()
+            c.execute('''SELECT l.link_id
+                         FROM %s.link as l
+                         WHERE l.link_hash='%s' ''' % (self._database, hash))
+            return c.fetchone()
+        except MySQLdb.DatabaseError, e:
+            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+                self._conn_retry_count -= 1
+                # trigger establishing a new connection on the next run
+                self._conn_ax1 = None
+                return self.is_hash_in_db(hash)
+            else:
+                raise YuDbError('Database error: %s' % e)
+
+    #-------------------------------------------------------------------
+    def is_shorthash_in_db(self, short):
+        try:
+            conn, c = self._get_connection()
+            c.execute('''SELECT l.link_id
+                         FROM %s.link as l
+                         WHERE l.link_shorthash='%s' ''' % (self._database, short))
+            return c.fetchone()
+        except MySQLdb.DatabaseError, e:
+            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+                self._conn_retry_count -= 1
+                # trigger establishing a new connection on the next run
+                self._conn_ax1 = None
+                return self.is_shorthash_in_db(short)
+            else:
+                raise YuDbError('Database error: %s' % e)
+
+    #-------------------------------------------------------------------
+    def add_link_to_db(self, short, hash, link):
+        """
+        Takes the given hash and link and put it into database.
+        """
+        try:
+            conn, c = self._get_connection()
+            c.execute('''INSERT INTO %s.`link` (
+                        `link_shorthash`,`link_hash`,`link_link`)
+                         VALUES ('%s', '%s','%s')''' % (self._database, short, hash, link))
+        except MySQLdb.DatabaseError, e:
+            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+                self._conn_retry_count -= 1
+                # trigger establishing a new connection on the next run
+                self._conn_ax1 = None
+                return self.add_link_to_db(short, hash, link)
             else:
                 raise YuDbError('Database error: %s' % e)
