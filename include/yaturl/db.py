@@ -23,6 +23,7 @@ class YuDb(object):
         self._passwd = config.get('database', 'password')
         self._host = config.get('database', 'host')
         self._port = config.getint('database', 'port')
+        self._database = config.get('database', 'database')
         self._conn = None
         # if the database connection died, retry it twice, then give up
         self._conn_retry_count = 3
@@ -70,13 +71,17 @@ class YuDb(object):
             pass
 
     #----------------------------------------------------------------------
-    def do_something(self):
+
+    def get_link_from_db(self, hash):
         """
-        Do Something
+        Fetches the link from database based on given hash
         """
         try:
             conn, c = self._get_connection()
-            c.execute('''SELECT `field` FROM `database`.`table` WHERE `field` = `%s`''' % (condition))
+            c.execute('''SELECT l.link_link
+                         FROM %s.link as l
+                         WHERE l.link_shorthash=%s LIMIT 1''' % (self._database, hash))
+            return c.fetchone()
         except MySQLdb.DatabaseError, e:
             if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
                 self._conn_retry_count -= 1
