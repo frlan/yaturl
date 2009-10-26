@@ -23,7 +23,7 @@ port: 1234
 database: db_name
 
 [templates]
-statichomepage: include/yaturl/static/homepage.tpl
-staticresultpage: include/yaturl/static/return.tpl
-resultpage: include/yaturl/static/result.tpl
-corruptlink: include/yaturl/static/404.tpl
+statichomepage: share/yaturl/templates/homepage.tpl
+staticresultpage: share/yaturl/templates/return.tpl
+resultpage: share/yaturl/templates/result.tpl
+corruptlink: share/yaturl/templates/404.tpl
