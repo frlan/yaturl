@@ -11,15 +11,16 @@ port: 24882
 resolve_clients: true
 
 [host]
-# submit data. Please specify also your port if you don't using http's 
+# submit data. Please specify also your port if you don't using http's
 # native one
 hosturl: localhost:24882
 
 [database]
-user: username
-password: password
-host: hostname
-port: 3306
+user: user
+password: pw
+host: 127.0.0.1
+port: 1234
+database: db_name
 
 [templates]
 statichomepage: include/yaturl/static/homepage.tpl
