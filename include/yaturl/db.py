@@ -70,6 +70,22 @@ class YuDb(object):
         except MySQLdb.DatabaseError:
             pass
 
+    def get_short_for_hash_from_db(self, hash):
+        try:
+            conn, c = self._get_connection()
+            c.execute('''SELECT l.link_shorthash
+                         FROM %s.link as l
+                         WHERE l.link_hash='%s' LIMIT 1''' % (self._database, hash))
+            return c.fetchone()
+        except MySQLdb.DatabaseError, e:
+            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+                self._conn_retry_count -= 1
+                # trigger establishing a new connection on the next run
+                self._conn_ax1 = None
+                return self.get_link_from_db(hash)
+            else:
+                raise YuDbError('Database error: %s' % e)
+
     #----------------------------------------------------------------------
     def get_link_from_db(self, hash):
         """

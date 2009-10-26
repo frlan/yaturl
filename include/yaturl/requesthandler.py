@@ -85,10 +85,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             URL=hash[0:i])
                     break
             else:
+                # It appears link is already stored or you have found an collision on sha1
                 text = yaturlTemplate.template(
                     self.server.config.get('templates','staticresultpage'),
-                    URL="Error!")
-            # It appears link is already stored or you have found an collision on sha1
+                    URL=self.server.db.get_short_for_hash_from_db(hash)[0])
 
         else:
             text = yaturlTemplate.template(
