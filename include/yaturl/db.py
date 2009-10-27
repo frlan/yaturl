@@ -69,7 +69,37 @@ class YuDb(object):
             conn.close()
         except MySQLdb.DatabaseError:
             pass
+    #-----------------------------------------------------------------------
+    def lock_table(self):
+        try:
+            conn, c = self._get_connection()
+            c.execute('''LOCK TABLES %s.link READ''' %(self._database))
+            return c.fetchone()
+        except MySQLdb.DatabaseError, e:
+            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+                self._conn_retry_count -= 1
+                # trigger establishing a new connection on the next run
+                self._conn_ax1 = None
+                return self.lock_table()
+            else:
+                raise YuDbError('Database error: %s' % e)
 
+    #------------------------------------------------------------------------
+    def unlock_table(self):
+        try:
+            conn, c = self._get_connection()
+            c.execute('''UNLOCK TABLES %s.link''' %(self._database))
+            return c.fetchone()
+        except MySQLdb.DatabaseError, e:
+            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+                self._conn_retry_count -= 1
+                # trigger establishing a new connection on the next run
+                self._conn_ax1 = None
+                return self.unlock_table()
+            else:
+                raise YuDbError('Database error: %s' % e)
+
+    #-------------------------------------------------------------------------
     def get_short_for_hash_from_db(self, hash):
         try:
             conn, c = self._get_connection()

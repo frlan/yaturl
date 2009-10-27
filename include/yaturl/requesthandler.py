@@ -76,10 +76,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             hash = hashlib.sha1(form['URL'].value).hexdigest()
             # Begin the response
             self.send_response(200)
+            self.server.db.lock_table()
             if not self.server.db.is_hash_in_db(hash):
                 for i in range(1, len(hash)):
                     if not self.server.db.is_shorthash_in_db(hash[0:i]):
                         self.server.db.add_link_to_db(hash[:i], hash, form['URL'].value)
+                        self.server.db.unlock_table()
                         text = yaturlTemplate.template(
                             self.server.config.get('templates','staticresultpage'),
                             URL=hash[0:i])
