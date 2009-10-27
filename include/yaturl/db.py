@@ -3,6 +3,7 @@
 
 import MySQLdb
 from MySQLdb.constants.CR import SERVER_GONE_ERROR
+from MySQLdb.constants.ER import DUP_ENTRY
 import sys
 
 
@@ -69,35 +70,6 @@ class YuDb(object):
             conn.close()
         except MySQLdb.DatabaseError:
             pass
-    #-----------------------------------------------------------------------
-    def lock_table(self):
-        try:
-            conn, c = self._get_connection()
-            c.execute('''LOCK TABLES %s.link READ''' %(self._database))
-            return c.fetchone()
-        except MySQLdb.DatabaseError, e:
-            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
-                self._conn_retry_count -= 1
-                # trigger establishing a new connection on the next run
-                self._conn_ax1 = None
-                return self.lock_table()
-            else:
-                raise YuDbError('Database error: %s' % e)
-
-    #------------------------------------------------------------------------
-    def unlock_table(self):
-        try:
-            conn, c = self._get_connection()
-            c.execute('''UNLOCK TABLES %s.link''' %(self._database))
-            return c.fetchone()
-        except MySQLdb.DatabaseError, e:
-            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
-                self._conn_retry_count -= 1
-                # trigger establishing a new connection on the next run
-                self._conn_ax1 = None
-                return self.unlock_table()
-            else:
-                raise YuDbError('Database error: %s' % e)
 
     #-------------------------------------------------------------------------
     def get_short_for_hash_from_db(self, hash):
@@ -171,20 +143,28 @@ class YuDb(object):
                 raise YuDbError('Database error: %s' % e)
 
     #-------------------------------------------------------------------
-    def add_link_to_db(self, short, hash, link):
+    def add_link_to_db(self, hash, link):
         """
         Takes the given hash and link and put it into database.
         """
-        try:
-            conn, c = self._get_connection()
-            c.execute('''INSERT INTO %s.`link`
+        for i in range(1, len(hash)):
+            short = hash[:i]
+            try:
+                conn, c = self._get_connection()
+                c.execute('''INSERT INTO %s.`link`
                          (`link_shorthash`,`link_hash`,`link_link`)
                          VALUES ('%s', '%s','%s')''' % (self._database, short, hash, link))
-        except MySQLdb.DatabaseError, e:
-            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
-                self._conn_retry_count -= 1
-                # trigger establishing a new connection on the next run
-                self._conn_ax1 = None
-                return self.add_link_to_db(short, hash, link)
-            else:
-                raise YuDbError('Database error: %s' % e)
+                return short
+            except MySQLdb.DatabaseError, e:
+                if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+                    self._conn_retry_count -= 1
+                    # trigger establishing a new connection on the next run
+                    self._conn_ax1 = None
+                    return self.add_link_to_db(short, hash, link)
+                if e.args and e.args[0] == DUP_ENTRY:
+                    if e[1].endswith("key 2"):
+                        return get_short_for_hash_from_db(hash)
+                    if e[1].endswith("key 1"):
+                        break
+                else:
+                    raise YuDbError('Database error: %s' % e)
