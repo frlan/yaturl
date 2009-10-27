@@ -27,3 +27,4 @@ statichomepage: share/yaturl/templates/homepage.tpl
 staticresultpage: share/yaturl/templates/return.tpl
 resultpage: share/yaturl/templates/result.tpl
 corruptlink: share/yaturl/templates/404.tpl
+databaseissuelink: share/yaturl/templates/databaserror.tpl
