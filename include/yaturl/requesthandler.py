@@ -52,9 +52,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         else:
             result = self.server.db.get_link_from_db(self.path[1:])
             if result is not None:
-                text = yaturlTemplate.template(
-                    self.server.config.get('templates','resultpage'),
-                    URL=result[0], method="get")
+                self.send_response(301)
+                self.send_header('Location', result[0])
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                return
             else:
                 text = yaturlTemplate.template(
                     self.server.config.get('templates','corruptlink'),
