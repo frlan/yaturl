@@ -73,9 +73,9 @@ class YuDb(object):
     def get_short_for_hash_from_db(self, hash):
         try:
             conn, c = self._get_connection()
-            c.execute('''SELECT l.link_shorthash
-                         FROM %s.link as l
-                         WHERE l.link_hash='%s' LIMIT 1''' % (self._database, hash))
+            c.execute('''SELECT link.link_shorthash
+                         FROM %s.link
+                         WHERE link.link_hash='%s' LIMIT 1''' % (self._database, hash))
             return c.fetchone()
         except MySQLdb.DatabaseError, e:
             if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
@@ -93,9 +93,9 @@ class YuDb(object):
         """
         try:
             conn, c = self._get_connection()
-            c.execute('''SELECT l.link_link
-                         FROM %s.link as l
-                         WHERE l.link_shorthash='%s' LIMIT 1''' % (self._database, hash))
+            c.execute('''SELECT link.link_link
+                         FROM %s.link
+                         WHERE link.link_shorthash='%s' LIMIT 1''' % (self._database, hash))
             return c.fetchone()
         except MySQLdb.DatabaseError, e:
             if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
@@ -110,9 +110,9 @@ class YuDb(object):
     def is_hash_in_db(self, hash):
         try:
             conn, c = self._get_connection()
-            c.execute('''SELECT l.link_id
-                         FROM %s.link as l
-                         WHERE l.link_hash='%s' ''' % (self._database, hash))
+            c.execute('''SELECT link.link_id
+                         FROM %s.link
+                         WHERE link.link_hash='%s' ''' % (self._database, hash))
             return c.fetchone()
         except MySQLdb.DatabaseError, e:
             if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
@@ -127,9 +127,9 @@ class YuDb(object):
     def is_shorthash_in_db(self, short):
         try:
             conn, c = self._get_connection()
-            c.execute('''SELECT l.link_id
-                         FROM %s.link as l
-                         WHERE l.link_shorthash='%s' ''' % (self._database, short))
+            c.execute('''SELECT link.link_id
+                         FROM %s.link
+                         WHERE link.link_shorthash='%s' ''' % (self._database, short))
             return c.fetchone()
         except MySQLdb.DatabaseError, e:
             if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
@@ -147,8 +147,8 @@ class YuDb(object):
         """
         try:
             conn, c = self._get_connection()
-            c.execute('''INSERT INTO %s.`link` (
-                        `link_shorthash`,`link_hash`,`link_link`)
+            c.execute('''INSERT INTO %s.`link`
+                         (`link_shorthash`,`link_hash`,`link_link`)
                          VALUES ('%s', '%s','%s')''' % (self._database, short, hash, link))
         except MySQLdb.DatabaseError, e:
             if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
