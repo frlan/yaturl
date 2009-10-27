@@ -75,15 +75,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             # Begin the response
             self.send_response(200)
             if not self.server.db.is_hash_in_db(hash):
-                print "hash passed"
                 for i in range(1, len(hash)):
-                    print hash[0:i]
                     if not self.server.db.is_shorthash_in_db(hash[0:i]):
                         self.server.db.add_link_to_db(hash[:i], hash, form['URL'].value)
                         text = yaturlTemplate.template(
                             self.server.config.get('templates','staticresultpage'),
                             URL=hash[0:i])
-                    break
+                        break
             else:
                 # It appears link is already stored or you have found an collision on sha1
                 text = yaturlTemplate.template(
