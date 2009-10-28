@@ -45,8 +45,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         if self.path.endswith("/"):
             text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'),
-                msg="",
-                host=self.server.config.get('host','hosturl'))
+                msg="")
 
         # Every other page
         else:

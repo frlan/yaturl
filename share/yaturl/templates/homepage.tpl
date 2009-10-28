@@ -10,7 +10,7 @@
 
 <body>
     <p>Please insert you URL here:</p>
-        <form action="http://%(host)s" method="post">
+        <form action="/" method="post">
 			<p>%(msg)s</p>
             <p><input name="URL" type="text" size="50"/>
             <input type="submit" value="Absenden"/></p>
