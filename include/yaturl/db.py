@@ -147,7 +147,7 @@ class YuDb(object):
         """
         Takes the given hash and link and put it into database.
         """
-        for i in range(1, len(hash)):
+        for i in range(4, len(hash)):
             short = hash[:i]
             try:
                 conn, c = self._get_connection()
