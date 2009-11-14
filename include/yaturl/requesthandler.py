@@ -34,7 +34,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     #----------------------------------------------------------------------
     def _send_head(self, text):
         self.send_response(200)
-        self.send_header('Content-Type', 'text/html')
+        if self.path.endswith(".css"):
+            self.send_header('Content-Type', 'text/css')
+        else:
+            self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", len(text))
         self.end_headers()
 
@@ -46,9 +49,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'),
                 msg="")
-
+        elif self.path.find("/static/") > -1:
+            print self.path
+            file = open(self.path[1:])
+            text = file.read()
         # Every other page
         else:
+            print "Something else"
             result = self.server.db.get_link_from_db(self.path[1:])
             if result is not None:
                 self.send_response(301)
@@ -60,7 +67,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 text = yaturlTemplate.template(
                     self.server.config.get('templates','corruptlink'),
                     URL="Nothing")
-
+    
         self._send_head(text)
         self.wfile.write(text)
 
