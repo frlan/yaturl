@@ -124,9 +124,3 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self._send_head(text)
         self.end_headers()
         self.wfile.write(text)
-#~ 
-    #~ #----------------------------------------------------------------------
-    #~ def do_HEAD(self):
-        #~ text = self._get_text('head')
-        #~ self._send_head(text)
-
