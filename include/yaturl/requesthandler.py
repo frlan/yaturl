@@ -51,14 +51,16 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 msg="")
         elif self.path.find("/static/") > -1:
             # Try to avoid some unwanted pathes inside static page
-            if (self.path.find("..") > -1) or (self.path.find("~") > -1):
+            print self.path
+            print self.path.find("..")
+            print self.path.find("~")
+            try:
+                file = open(self.path[1:])
+                text = file.read()
+            except IOError:
                 text = yaturlTemplate.template(
                     self.server.config.get('templates','corruptlink'),
                     URL="Nothing")
-            
-            file = open(self.path[1:])
-            text = file.read()
-        
         # Every other page
         else:
             print "Something else"
