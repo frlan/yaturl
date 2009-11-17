@@ -59,12 +59,21 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'),
                 msg="")
+            self.send_response(200)
+            self._send_head(text)
+            self.end_headers()
+            self.wfile.write(text)
+
         elif self.path.find("/static/") > -1:
             # Try to avoid some unwanted pathes inside static page
             print self.path
             try:
                 file = open(self.path[1:])
                 text = file.read()
+                self.send_response(200)
+                self._send_head(text)
+                self.end_headers()
+                self.wfile.write(text)
             except IOError:
                 self.do_404()
         # Every other page
@@ -115,9 +124,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self._send_head(text)
         self.end_headers()
         self.wfile.write(text)
-
-    #----------------------------------------------------------------------
-    def do_HEAD(self):
-        text = self._get_text('head')
-        self._send_head(text)
+#~ 
+    #~ #----------------------------------------------------------------------
+    #~ def do_HEAD(self):
+        #~ text = self._get_text('head')
+        #~ self._send_head(text)
 
