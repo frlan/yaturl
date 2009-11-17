@@ -42,6 +42,16 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     #----------------------------------------------------------------------
+    def do_404(self):
+        self.send_response(404)
+        text = yaturlTemplate.template(
+            self.server.config.get('templates','corruptlink'),
+            URL="Nothing")
+        self._send_head(text)
+        self.end_headers()
+        self.wfile.write(text)
+
+    #----------------------------------------------------------------------
     def do_GET(self):
         # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
@@ -52,15 +62,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         elif self.path.find("/static/") > -1:
             # Try to avoid some unwanted pathes inside static page
             print self.path
-            print self.path.find("..")
-            print self.path.find("~")
             try:
                 file = open(self.path[1:])
                 text = file.read()
             except IOError:
-                text = yaturlTemplate.template(
-                    self.server.config.get('templates','corruptlink'),
-                    URL="Nothing")
+                self.do_404()
         # Every other page
         else:
             print "Something else"
@@ -70,15 +76,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self.send_header('Location', result[0])
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
+                self._send_head(text)
+                self.wfile.write(text)
                 return
             else:
-                text = yaturlTemplate.template(
-                    self.server.config.get('templates','corruptlink'),
-                    URL="Nothing")
-    
-        self._send_head(text)
-        self.wfile.write(text)
-
+                self.do_404()
+                
     #----------------------------------------------------------------------
     def do_POST(self):
         form = cgi.FieldStorage(
