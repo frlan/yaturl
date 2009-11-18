@@ -121,8 +121,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self.send_header('Location', result[0])
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
-                self._send_head(text)
-                self.wfile.write(text)
             else:
                 self.do_404()
 
