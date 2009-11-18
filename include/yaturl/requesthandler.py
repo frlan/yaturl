@@ -150,9 +150,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                        URL=new_URL)
         else:
             text = yaturlTemplate.template(
-            self.server.config.get('templates','statichomepage'),
-                msg="Please specify any input",
-                host=self.server.config.get('host','hosturl'))
+            self.server.config.get('templates','statichomepage'), msg="Please specify any input")
 
         if text:
             self._send_head(text)
