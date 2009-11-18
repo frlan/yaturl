@@ -93,7 +93,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         if not text:
             self._send_internal_server_error()
             return
-        self._send_head(text, 200)
+        self._send_head(text, 500)
         self.end_headers()
         self.wfile.write(text)
 
