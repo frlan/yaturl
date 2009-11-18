@@ -51,8 +51,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.server.accesslog.info(format%args)
 
     #----------------------------------------------------------------------
-    def _send_head(self, text):
-        self.send_response(200)
+    def _send_head(self, text, code):
+        self.send_response(code)
         if self.path.endswith(".css"):
             self.send_header('Content-Type', 'text/css')
         else:
@@ -66,8 +66,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.server.config.get('templates','corruptlink'),
             URL="Nothing")
         if text:
-            self.send_response(404)
-            self._send_head(text)
+            self._send_head(text, 404)
             self.end_headers()
             self.wfile.write(text)
         else:
@@ -79,8 +78,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         if not text:
             # fallback to hard-coded template
             text = template_500
-        self.send_response(500)
-        self._send_head(text)
+        self._send_head(text, 500)
         self.end_headers()
         self.wfile.write(text)
 
@@ -93,8 +91,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self.server.config.get('templates','statichomepage'),
                 msg="")
             if text:
-                self.send_response(200)
-                self._send_head(text)
+                self._send_head(text, 200)
                 self.end_headers()
                 self.wfile.write(text)
             else:
@@ -106,8 +103,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             try:
                 file = open(self.path[1:])
                 text = file.read()
-                self.send_response(200)
-                self._send_head(text)
+                self._send_head(text, 200)
                 self.end_headers()
                 self.wfile.write(text)
             except IOError:
@@ -134,7 +130,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             # Calculating the output
             hash = hashlib.sha1(form['URL'].value).hexdigest()
             # Begin the response
-            self.send_response(200)
             if not self.server.db.is_hash_in_db(hash):
                 short = self.server.db.add_link_to_db(hash, form['URL'].value)
                 new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
@@ -153,7 +148,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.server.config.get('templates','statichomepage'), msg="Please specify any input")
 
         if text:
-            self._send_head(text)
+            self._send_head(text, 200)
             self.end_headers()
             self.wfile.write(text)
         else:
