@@ -14,7 +14,7 @@ resolve_clients: true
 user: user
 password: pw
 host: 127.0.0.1
-port: 1234
+port: 3306
 database: db_name
 
 [templates]
