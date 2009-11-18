@@ -7,6 +7,25 @@ import cgi
 import yaturlTemplate
 import hashlib
 
+# we need to hard-code this one at least in case of the file cannot be found on disk
+template_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+	<title>yatURL.net - Internal server error</title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	<meta name="generator" content="Geany 0.18" />
+</head>
+
+<body>
+	<p>500 - Internal server error</p>
+
+	<p>The server encountered an internal error and was unable to complete your request.</p>
+</body>
+</html>
+'''
+
 class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
@@ -43,10 +62,24 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_404(self):
-        self.send_response(404)
         text = yaturlTemplate.template(
             self.server.config.get('templates','corruptlink'),
             URL="Nothing")
+        if text:
+            self.send_response(404)
+            self._send_head(text)
+            self.end_headers()
+            self.wfile.write(text)
+        else:
+            self._send_internal_server_error()
+
+    #----------------------------------------------------------------------
+    def _send_internal_server_error(self):
+        text = yaturlTemplate.template(self.server.config.get('templates','servererror'))
+        if not text:
+            # fallback to hard-coded template
+            text = template_500
+        self.send_response(500)
         self._send_head(text)
         self.end_headers()
         self.wfile.write(text)
@@ -59,10 +92,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'),
                 msg="")
-            self.send_response(200)
-            self._send_head(text)
-            self.end_headers()
-            self.wfile.write(text)
+            if text:
+                self.send_response(200)
+                self._send_head(text)
+                self.end_headers()
+                self.wfile.write(text)
+            else:
+                self._send_internal_server_error()
 
         elif self.path.find("/static/") > -1:
             # Try to avoid some unwanted pathes inside static page
@@ -87,10 +123,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self._send_head(text)
                 self.wfile.write(text)
-                return
             else:
                 self.do_404()
-                
+
     #----------------------------------------------------------------------
     def do_POST(self):
         form = cgi.FieldStorage(
@@ -121,6 +156,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 msg="Please specify any input",
                 host=self.server.config.get('host','hosturl'))
 
-        self._send_head(text)
-        self.end_headers()
-        self.wfile.write(text)
+        if text:
+            self._send_head(text)
+            self.end_headers()
+            self.wfile.write(text)
+        else:
+            self._send_internal_server_error()
+
