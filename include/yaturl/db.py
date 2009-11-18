@@ -18,7 +18,7 @@ class YuDb(object):
     Very simple wrapper class around MySQLdb for convenience.
     """
     #----------------------------------------------------------------------
-    def __init__(self, config):
+    def __init__(self, config, logger):
         # we don't check whether the config has this item, it is an error if it is missing
         self._user = config.get('database', 'user')
         self._passwd = config.get('database', 'password')
@@ -26,6 +26,7 @@ class YuDb(object):
         self._port = config.getint('database', 'port')
         self._database = config.get('database', 'database')
         self._conn = None
+        self.logger = logger
         # if the database connection died, retry it twice, then give up
         self._conn_retry_count = 3
 
@@ -44,6 +45,7 @@ class YuDb(object):
                 port=self._port, use_unicode=True, init_command='SET NAMES utf8')
             self._conn_retry_count = 3
         except MySQLdb.DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
             raise YuDbError('Database error: %s' % e)
 
         return conn
@@ -87,6 +89,7 @@ class YuDb(object):
                 self._conn_ax1 = None
                 return self.get_link_from_db(hash)
             else:
+                self.logger.warn('Database error: %s' % e)
                 raise YuDbError('Database error: %s' % e)
 
     #----------------------------------------------------------------------
@@ -109,6 +112,7 @@ class YuDb(object):
                 self._conn_ax1 = None
                 return self.get_link_from_db(hash)
             else:
+                self.logger.warn('Database error: %s' % e)
                 raise YuDbError('Database error: %s' % e)
 
     #-------------------------------------------------------------------
@@ -128,6 +132,7 @@ class YuDb(object):
                 self._conn_ax1 = None
                 return self.is_hash_in_db(hash)
             else:
+                self.logger.warn('Database error: %s' % e)
                 raise YuDbError('Database error: %s' % e)
 
     #-------------------------------------------------------------------
@@ -147,6 +152,7 @@ class YuDb(object):
                 self._conn_ax1 = None
                 return self.is_shorthash_in_db(short)
             else:
+                self.logger.warn('Database error: %s' % e)
                 raise YuDbError('Database error: %s' % e)
 
     #-------------------------------------------------------------------
@@ -177,4 +183,5 @@ class YuDb(object):
                     if e[1].endswith("key 1"):
                         break
                 else:
+                    self.logger.warn('Database error: %s' % e)
                     raise YuDbError('Database error: %s' % e)
