@@ -99,7 +99,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         elif self.path.find("/static/") > -1:
             # Try to avoid some unwanted pathes inside static page
-            print self.path
             try:
                 file = open(self.path[1:])
                 text = file.read()
@@ -110,7 +109,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self._send_404()
         # Every other page
         else:
-            print "Something else"
             result = self.server.db.get_link_from_db(self.path[1:])
             if result is not None:
                 self.send_response(301)
