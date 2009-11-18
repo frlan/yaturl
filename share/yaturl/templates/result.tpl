@@ -8,7 +8,7 @@
 	<meta name="generator" content="Geany 0.18" />
 </head>
 <body>
-<p>OK. Not yet working, but you wanted to acces short URL for Parameterset 
-%(URL)s.</p>	
+<p>OK. Not yet working, but you wanted to access short URL for parameter set
+%(URL)s.</p>
 </body>
 </html>

@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <p>Please insert you URL here:</p>
+    <p>Please insert your URL here:</p>
         <form action="/" method="post">
 			<p>%(msg)s</p>
             <p><input name="URL" type="text" size="50"/>
