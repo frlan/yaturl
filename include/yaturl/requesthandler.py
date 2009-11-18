@@ -73,7 +73,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(text)
             except socket.error:
                 # clients like to stop reading after they got a 404
-                print 'haha'
                 pass
         else:
             self._send_internal_server_error()
