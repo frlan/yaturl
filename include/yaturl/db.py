@@ -2,7 +2,7 @@
 
 
 import MySQLdb
-from MySQLdb.constants.CR import SERVER_GONE_ERROR
+from MySQLdb.constants.CR import SERVER_GONE_ERROR, SERVER_LOST
 from MySQLdb.constants.ER import DUP_ENTRY
 import sys
 
@@ -42,12 +42,11 @@ class YuDb(object):
         try:
             conn = MySQLdb.connect(host=hostname, db=database, user=self._user, passwd=self._passwd,
                 port=self._port, use_unicode=True, init_command='SET NAMES utf8')
-            c = conn.cursor()
             self._conn_retry_count = 3
         except MySQLdb.DatabaseError, e:
             raise YuDbError('Database error: %s' % e)
 
-        return (conn, c)
+        return conn
 
     #----------------------------------------------------------------------
     def _get_connection(self):
@@ -57,16 +56,16 @@ class YuDb(object):
         if not self._conn:
             self._conn = self._open(self._host)
 
-        return self._conn
+        c = self._conn.cursor()
+        return (self._conn, c)
 
     #----------------------------------------------------------------------
     def _close(self, x):
         """
         Close the database connection.
         """
-        conn, c = x
+        conn = x
         try:
-            c.close()
             conn.close()
         except MySQLdb.DatabaseError:
             pass
@@ -78,9 +77,11 @@ class YuDb(object):
             c.execute('''SELECT link.link_shorthash
                          FROM %s.link
                          WHERE link.link_hash='%s' LIMIT 1''' % (self._database, hash))
-            return c.fetchone()
+            result = c.fetchone()
+            c.close()
+            return result
         except MySQLdb.DatabaseError, e:
-            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+            if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
                 self._conn_retry_count -= 1
                 # trigger establishing a new connection on the next run
                 self._conn_ax1 = None
@@ -98,9 +99,11 @@ class YuDb(object):
             c.execute('''SELECT link.link_link
                          FROM %s.link
                          WHERE link.link_shorthash='%s' LIMIT 1''' % (self._database, hash))
-            return c.fetchone()
+            result = c.fetchone()
+            c.close()
+            return result
         except MySQLdb.DatabaseError, e:
-            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+            if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
                 self._conn_retry_count -= 1
                 # trigger establishing a new connection on the next run
                 self._conn_ax1 = None
@@ -115,9 +118,11 @@ class YuDb(object):
             c.execute('''SELECT link.link_id
                          FROM %s.link
                          WHERE link.link_hash='%s' ''' % (self._database, hash))
-            return c.fetchone()
+            result = c.fetchone()
+            c.close()
+            return result
         except MySQLdb.DatabaseError, e:
-            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+            if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
                 self._conn_retry_count -= 1
                 # trigger establishing a new connection on the next run
                 self._conn_ax1 = None
@@ -132,9 +137,11 @@ class YuDb(object):
             c.execute('''SELECT link.link_id
                          FROM %s.link
                          WHERE link.link_shorthash='%s' ''' % (self._database, short))
-            return c.fetchone()
+            result = c.fetchone()
+            c.close()
+            return result
         except MySQLdb.DatabaseError, e:
-            if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+            if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
                 self._conn_retry_count -= 1
                 # trigger establishing a new connection on the next run
                 self._conn_ax1 = None
@@ -154,9 +161,12 @@ class YuDb(object):
                 c.execute('''INSERT INTO %s.`link`
                          (`link_shorthash`,`link_hash`,`link_link`)
                          VALUES ('%s', '%s','%s')''' % (self._database, short, hash, link))
+                conn.commit()
+                c.close()
                 return short
             except MySQLdb.DatabaseError, e:
-                if e.args and e.args[0] == SERVER_GONE_ERROR and self._conn_retry_count > 0:
+                if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) \
+                    and self._conn_retry_count > 0:
                     self._conn_retry_count -= 1
                     # trigger establishing a new connection on the next run
                     self._conn_ax1 = None
