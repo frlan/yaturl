@@ -87,7 +87,7 @@ class YuDb(object):
                 self._conn_retry_count -= 1
                 # trigger establishing a new connection on the next run
                 self._conn_ax1 = None
-                return self.get_link_from_db(hash)
+                return self.get_short_for_hash_from_db(hash)
             else:
                 self.logger.warn('Database error: %s' % e)
                 raise YuDbError('Database error: %s' % e)
