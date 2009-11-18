@@ -1,4 +1,7 @@
 #!/usr/bin/env python
 
 def template(file, **vars):
-   	return open(file, 'r').read() % vars
+    f = open(file, 'r')
+    result = f.read() % vars
+    f.close()
+    return result
