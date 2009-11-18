@@ -4,8 +4,9 @@
 from BaseHTTPServer import BaseHTTPRequestHandler
 import socket
 import cgi
-import yaturlTemplate
 import hashlib
+import yaturlTemplate
+from db import YuDbError
 
 # we need to hard-code this one at least in case of the file cannot be found on disk
 template_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -88,6 +89,16 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(text)
 
     #----------------------------------------------------------------------
+    def _send_database_problem(self):
+        text = yaturlTemplate.template(self.server.config.get('templates','databaseissuelink'))
+        if not text:
+            self._send_internal_server_error()
+            return
+        self._send_head(text, 200)
+        self.end_headers()
+        self.wfile.write(text)
+
+    #----------------------------------------------------------------------
     def do_GET(self):
         # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
@@ -114,7 +125,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self._send_404()
         # Every other page
         else:
-            result = self.server.db.get_link_from_db(self.path[1:])
+            try:
+                result = self.server.db.get_link_from_db(self.path[1:])
+            except YuDbError:
+                self._send_database_problem()
+                return
             if result is not None:
                 self.send_response(301)
                 self.send_header('Location', result[0])
@@ -133,15 +148,28 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             # Calculating the output
             hash = hashlib.sha1(form['URL'].value).hexdigest()
             # Begin the response
-            if not self.server.db.is_hash_in_db(hash):
-                short = self.server.db.add_link_to_db(hash, form['URL'].value)
+            try:
+                result = self.server.db.is_hash_in_db(hash)
+            except YuDbError:
+                self._send_database_problem()
+                return
+            if not result:
+                try:
+                    short = self.server.db.add_link_to_db(hash, form['URL'].value)
+                except YuDbError:
+                    self._send_database_problem()
+                    return
                 new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
                 text = yaturlTemplate.template(
                        self.server.config.get('templates','staticresultpage'),
                        URL=new_URL)
             else:
                 # It appears link is already stored or you have found an collision on sha1
-                short = self.server.db.get_short_for_hash_from_db(hash)[0]
+                try:
+                    short = self.server.db.get_short_for_hash_from_db(hash)[0]
+                except YuDbError:
+                    self._send_database_problem()
+                    return
                 new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
                 text = yaturlTemplate.template(
                        self.server.config.get('templates','staticresultpage'),
