@@ -61,7 +61,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     #----------------------------------------------------------------------
-    def do_404(self):
+    def _send_404(self):
         text = yaturlTemplate.template(
             self.server.config.get('templates','corruptlink'),
             URL="Nothing")
@@ -111,7 +111,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(text)
             except IOError:
-                self.do_404()
+                self._send_404()
         # Every other page
         else:
             print "Something else"
@@ -122,7 +122,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
             else:
-                self.do_404()
+                self._send_404()
 
     #----------------------------------------------------------------------
     def do_POST(self):
