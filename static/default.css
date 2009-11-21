@@ -21,19 +21,34 @@ BODY, HTML {
 
 /* put header specific stuff here */
 #header { 
-	padding: 10px 0px 0px 10px; 
+	padding: 20px 0px 0px 20px; 
+}
+
+#header SPAN { 
+	color: lightgreen; 
+	font-size: 3em; 
+	font-weight: bold;
 }
 
 /* put footer specific stuff here */
 #footer {  
-	position: absolute; 
+	position: absolute;
 	bottom: 0; 
 	width: 100%; 
+	color: lightgreen;
+	font-size: 2em;
+	text-align: center;
+	padding-top: 10px;
 }
 
+#footer a {
+	color: lightgreen;
+}
 /* content area padding to find a nice place for the input field  */
 #main { 
-	padding: 15% 0px 0px 15%; 
+	padding-top: 10%;
+	padding-right: 10%;
+	padding-left: 10%;
 }
 
 /* element styles for input field */
