@@ -124,16 +124,22 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self._send_404()
         # Every other page
         else:
-            try:
-                result = self.server.db.get_link_from_db(self.path[1:])
-            except YuDbError:
-                self._send_database_problem()
-                return
-            if result is not None:
-                self.send_response(301)
-                self.send_header('Location', result[0])
-                self.send_header('Content-type', 'text/html')
-                self.end_headers()
+            # Assuming, if there is aynthing else then a alphanumeric
+            # character after the starting /, its not a valid hash in
+            # no case
+            if self.path[1:].isalnum():
+                try:
+                    result = self.server.db.get_link_from_db(self.path[1:])
+                except YuDbError:
+                    self._send_database_problem()
+                    return
+                if result is not None:
+                    self.send_response(301)
+                    self.send_header('Location', result[0])
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                else:
+                    self._send_404()
             else:
                 self._send_404()
 
