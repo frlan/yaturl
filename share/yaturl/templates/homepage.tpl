@@ -14,11 +14,12 @@
 		<div id="header"><span>yaturl.net</span></div>
 		<div id="main">
 			<p>Please insert your URL here:</p>
+			%(msg)s
 				<form action="/" method="post">
-					<p>%(msg)s</p>
 					<p><input name="URL" type="text" size="50"/>
-				<input type="submit" value="Absenden"/></p>
-        </form></div>
+					<input type="submit" value="Absenden"/></p>
+				</form>
+		</div>
 		<div id="footer"></div>
 	</div>
 	    
