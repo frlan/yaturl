@@ -19,7 +19,8 @@ class YuDb(object):
     """
     #----------------------------------------------------------------------
     def __init__(self, config, logger):
-        # we don't check whether the config has this item, it is an error if it is missing
+        # we don't check whether the config has this item, it is an
+        # error if it is missing
         self._user = config.get('database', 'user')
         self._passwd = config.get('database', 'password')
         self._host = config.get('database', 'host')
@@ -27,7 +28,8 @@ class YuDb(object):
         self._database = config.get('database', 'database')
         self._conn = None
         self.logger = logger
-        # if the database connection died, retry it twice, then give up
+        # if the database connection died, retry it twice, then give
+        # up
         self._conn_retry_count = 3
 
     #----------------------------------------------------------------------
@@ -74,6 +76,11 @@ class YuDb(object):
 
     #-------------------------------------------------------------------------
     def get_short_for_hash_from_db(self, hash):
+        """
+        Checks, whether a short hash is already stored inside
+        database. If its stored, the function will return the hash for
+        this shorthash
+        """
         try:
             conn, c = self._get_connection()
             c.execute('''SELECT link.link_shorthash
@@ -117,6 +124,10 @@ class YuDb(object):
 
     #-------------------------------------------------------------------
     def is_hash_in_db(self, hash):
+        """
+        Returns the link ID for a hash in case of its available inside
+        database.
+        """
         try:
             conn, c = self._get_connection()
             c.execute('''SELECT link.link_id
@@ -137,6 +148,10 @@ class YuDb(object):
 
     #-------------------------------------------------------------------
     def is_shorthash_in_db(self, short):
+        """
+        Checks whether a shorthash is stored inside database. If so,
+        its returning the link ID of database entry.
+        """
         try:
             conn, c = self._get_connection()
             c.execute('''SELECT link.link_id
