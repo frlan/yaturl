@@ -13,7 +13,7 @@
 <body>
 
 	<div id="container">
-		<div id="header"></div>
+		<div id="header"><span>500 - Internal Server Error</span></div>
 		<div id="main">
 			<p>500 - Internal server error</p>
 			<p>The server encountered an internal error and was unable 

@@ -11,7 +11,7 @@
 
 <body>
 	<div id="container">
-		<div id="header"></div>
+		<div id="header"><span>yaturl.net</span></div>
 		<div id="main">
 			<p>Please insert your URL here:</p>
 				<form action="/" method="post">

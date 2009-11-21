@@ -21,7 +21,8 @@ BODY, HTML {
 
 /* put header specific stuff here */
 #header { 
-	padding: 20px 0px 0px 20px; 
+	padding: 10px 2% 0px 10px; 
+	text-align: right;
 }
 
 #header SPAN { 
@@ -36,7 +37,7 @@ BODY, HTML {
 	bottom: 0; 
 	width: 100%; 
 	color: lightgreen;
-	font-size: 2em;
+	font-size: 1.5em;
 	text-align: center;
 	padding-top: 10px;
 }
@@ -44,6 +45,7 @@ BODY, HTML {
 #footer a {
 	color: lightgreen;
 }
+
 /* content area padding to find a nice place for the input field  */
 #main { 
 	padding-top: 10%;

@@ -22,7 +22,7 @@
 
 <body>	
 	<div id="container">
-		<div id="header"></div>
+		<div id="header"><span>New URL</span></div>
 		<div id="main">
 			<p>Thanks for using our service. Your new short URL is</p>
 			<p>%(URL)s</p>

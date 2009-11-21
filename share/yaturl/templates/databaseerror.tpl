@@ -10,10 +10,9 @@
 
 </head>
 
-
 <body>
 	<div id="container">
-		<div id="header"></div>
+		<div id="header"><span>Error</span></div>
 		<div id="main">
 			<p>We are sorry, something went wrong during attempt to access 
 			the database</p>

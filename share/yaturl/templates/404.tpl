@@ -12,12 +12,12 @@
 
 <body>
 	<div id="container">
-		<div id="header"></div>
+		<div id="header"><span>404 - Page not found</span></div>
 		<div id="main">
 			<p>We are sorry we couldn't find any data for your requested URL</p>
 			<p>Please double check and try again</p>
 		</div>
-		<div id="footer"></div>
+		<div id="footer"><span>foo baa lsakdfjasklfj laskfjaskfjlk slfkjasfln  aslfajsfal</span></div>
 	</div>	
 </body>
 </html>
