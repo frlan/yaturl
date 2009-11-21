@@ -1,0 +1,48 @@
+/* reset some global params */
+BODY, HTML { 
+	font-family: verdana; 
+	font-size: 100.1%;
+	margin: 0; 
+	height: 100%; 
+}
+
+/* define content background color here */
+#container { 
+	background: #CCCCFF; 
+	position: relative; 
+	min-height: 100%;
+}
+
+/* dress header and footer in black */
+#header, #footer { 
+	height: 100px; 
+	background: black; 
+}
+
+/* put header specific stuff here */
+#header { 
+	padding: 10px 0px 0px 10px; 
+}
+
+/* put footer specific stuff here */
+#footer {  
+	position: absolute; 
+	bottom: 0; 
+	width: 100%; 
+}
+
+/* content area padding to find a nice place for the input field  */
+#main { 
+	padding: 15% 0px 0px 15%; 
+}
+
+/* element styles for input field */
+#main INPUT { 
+	font-size: 1.2em; 
+}
+
+#main INPUT.button { 
+	background: green; 
+	color: white; 
+	border: none;	
+}

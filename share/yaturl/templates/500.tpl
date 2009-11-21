@@ -6,11 +6,21 @@
 	<title>yatURL.net - Internal server error</title>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 	<meta name="generator" content="Geany 0.18" />
+	<link rel="stylesheet" href="/static/default.css" type="text/css"/>
+
 </head>
 
 <body>
-	<p>500 - Internal server error</p>
 
-	<p>The server encountered an internal error and was unable to complete your request.</p>
+	<div id="container">
+		<div id="header"></div>
+		<div id="main">
+			<p>500 - Internal server error</p>
+			<p>The server encountered an internal error and was unable 
+			to complete your request.</p>
+		</div>
+		<div id="footer"></div>
+	</div>	
+	
 </body>
 </html>

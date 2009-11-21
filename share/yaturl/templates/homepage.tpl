@@ -6,15 +6,22 @@
     <title>yatURL.net - Yet another tiny URL service</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <meta name="generator" content="Geany 0.19" />
+    <link rel="stylesheet" href="/static/default.css" type="text/css"/>
 </head>
 
 <body>
-    <p>Please insert your URL here:</p>
-        <form action="/" method="post">
-			<p>%(msg)s</p>
-            <p><input name="URL" type="text" size="50"/>
-            <input type="submit" value="Absenden"/></p>
-        </form>
+	<div id="container">
+		<div id="header"></div>
+		<div id="main">
+			<p>Please insert your URL here:</p>
+				<form action="/" method="post">
+					<p>%(msg)s</p>
+					<p><input name="URL" type="text" size="50"/>
+				<input type="submit" value="Absenden"/></p>
+        </form></div>
+		<div id="footer"></div>
+	</div>
+	    
 </body>
 
 </html>

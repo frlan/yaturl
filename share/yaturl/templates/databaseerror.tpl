@@ -5,14 +5,21 @@
 <head>
 	<title>yatURL.net - Failure</title>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-	<meta name="generator" content="Geany 0.18" />
+	<meta name="generator" content="Geany 0.18" /> 
+	<link rel="stylesheet" href="/static/default.css" type="text/css"/>
+
 </head>
 
+
 <body>
-	<p>We are sorry, something went wrong during attempt to access the database</p>
-
-	<p>Please double check and try again later</p>
-
-	<p>Werbung ;)</p>
+	<div id="container">
+		<div id="header"></div>
+		<div id="main">
+			<p>We are sorry, something went wrong during attempt to access 
+			the database</p>
+			<p>Please double check and try again later</p>
+		</div>
+		<div id="footer"></div>
+	</div>	
 </body>
 </html>
