@@ -44,9 +44,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     #----------------------------------------------------------------------
     def log_message(self, format, *args):
         """
-        Overwrite the default log_message() method which prints for some reason
-        to stderr which we don't want.
-        Instead, use a logger.
+        Overwrite the default log_message() method which prints for
+        some reason to stderr which we don't want.  Instead, use a
+        logger.
         """
         format = '%s: %s' % (self.address_string(), format)
         self.server.accesslog.info(format%args)
@@ -99,7 +99,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_GET(self):
-        # Homepage and other path ending with /
+        # Homepage and other path ending with / 
         # Needs to be extended later with things like FAQ etc.
         if self.path.endswith("/"):
             text = yaturlTemplate.template(
@@ -112,8 +112,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             else:
                 self._send_internal_server_error()
 
+        # TODO: Avoid reactng on manipulated realtive path as
+        # e.g. /static/../etc/yaturl.conf
         elif self.path.find("/static/") > -1:
-            # Try to avoid some unwanted pathes inside static page
             try:
                 file = open(self.path[1:])
                 text = file.read()
@@ -149,6 +150,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             fp=self.rfile,
             headers=self.headers,
             environ={'REQUEST_METHOD':'POST'})
+        # TODO: Check for valid URL and avoid SQL injection later
+        # inisde this function
         if 'URL' in form:
             # Calculating the output
             hash = hashlib.sha1(form['URL'].value).hexdigest()
@@ -169,7 +172,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                        self.server.config.get('templates','staticresultpage'),
                        URL=new_URL)
             else:
-                # It appears link is already stored or you have found an collision on sha1
+                # It appears link is already stored or you have found
+                # an collision on sha1
                 try:
                     short = self.server.db.get_short_for_hash_from_db(hash)[0]
                 except YuDbError:
