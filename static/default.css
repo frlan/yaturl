@@ -1,65 +1,65 @@
 /* reset some global params */
-BODY, HTML { 
-	font-family: verdana; 
+BODY, HTML {
+	font-family: verdana;
 	font-size: 100.1%;
-	margin: 0; 
-	height: 100%; 
+	margin: 0;
+	height: 100%;
 }
 
 /* define content background color here */
-#container { 
-	background: #CCCCFF; 
-	position: relative; 
+#container {
+	background: #CCCCFF;
+	position: relative;
 	min-height: 100%;
 }
 
 /* dress header and footer in black */
-#header, #footer { 
-	height: 100px; 
-	background: black; 
+#header, #footer {
+	height: 100px;
+	background: black;
 }
 
 /* put header specific stuff here */
-#header { 
-	padding: 10px 2% 0px 10px; 
+#header {
+	padding: 10px 2% 0px 10px;
 	text-align: right;
 }
 
-#header SPAN { 
-	color: lightgreen; 
-	font-size: 3em; 
+#header SPAN {
+	color: lime;
+	font-size: 3em;
 	font-weight: bold;
 }
 
 /* put footer specific stuff here */
-#footer {  
+#footer {
 	position: absolute;
-	bottom: 0; 
-	width: 100%; 
-	color: lightgreen;
+	bottom: 0;
+	width: 100%;
+	color: lime;
 	font-size: 1.5em;
 	text-align: center;
 	padding-top: 10px;
 }
 
 #footer a {
-	color: lightgreen;
+	color: lime;
 }
 
 /* content area padding to find a nice place for the input field  */
-#main { 
+#main {
 	padding-top: 10%;
 	padding-right: 10%;
 	padding-left: 10%;
 }
 
 /* element styles for input field */
-#main INPUT { 
-	font-size: 1.2em; 
+#main INPUT {
+	font-size: 1.2em;
 }
 
-#main INPUT.button { 
-	background: green; 
-	color: white; 
-	border: none;	
+#main INPUT button {
+	background: green;
+	color: white;
+	border: none;
 }
