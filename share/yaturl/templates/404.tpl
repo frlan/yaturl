@@ -17,7 +17,7 @@
 			<p>We are sorry we couldn't find any data for your requested URL</p>
 			<p>Please double check and try again</p>
 		</div>
-		<div id="footer"><span>foo baa lsakdfjasklfj laskfjaskfjlk slfkjasfln  aslfajsfal</span></div>
-	</div>	
+		<div id="footer"></div>
+	</div>
 </body>
 </html>
