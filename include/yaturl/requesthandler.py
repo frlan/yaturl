@@ -99,7 +99,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_GET(self):
-        # Homepage and other path ending with / 
+        # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
         if self.path.endswith("/"):
             text = yaturlTemplate.template(
@@ -154,7 +154,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         # inisde this function
         if 'URL' in form:
             # Calculating the output
-            hash = hashlib.sha1(form['URL'].value).hexdigest()
+            url = form['URL'].value
+            print url
+            # First check, whether some protocoll prefix is
+            # available. If not, assume http:// was intented to put
+            # there.
+            if not url.find("://") > -1:
+                url = 'http://%s' % (url)
+            hash = hashlib.sha1(url).hexdigest()
             # Begin the response
             try:
                 result = self.server.db.is_hash_in_db(hash)
@@ -163,7 +170,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 return
             if not result:
                 try:
-                    short = self.server.db.add_link_to_db(hash, form['URL'].value)
+                    short = self.server.db.add_link_to_db(hash, url)
                 except YuDbError:
                     self._send_database_problem()
                     return
