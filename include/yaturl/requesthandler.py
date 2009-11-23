@@ -155,7 +155,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         if 'URL' in form:
             # Calculating the output
             url = form['URL'].value
-            print url
             # First check, whether some protocoll prefix is
             # available. If not, assume http:// was intented to put
             # there.
