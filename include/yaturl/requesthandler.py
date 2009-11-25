@@ -62,21 +62,21 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     #----------------------------------------------------------------------
-    def _send_404(self, head=False):
+    def _send_404(self, header_only=False):
         text = yaturlTemplate.template(
             self.server.config.get('templates','corruptlink'),
             URL="Nothing")
         if text:
             self._send_head(text, 404)
             self.end_headers()
-            if head == True:
+            if header_only == True:
                 try:
                     self.wfile.write(text)
                 except socket.error:
                     # clients like to stop reading after they got a 404
                     pass
         else:
-            self._send_internal_server_error(head)
+            self._send_internal_server_error(header_only)
 
     #----------------------------------------------------------------------
     def _send_internal_server_error(self, header_only=False):
@@ -90,14 +90,15 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(text)
 
     #----------------------------------------------------------------------
-    def _send_database_problem(self):
+    def _send_database_problem(self, header_only=False):
         text = yaturlTemplate.template(self.server.config.get('templates','databaseissuelink'))
         if not text:
             self._send_internal_server_error()
             return
         self._send_head(text, 500)
         self.end_headers()
-        self.wfile.write(text)
+        if header_only == True:
+            self.wfile.write(text)
 
     #----------------------------------------------------------------------
     def do_GET(self):
