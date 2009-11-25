@@ -62,30 +62,32 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     #----------------------------------------------------------------------
-    def _send_404(self):
+    def _send_404(self, head=False):
         text = yaturlTemplate.template(
             self.server.config.get('templates','corruptlink'),
             URL="Nothing")
         if text:
             self._send_head(text, 404)
             self.end_headers()
-            try:
-                self.wfile.write(text)
-            except socket.error:
-                # clients like to stop reading after they got a 404
-                pass
+            if head == true:
+                try:
+                    self.wfile.write(text)
+                except socket.error:
+                    # clients like to stop reading after they got a 404
+                    pass
         else:
-            self._send_internal_server_error()
+            self._send_internal_server_error(head)
 
     #----------------------------------------------------------------------
-    def _send_internal_server_error(self):
+    def _send_internal_server_error(self, header_only=False):
         text = yaturlTemplate.template(self.server.config.get('templates','servererror'))
         if not text:
             # fallback to hard-coded template
             text = template_500
         self._send_head(text, 500)
         self.end_headers()
-        self.wfile.write(text)
+        if header_only == False:
+            self.wfile.write(text)
 
     #----------------------------------------------------------------------
     def _send_database_problem(self):
@@ -199,4 +201,53 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(text)
         else:
             self._send_internal_server_error()
+    #----------------------------------------------------------------------
+    def do_HEAD(self):
+        """
+        First attempt to implement HEAD response which is pretty much
+        the same as the do_GET at the moment w/o sending the real
+        data....
+        """
+        # Homepage and other path ending with /
+        # Needs to be extended later with things like FAQ etc.
+        if self.path.endswith("/"):
+            text = yaturlTemplate.template(
+                self.server.config.get('templates','statichomepage'),
+                msg="")
+            if text:
+                self._send_head(text, 200)
+                self.end_headers()
+            else:
+                self._send_internal_server_error()
 
+        # TODO: Avoid reactng on manipulated realtive path as
+        # e.g. /static/../etc/yaturl.conf
+        elif self.path.find("/static/") > -1:
+            try:
+                file = open(self.path[1:])
+                text = file.read()
+                self._send_head(text, 200)
+                self.end_headers()
+            except IOError:
+                self._send_404()
+        # Every other page
+        else:
+            # Assuming, if there is aynthing else then a alphanumeric
+            # character after the starting /, its not a valid hash in
+            # no case
+            if self.path[1:].isalnum():
+                try:
+                    result = self.server.db.get_link_from_db(self.path[1:])
+                except YuDbError:
+                    self._send_database_problem()
+                    return
+                if result is not None:
+                    self.send_response(301)
+                    self.send_header('Location', result[0])
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                else:
+                    self._send_404()
+            else:
+                self._send_404()
+        
