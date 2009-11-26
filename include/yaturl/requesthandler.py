@@ -69,7 +69,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         if text:
             self._send_head(text, 404)
             self.end_headers()
-            if header_only == True:
+            if header_only == False:
                 try:
                     self.wfile.write(text)
                 except socket.error:
@@ -97,7 +97,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             return
         self._send_head(text, 500)
         self.end_headers()
-        if header_only == True:
+        if header_only == False:
             self.wfile.write(text)
 
     #----------------------------------------------------------------------
