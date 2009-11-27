@@ -157,10 +157,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             environ={'REQUEST_METHOD':'POST'})
         # TODO: Check for valid URL and avoid SQL injection later
         # inisde this function
-        if 'URL' in form:
+        if 'URL' in form and len(form['URL'].value) < 1000:
             # Calculating the output
             url = form['URL'].value
-            # First check, whether some protocoll prefix is
+            # Now check, whether some protocoll prefix is
             # available. If not, assume http:// was intented to put
             # there.
             if not url.find("://") > -1:
@@ -196,7 +196,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                        URL=new_URL)
         else:
             text = yaturlTemplate.template(
-            self.server.config.get('templates','statichomepage'), msg="<p>Please specify any input</p>")
+            self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
 
         if text:
             self._send_head(text, 200)
