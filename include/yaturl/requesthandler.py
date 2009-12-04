@@ -5,6 +5,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 import socket
 import cgi
 import hashlib
+import os
 import yaturlTemplate
 from db import YuDbError
 
@@ -101,6 +102,22 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(text)
 
     #----------------------------------------------------------------------
+    def _sanitize_path(self, path):
+        """
+        Check whether the given path is valid and remove any '..'
+
+        @param path (str) - the path to check
+        @return the full normalized absolute path (str)
+        """
+        if not path:
+            return ''
+        if os.path.isabs(path):
+            # skip leading slashhes
+            path = path[1:]
+        # sanitize path
+        return os.path.normpath(path)
+
+    #----------------------------------------------------------------------
     def do_GET(self, header_only=False):
         # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
@@ -115,12 +132,15 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(text)
             else:
                 self._send_internal_server_error(header_only)
-
-        # TODO: Avoid reactng on manipulated realtive path as
-        # e.g. /static/../etc/yaturl.conf
         elif self.path.find("/static/") > -1:
+            # remove '../' and friends
+            path = self._sanitize_path(self.path)
             try:
-                file = open(self.path[1:])
+                # check whether the path is still what we want
+                if not path.startswith('static/'):
+                    raise IOError
+                # actually deliver the requested file
+                file = open(path)
                 text = file.read()
                 self._send_head(text, 200)
                 self.end_headers()
