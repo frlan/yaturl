@@ -158,7 +158,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 except YuDbError:
                     self._send_database_problem(header_only)
                     return
-                if result is not None:
+                if result:
                     self.send_response(301)
                     self.send_header('Location', result[0])
                     self.send_header('Content-type', 'text/html')
