@@ -132,7 +132,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(text)
             else:
                 self._send_internal_server_error(header_only)
-        elif self.path.find("/static/") > -1:
+        elif self.path.startswith('/static/'):
             # remove '../' and friends
             path = self._sanitize_path(self.path)
             try:
