@@ -112,7 +112,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         if not path:
             return ''
         if os.path.isabs(path):
-            # skip leading slashhes
+            # skip leading slashes
             path = path[1:]
         # sanitize path
         return os.path.normpath(path)
@@ -150,9 +150,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self._send_404(header_only)
         # Every other page
         else:
-            # Assuming, if there is aynthing else then a alphanumeric
-            # character after the starting /, its not a valid hash in
-            # no case
+            # Assuming, if there is anything else than an alphanumeric
+            # character after the starting /, it's not a valid hash at all
             if self.path[1:].isalnum():
                 try:
                     result = self.server.db.get_link_from_db(self.path[1:])
@@ -176,12 +175,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             headers=self.headers,
             environ={'REQUEST_METHOD':'POST'})
         # TODO: Check for valid URL and avoid SQL injection later
-        # inisde this function
+        # inside this function
         if 'URL' in form and len(form['URL'].value) < 1000:
             # Calculating the output
             url = form['URL'].value
-            # Now check, whether some protocoll prefix is
-            # available. If not, assume http:// was intented to put
+            # Now check, whether some protocol prefix is
+            # available. If not, assume http:// was intended to put
             # there.
             if not url.find("://") > -1:
                 url = 'http://%s' % (url)
