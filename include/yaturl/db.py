@@ -28,14 +28,16 @@ class YuDb(object):
         self._database = config.get('database', 'database')
         self._conn = None
         self.logger = logger
-        # if the database connection died, retry it twice, then give
-        # up
+        # if the database connection died, retry it twice, then give up
         self._conn_retry_count = 3
 
     #----------------------------------------------------------------------
     def __del__(self):
         if self._conn:
-            self._close(self._conn)
+            try:
+                self._conn.close()
+            except MySQLdb.DatabaseError:
+                pass
 
     #----------------------------------------------------------------------
     def _open(self, hostname, database=''):
@@ -44,7 +46,8 @@ class YuDb(object):
         """
         try:
             conn = MySQLdb.connect(host=hostname, db=database, user=self._user, passwd=self._passwd,
-                port=self._port, use_unicode=True, init_command='SET NAMES utf8')
+                port=self._port, use_unicode=True,
+                init_command='SET TRANSACTION ISOLATION LEVEL READ COMMITTED')
             self._conn_retry_count = 3
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
@@ -62,17 +65,6 @@ class YuDb(object):
 
         c = self._conn.cursor()
         return (self._conn, c)
-
-    #----------------------------------------------------------------------
-    def _close(self, x):
-        """
-        Close the database connection.
-        """
-        conn = x
-        try:
-            conn.close()
-        except MySQLdb.DatabaseError:
-            pass
 
     #-------------------------------------------------------------------------
     def get_short_for_hash_from_db(self, hash):
