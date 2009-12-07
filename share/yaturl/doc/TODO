@@ -12,5 +12,3 @@
 		* Style submit button
 	* Rework of template system to be more flexible
 	* Prevent of circle linkage
-* Database integration
-	* db: longtext -> varchar(255) for comment column
