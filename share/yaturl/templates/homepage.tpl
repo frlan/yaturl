@@ -17,7 +17,7 @@
 			%(msg)s
 				<form action="/" method="post">
 					<p><input name="URL" type="text" size="50"/>
-					<input type="submit" value="Absenden"/></p>
+					<input type="submit" value="Submit"/></p>
 				</form>
 		</div>
 		<div id="footer"></div>
