@@ -7,6 +7,7 @@ import cgi
 import hashlib
 import os
 import yaturlTemplate
+import encodings.idna
 from db import YuDbError
 
 # we need to hard-code this one at least in case of the file cannot be found on disk
@@ -155,8 +156,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     return
                 if result:
                     self.send_response(301)
-                    self.send_header('Location', result[0])
-                    self.send_header('Content-type', 'text/html')
+                    self.send_header('Location', encodings.idna.ToASCII(result[0]))
+                    #self.send_header('Content-type', 'text/html')
                     self.end_headers()
                 else:
                     self._send_404(header_only)
