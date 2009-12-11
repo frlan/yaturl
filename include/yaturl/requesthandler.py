@@ -15,15 +15,15 @@ template_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-	<title>yatURL.net - Internal server error</title>
-	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-	<meta name="generator" content="Geany 0.18" />
+    <title>yatURL.net - Internal server error</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <meta name="generator" content="Geany 0.18" />
 </head>
 
 <body>
-	<p>500 - Internal server error</p>
+    <p>500 - Internal server error</p>
 
-	<p>The server encountered an internal error and was unable to complete your request.</p>
+    <p>The server encountered an internal error and was unable to complete your request.</p>
 </body>
 </html>
 '''
@@ -123,7 +123,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         # Needs to be extended later with things like FAQ etc.
         if self.path.endswith("/"):
             text = yaturlTemplate.template(
-                self.server.config.get('templates','statichomepage'),
+            self.server.config.get('templates','statichomepage'),
                 msg="")
             if text:
                 self._send_head(text, 200)
@@ -148,6 +148,17 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(text)
             except IOError:
                 self._send_404(header_only)
+        elif self.path.startswith('/ContactUs'):
+            text = yaturlTemplate.template(
+                self.server.config.get('templates', 'contactuspage'))
+            print text
+            if text:
+                self._send_head(text, 200)
+                self.end_headers()
+                if header_only == False:
+                    self.wfile.write(text)
+            else:
+                self._send_internal_server_error(header_only)
         # Every other page
         else:
             # Assuming, if there is anything else than an alphanumeric
