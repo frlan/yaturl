@@ -62,7 +62,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/css')
         else:
             self.send_header('Content-Type', 'text/html')
-        self.send_header("Content-Length", len(text) +1 )
+        self.send_header("Content-Length", len(text))
         self.end_headers()
 
     #----------------------------------------------------------------------
@@ -72,7 +72,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             URL="Nothing")
         if text:
             self._send_head(text, 404)
-            self.end_headers()
             if header_only == False:
                 try:
                     self.wfile.write(text)
@@ -89,7 +88,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             # fallback to hard-coded template
             text = template_500
         self._send_head(text, 500)
-        self.end_headers()
         if header_only == False:
             self.wfile.write(text)
 
@@ -100,7 +98,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self._send_internal_server_error()
             return
         self._send_head(text, 500)
-        self.end_headers()
         if header_only == False:
             self.wfile.write(text)
 
@@ -148,7 +145,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 msg="")
             if text:
                 self._send_head(text, 200)
-                self.end_headers()
                 if header_only == False:
                     self.wfile.write(text)
             else:
@@ -164,7 +160,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 file = open(path)
                 text = file.read()
                 self._send_head(text, 200)
-                self.end_headers()
                 if header_only == False:
                     self.wfile.write(text)
             except IOError:
@@ -263,7 +258,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         if text:
             self._send_head(text, 200)
-            self.end_headers()
             self.wfile.write(text)
         else:
             self._send_internal_server_error()
