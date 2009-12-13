@@ -59,7 +59,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/css')
         else:
             self.send_header('Content-Type', 'text/html')
-        self.send_header("Content-Length", len(text) +1 )
+        self.send_header("Content-Length", len(text))
         self.end_headers()
 
     #----------------------------------------------------------------------
