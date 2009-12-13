@@ -8,6 +8,9 @@ import hashlib
 import os
 import yaturlTemplate
 from db import YuDbError
+import smtplib
+from email.mime.text import MIMEText
+
 
 # we need to hard-code this one at least in case of the file cannot be found on disk
 template_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -100,6 +103,24 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         if header_only == False:
             self.wfile.write(text)
+
+    #----------------------------------------------------------------------
+    def _send_mail(self, subject, content, email):
+        
+        msg = MIMEText(content, 'plain', 'utf-8')
+
+        msg['Subject'] = '%s' % (subject)
+        msg['From'] = email
+        msg['To'] = self.server.config.get('email','toemail'),
+
+        try:
+            s = smtplib.SMTP('localhost')
+            s.sendmail(msg['From'], [msg['To']], msg.as_string())
+            s.quit()
+        except Exception, e:
+            print 'Mail could not be sent (%s)' % e
+            return -1
+
 
     #----------------------------------------------------------------------
     def _sanitize_path(self, path):
@@ -224,6 +245,18 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 text = yaturlTemplate.template(
                        self.server.config.get('templates','staticresultpage'),
                        URL=new_URL)
+        elif 'email' in form:
+            email = form['email'].value
+            subj = form['subject'].value
+            descr = form['request'].value
+            if (self._send_mail(subj, descr, email) is None):
+                text = yaturlTemplate.template(
+                self.server.config.get('templates','contactUsResultpage'),
+                    msg="Your request has been sent. You will receive an answer soon.")
+            else:
+                self._send_internal_server_error()
+                return 
+            
         else:
             text = yaturlTemplate.template(
             self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
