@@ -7,6 +7,7 @@ import cgi
 import hashlib
 import os
 import yaturlTemplate
+import encodings.idna
 from db import YuDbError
 import smtplib
 from email.mime.text import MIMEText
@@ -64,12 +65,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", len(text))
         self.end_headers()
+
     #----------------------------------------------------------------------
     def _send_301(self, new_url):
         self.send_response(301)
         self.send_header('Location', new_url)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
+
     #----------------------------------------------------------------------
     def _send_404(self, header_only=False):
         text = yaturlTemplate.template(
