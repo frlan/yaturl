@@ -15,15 +15,15 @@ template_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-	<title>yatURL.net - Internal server error</title>
-	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-	<meta name="generator" content="Geany 0.18" />
+    <title>yatURL.net - Internal server error</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <meta name="generator" content="Geany 0.18" />
 </head>
 
 <body>
-	<p>500 - Internal server error</p>
+    <p>500 - Internal server error</p>
 
-	<p>The server encountered an internal error and was unable to complete your request.</p>
+    <p>The server encountered an internal error and was unable to complete your request.</p>
 </body>
 </html>
 '''
@@ -61,7 +61,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", len(text))
         self.end_headers()
-
+    #----------------------------------------------------------------------
+    def _send_301(self, new_url):
+        self.send_response(301)
+        self.send_header('Location', new_url)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
     #----------------------------------------------------------------------
     def _send_404(self, header_only=False):
         text = yaturlTemplate.template(
@@ -154,10 +159,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self._send_database_problem(header_only)
                     return
                 if result:
-                    self.send_response(301)
-                    self.send_header('Location', result[0])
-                    self.send_header('Content-type', 'text/html')
-                    self.end_headers()
+                    self._send_301(result[0])
                 else:
                     self._send_404(header_only)
             else:
