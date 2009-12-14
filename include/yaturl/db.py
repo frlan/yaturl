@@ -46,7 +46,7 @@ class YuDb(object):
         """
         try:
             conn = MySQLdb.connect(host=hostname, db=database, user=self._user, passwd=self._passwd,
-                port=self._port, use_unicode=True,
+                port=self._port, use_unicode=True, charset='utf8',
                 init_command='SET TRANSACTION ISOLATION LEVEL READ COMMITTED')
             self._conn_retry_count = 3
         except MySQLdb.DatabaseError, e:
