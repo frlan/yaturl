@@ -174,7 +174,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             environ={'REQUEST_METHOD':'POST'})
         # TODO: Check for valid URL and avoid SQL injection later
         # inside this function
-        if 'URL' in form and len(form['URL'].value) < 1000:
+        if 'URL' in form and len(form['URL'].value) < 4048:
             # Calculating the output and doing some minor input checks
             url = urlparse (form['URL'].value, 'http')
             hash = hashlib.sha1(url.geturl()).hexdigest()

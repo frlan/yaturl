@@ -2,7 +2,6 @@
 
 * Webinterface:
 	* Inputvalidation for submit field:
-		* Adjusting length of possibles URL submitted to the form
 		* General inputvalidation of URL
 		* Implement correct handling of non ascii characters in URL
 	* Adding a 304 - no change - function to allow using browser cache
