@@ -58,6 +58,10 @@ BODY, HTML {
 	font-size: 1.2em;
 }
 
+#main textarea{
+	font-size: 1.2em;
+}
+
 #main INPUT button {
 	background: green;
 	color: white;
