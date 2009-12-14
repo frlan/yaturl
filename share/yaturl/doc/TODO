@@ -5,9 +5,7 @@
 		* Adjusting length of possibles URL submitted to the form
 		* General inputvalidation of URL
 		* Implement correct handling of non ascii characters in URL
-	* HTTP dialog debuuging for static files
 	* Adding a 304 - no change - function to allow using browser cache
-	  for static pages
 	* CSS:
 		* Style submit button
 	* Rework of template system to be more flexible

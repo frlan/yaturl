@@ -64,7 +64,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", len(text))
         self.end_headers()
-
+    #----------------------------------------------------------------------
+    def _send_301(self, new_url):
+        self.send_response(301)
+        self.send_header('Location', new_url)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
     #----------------------------------------------------------------------
     def _send_404(self, header_only=False):
         text = yaturlTemplate.template(
@@ -186,10 +191,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self._send_database_problem(header_only)
                     return
                 if result:
-                    self.send_response(301)
-                    self.send_header('Location', result[0])
-                    self.send_header('Content-type', 'text/html')
-                    self.end_headers()
+                    self._send_301(result[0])
                 else:
                     self._send_404(header_only)
             else:
