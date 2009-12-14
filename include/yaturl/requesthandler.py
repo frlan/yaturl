@@ -181,7 +181,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         elif self.path.startswith('/ContactUs'):
             text = yaturlTemplate.template(
                 self.server.config.get('templates', 'contactuspage'))
-            print text
             if text:
                 self._send_head(text, 200)
                 self.end_headers()
