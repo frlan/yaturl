@@ -113,7 +113,7 @@ class YuDb(object):
             if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
                 self._conn_retry_count -= 1
                 # trigger establishing a new connection on the next run
-                self.close()
+                self._close()
                 self.logger.warn('Database connection seems to be dead (%d, %s)' % (self._conn_retry_count, e.args))
                 return self.get_link_from_db(hash)
             else:
@@ -138,7 +138,7 @@ class YuDb(object):
             if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
                 self._conn_retry_count -= 1
                 # trigger establishing a new connection on the next run
-                self.close()
+                self._close()
                 self.logger.warn('Database connection seems to be dead (%d, %s)' % (self._conn_retry_count, e.args))
                 return self.is_hash_in_db(hash)
             else:
@@ -163,7 +163,7 @@ class YuDb(object):
             if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
                 self._conn_retry_count -= 1
                 # trigger establishing a new connection on the next run
-                self.close()
+                self._close()
                 self.logger.warn('Database connection seems to be dead (%d, %s)' % (self._conn_retry_count, e.args))
                 return self.is_shorthash_in_db(short)
             else:
@@ -190,7 +190,7 @@ class YuDb(object):
                     and self._conn_retry_count > 0:
                     self._conn_retry_count -= 1
                     # trigger establishing a new connection on the next run
-                    self.close()
+                    self._close()
                     self.logger.warn('Database connection seems to be dead (%d, %s)' % (self._conn_retry_count, e.args))
                     return self.add_link_to_db(short, hash, link)
                 if e.args and e.args[0] == DUP_ENTRY:
