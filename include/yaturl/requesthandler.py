@@ -58,6 +58,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.send_response(code)
         if self.path.endswith(".css"):
             self.send_header('Content-Type', 'text/css')
+        elif self.path.endswith(".ico"):
+            self.send_header('Content-Type', 'image/vnd.microsoft.icon')
         else:
             self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", len(text))
