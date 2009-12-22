@@ -2,8 +2,8 @@
 
 
 import MySQLdb
-from MySQLdb.constants.CR import SERVER_GONE_ERROR, SERVER_LOST
 from MySQLdb.constants.ER import DUP_ENTRY
+from safedb import SafeMySQLConnection
 import sys
 
 
@@ -28,8 +28,6 @@ class YuDb(object):
         self._database = config.get('database', 'database')
         self._conn = None
         self.logger = logger
-        # if the database connection died, retry it twice, then give up
-        self._conn_retry_count = 3
 
     #----------------------------------------------------------------------
     def __del__(self):
@@ -86,15 +84,8 @@ class YuDb(object):
             c.close()
             return result
         except MySQLdb.DatabaseError, e:
-            if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
-                self._conn_retry_count -= 1
-                # trigger establishing a new connection on the next run
-                self._close()
-                self.logger.warn('Database connection seems to be dead (%d, %s)' % (self._conn_retry_count, e.args))
-                return self.get_short_for_hash_from_db(hash)
-            else:
-                self.logger.warn('Database error: %s' % e)
-                raise YuDbError('Database error: %s' % e)
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError('Database error: %s' % e)
 
     #----------------------------------------------------------------------
     def get_link_from_db(self, hash):
@@ -110,15 +101,8 @@ class YuDb(object):
             c.close()
             return result
         except MySQLdb.DatabaseError, e:
-            if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
-                self._conn_retry_count -= 1
-                # trigger establishing a new connection on the next run
-                self._close()
-                self.logger.warn('Database connection seems to be dead (%d, %s)' % (self._conn_retry_count, e.args))
-                return self.get_link_from_db(hash)
-            else:
-                self.logger.warn('Database error: %s' % e)
-                raise YuDbError('Database error: %s' % e)
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError('Database error: %s' % e)
 
     #-------------------------------------------------------------------
     def is_hash_in_db(self, hash):
@@ -135,15 +119,8 @@ class YuDb(object):
             c.close()
             return result
         except MySQLdb.DatabaseError, e:
-            if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
-                self._conn_retry_count -= 1
-                # trigger establishing a new connection on the next run
-                self._close()
-                self.logger.warn('Database connection seems to be dead (%d, %s)' % (self._conn_retry_count, e.args))
-                return self.is_hash_in_db(hash)
-            else:
-                self.logger.warn('Database error: %s' % e)
-                raise YuDbError('Database error: %s' % e)
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError('Database error: %s' % e)
 
     #-------------------------------------------------------------------
     def is_shorthash_in_db(self, short):
@@ -160,15 +137,8 @@ class YuDb(object):
             c.close()
             return result
         except MySQLdb.DatabaseError, e:
-            if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and self._conn_retry_count > 0:
-                self._conn_retry_count -= 1
-                # trigger establishing a new connection on the next run
-                self._close()
-                self.logger.warn('Database connection seems to be dead (%d, %s)' % (self._conn_retry_count, e.args))
-                return self.is_shorthash_in_db(short)
-            else:
-                self.logger.warn('Database error: %s' % e)
-                raise YuDbError('Database error: %s' % e)
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError('Database error: %s' % e)
 
     #-------------------------------------------------------------------
     def add_link_to_db(self, hash, link):
@@ -186,13 +156,6 @@ class YuDb(object):
                 c.close()
                 return short
             except MySQLdb.DatabaseError, e:
-                if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) \
-                    and self._conn_retry_count > 0:
-                    self._conn_retry_count -= 1
-                    # trigger establishing a new connection on the next run
-                    self._close()
-                    self.logger.warn('Database connection seems to be dead (%d, %s)' % (self._conn_retry_count, e.args))
-                    return self.add_link_to_db(short, hash, link)
                 if e.args and e.args[0] == DUP_ENTRY:
                     if e[1].endswith("key 2"):
                         return get_short_for_hash_from_db(hash)
