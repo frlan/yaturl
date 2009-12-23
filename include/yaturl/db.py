@@ -48,7 +48,7 @@ class YuDb(object):
         Open the database connection.
         """
         try:
-            conn = MySQLdb.connect(host=hostname, db=database, user=self._user, passwd=self._passwd,
+            conn = SafeMySQLConnection(host=hostname, db=database, user=self._user, passwd=self._passwd,
                 port=self._port, use_unicode=True, charset='utf8',
                 init_command='SET TRANSACTION ISOLATION LEVEL READ COMMITTED')
         except MySQLdb.DatabaseError, e:
