@@ -189,53 +189,56 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_POST(self):
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD':'POST'})
-        # TODO: Check for valid URL and avoid SQL injection later
-        # inside this function
-        if 'URL' in form and len(form['URL'].value) < 4096:
-            # Calculating the output and doing some minor input checks
-            url = urlparse (form['URL'].value, 'http')
-            hash = hashlib.sha1(url.geturl()).hexdigest()
-            # Begin the response
-            try:
-                result = self.server.db.is_hash_in_db(hash)
-            except YuDbError:
-                self._send_database_problem()
-                return
-            if not result:
+        if self.path == "/URLRequest":
+            form = cgi.FieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD':'POST'})
+            # TODO: Check for valid URL and avoid SQL injection later
+            # inside this function
+            if 'URL' in form and len(form['URL'].value) < 4096:
+                # Calculating the output and doing some minor input checks
+                url = urlparse (form['URL'].value, 'http')
+                hash = hashlib.sha1(url.geturl()).hexdigest()
+                # Begin the response
                 try:
-                    short = self.server.db.add_link_to_db(hash, url.geturl())
+                    result = self.server.db.is_hash_in_db(hash)
                 except YuDbError:
                     self._send_database_problem()
                     return
-                new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
-                text = yaturlTemplate.template(
-                       self.server.config.get('templates','staticresultpage'),
-                       URL=new_URL)
+                if not result:
+                    try:
+                        short = self.server.db.add_link_to_db(hash, url.geturl())
+                    except YuDbError:
+                        self._send_database_problem()
+                        return
+                    new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
+                    text = yaturlTemplate.template(
+                           self.server.config.get('templates','staticresultpage'),
+                           URL=new_URL)
+                else:
+                    # It appears link is already stored or you have found
+                    # an collision on sha1
+                    try:
+                        short = self.server.db.get_short_for_hash_from_db(hash)[0]
+                    except YuDbError:
+                        self._send_database_problem()
+                        return
+                    new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
+                    text = yaturlTemplate.template(
+                           self.server.config.get('templates','staticresultpage'),
+                           URL=new_URL)
             else:
-                # It appears link is already stored or you have found
-                # an collision on sha1
-                try:
-                    short = self.server.db.get_short_for_hash_from_db(hash)[0]
-                except YuDbError:
-                    self._send_database_problem()
-                    return
-                new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
                 text = yaturlTemplate.template(
-                       self.server.config.get('templates','staticresultpage'),
-                       URL=new_URL)
-        else:
-            text = yaturlTemplate.template(
-            self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
+                self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
 
-        if text:
-            self._send_head(text, 200)
-            self.wfile.write(text)
+            if text:
+                self._send_head(text, 200)
+                self.wfile.write(text)
+            else:
+                self._send_internal_server_error()
         else:
-            self._send_internal_server_error()
+            self._send_404()
     #----------------------------------------------------------------------
     def do_HEAD(self):
         """
