@@ -1,5 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# Author:  Enrico Tröger
+#          Frank Lanitz <frank@frank.uvena.de>
+# License: GPL v2 or later
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+# MA 02110-1301, USA.
 
 from BaseHTTPServer import BaseHTTPRequestHandler
 import socket
@@ -62,6 +81,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.send_response(code)
         if self.path.endswith(".css"):
             self.send_header('Content-Type', 'text/css')
+        elif self.path.endswith(".ico"):
+            self.send_header('Content-Type', 'image/vnd.microsoft.icon')
         else:
             self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", len(text))
@@ -207,65 +228,74 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_POST(self):
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD':'POST'})
-        # TODO: Check for valid URL and avoid SQL injection later
-        # inside this function
-        if 'URL' in form and len(form['URL'].value) < 1000:
-            # Calculating the output and doing some minor input checks
-            url = urlparse (form['URL'].value, 'http')
-            hash = hashlib.sha1(url.geturl()).hexdigest()
-            # Begin the response
-            try:
-                result = self.server.db.is_hash_in_db(hash)
-            except YuDbError:
-                self._send_database_problem()
-                return
-            if not result:
+        if self.path == "/URLRequest":
+            form = cgi.FieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD':'POST'})
+            # TODO: Check for valid URL and avoid SQL injection later
+            # inside this function
+            if 'URL' in form and len(form['URL'].value) < 4096:
+                # Calculating the output and doing some minor input checks
+                url = form['URL'].value
+                # Now check, whether some protocol prefix is
+                # available. If not, assume http:// was intended to put
+                # there.
+                if not url.find("://") > -1:
+                    url = 'http://%s' % (url)
+                hash = hashlib.sha1(url).hexdigest()
+            
+                # Begin the response
                 try:
-                    short = self.server.db.add_link_to_db(hash, url.geturl())
+                    result = self.server.db.is_hash_in_db(hash)
                 except YuDbError:
                     self._send_database_problem()
                     return
-                new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
-                text = yaturlTemplate.template(
-                       self.server.config.get('templates','staticresultpage'),
-                       URL=new_URL)
+                if not result:
+                    try:
+                        short = self.server.db.add_link_to_db(hash, url)
+                    except YuDbError:
+                        self._send_database_problem()
+                        return
+                    new_URL= '<a href="hfttp://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
+                    text = yaturlTemplate.template(
+                           self.server.config.get('templates','staticresultpage'),
+                           URL=new_URL)
+                else:
+                    # It appears link is already stored or you have found
+                    # an collision on sha1
+                    try:
+                        short = self.server.db.get_short_for_hash_from_db(hash)[0]
+                    except YuDbError:
+                        self._send_database_problem()
+                        return
+                    new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
+                    text = yaturlTemplate.template(
+                           self.server.config.get('templates','staticresultpage'),
+                           URL=new_URL)
+            elif 'email' in form:
+                email = form['email'].value
+                subj = form['subject'].value
+                descr = form['request'].value
+                if (self._send_mail(subj, descr, email) is None):
+                    text = yaturlTemplate.template(
+                        self.server.config.get('templates','contactUsResultpage'),
+                        msg="Your request has been sent. You will receive an answer soon.")
+                else:
+                    self._send_internal_server_error()
+                    return 
+            
             else:
-                # It appears link is already stored or you have found
-                # an collision on sha1
-                try:
-                    short = self.server.db.get_short_for_hash_from_db(hash)[0]
-                except YuDbError:
-                    self._send_database_problem()
-                    return
-                new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
                 text = yaturlTemplate.template(
-                       self.server.config.get('templates','staticresultpage'),
-                       URL=new_URL)
-        elif 'email' in form:
-            email = form['email'].value
-            subj = form['subject'].value
-            descr = form['request'].value
-            if (self._send_mail(subj, descr, email) is None):
-                text = yaturlTemplate.template(
-                self.server.config.get('templates','contactUsResultpage'),
-                    msg="Your request has been sent. You will receive an answer soon.")
+                self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
+
+            if text:
+                self._send_head(text, 200)
+                self.wfile.write(text)
             else:
                 self._send_internal_server_error()
-                return 
-            
         else:
-            text = yaturlTemplate.template(
-            self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
-
-        if text:
-            self._send_head(text, 200)
-            self.wfile.write(text)
-        else:
-            self._send_internal_server_error()
+            self._send_404()
     #----------------------------------------------------------------------
     def do_HEAD(self):
         """
