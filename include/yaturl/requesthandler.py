@@ -198,8 +198,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             # inside this function
             if 'URL' in form and len(form['URL'].value) < 4096:
                 # Calculating the output and doing some minor input checks
-                url = urlparse (form['URL'].value, 'http')
-                hash = hashlib.sha1(url.geturl()).hexdigest()
+                url = form['URL'].value
+                # Now check, whether some protocol prefix is
+                # available. If not, assume http:// was intended to put
+                # there.
+                if not url.find("://") > -1:
+                    url = 'http://%s' % (url)
+                hash = hashlib.sha1(url).hexdigest()
+            
                 # Begin the response
                 try:
                     result = self.server.db.is_hash_in_db(hash)
@@ -208,11 +214,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     return
                 if not result:
                     try:
-                        short = self.server.db.add_link_to_db(hash, url.geturl())
+                        short = self.server.db.add_link_to_db(hash, url)
                     except YuDbError:
                         self._send_database_problem()
                         return
-                    new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
+                    new_URL= '<a href="hfttp://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
                     text = yaturlTemplate.template(
                            self.server.config.get('templates','staticresultpage'),
                            URL=new_URL)
