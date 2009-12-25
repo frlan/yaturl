@@ -273,6 +273,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     text = yaturlTemplate.template(
                            self.server.config.get('templates','staticresultpage'),
                            URL=new_URL)
+            else:
+                text = yaturlTemplate.template(
+                self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
+                
         elif self.path('/ContactUs'):
                 email = form['email'].value
                 subj = form['subject'].value
@@ -285,9 +289,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self._send_internal_server_error()
                     return 
             
-            else:
-                text = yaturlTemplate.template(
-                self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
 
             if text:
                 self._send_head(text, 200)
