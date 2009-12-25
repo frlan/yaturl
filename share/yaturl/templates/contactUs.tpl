@@ -14,7 +14,7 @@
 	<div id="container">
 		<div id="header"><span>Contact Us</span></div>
 		<div id="main">
-			<form action="/" method="post">
+			<form action="/ContactUs" method="post">
 				<p>Your email: <input name="email" type="text" size="50"/></p>
 				<p>Subject: <input name="subject" type="text" size="50"/></p>
 				<p>Your request: <textarea name="request" cols="50" rows="10"></textarea></p>

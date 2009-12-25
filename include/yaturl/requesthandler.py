@@ -273,7 +273,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     text = yaturlTemplate.template(
                            self.server.config.get('templates','staticresultpage'),
                            URL=new_URL)
-            elif 'email' in form:
+        elif self.path('/ContactUs'):
                 email = form['email'].value
                 subj = form['subject'].value
                 descr = form['request'].value
