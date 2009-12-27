@@ -168,7 +168,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         # Needs to be extended later with things like FAQ etc.
         if self.path.endswith("/"):
             text = yaturlTemplate.template(
-            self.server.config.get('templates','statichomepage'),
+                self.server.config.get('templates','statichomepage'),
                 msg="")
             if text:
                 self._send_head(text, 200)
