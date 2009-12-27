@@ -27,7 +27,10 @@ import hashlib
 import os
 import yaturlTemplate
 from db import YuDbError
+import smtplib
+from email.mime.text import MIMEText
 from urlparse import urlparse
+
 
 # we need to hard-code this one at least in case of the file cannot be found on disk
 template_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -126,6 +129,24 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(text)
 
     #----------------------------------------------------------------------
+    def _send_mail(self, subject, content, email):
+
+        msg = MIMEText(content, 'plain', 'utf-8')
+
+        msg['Subject'] = '%s' % (subject)
+        msg['From'] = email
+        msg['To'] = self.server.config.get('email','toemail')
+
+        try:
+            s = smtplib.SMTP('localhost')
+            s.sendmail(msg['From'], [msg['To']], msg.as_string())
+            s.quit()
+        except Exception, e:
+            print 'Mail could not be sent (%s)' % e
+            return -1
+
+
+    #----------------------------------------------------------------------
     def _sanitize_path(self, path):
         """
         Check whether the given path is valid and remove any '..'
@@ -170,6 +191,16 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(text)
             except IOError:
                 self._send_404(header_only)
+        elif self.path.startswith('/ContactUs'):
+            text = yaturlTemplate.template(
+                self.server.config.get('templates', 'contactuspage'))
+            if text:
+                self._send_head(text, 200)
+                self.end_headers()
+                if header_only == False:
+                    self.wfile.write(text)
+            else:
+                self._send_internal_server_error(header_only)
         # Every other page
         else:
             # Assuming, if there is anything else than an alphanumeric
@@ -189,11 +220,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_POST(self):
-        if self.path == "/URLRequest":
-            form = cgi.FieldStorage(
+        form = cgi.FieldStorage(
                 fp=self.rfile,
                 headers=self.headers,
                 environ={'REQUEST_METHOD':'POST'})
+        if self.path == "/URLRequest":  
             # TODO: Check for valid URL and avoid SQL injection later
             # inside this function
             if 'URL' in form and len(form['URL'].value) < 4096:
@@ -205,7 +236,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 if not url.find("://") > -1:
                     url = 'http://%s' % (url)
                 hash = hashlib.sha1(url).hexdigest()
-            
+
                 # Begin the response
                 try:
                     result = self.server.db.is_hash_in_db(hash)
@@ -238,13 +269,26 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
 
-            if text:
-                self._send_head(text, 200)
-                self.wfile.write(text)
-            else:
-                self._send_internal_server_error()
+        elif form and self.path == '/ContactUs':
+                email = form['email'].value
+                subj = form['subject'].value
+                descr = form['request'].value
+                if (self._send_mail(subj, descr, email) is None):
+                    text = yaturlTemplate.template(
+                        self.server.config.get('templates','contactUsResultpage'),
+                        msg="Your request has been sent. You will receive an answer soon.")
+                else:
+                    self._send_internal_server_error()
+                    return
+
         else:
             self._send_404()
+
+        if text:
+            self._send_head(text, 200)
+            self.wfile.write(text)
+        else:
+            self._send_internal_server_error()
     #----------------------------------------------------------------------
     def do_HEAD(self):
         """
