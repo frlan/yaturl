@@ -138,7 +138,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_mail(self, subject, content, email):
-        
+
         msg = MIMEText(content, 'plain', 'utf-8')
 
         msg['Subject'] = '%s' % (subject)
@@ -244,7 +244,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 if not url.find("://") > -1:
                     url = 'http://%s' % (url)
                 hash = hashlib.sha1(url).hexdigest()
-            
+
                 # Begin the response
                 try:
                     result = self.server.db.is_hash_in_db(hash)
@@ -276,7 +276,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             else:
                 text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
-                
+
         elif self.path('/ContactUs'):
                 email = form['email'].value
                 subj = form['subject'].value
@@ -287,16 +287,16 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         msg="Your request has been sent. You will receive an answer soon.")
                 else:
                     self._send_internal_server_error()
-                    return 
-            
+                    return
 
-            if text:
-                self._send_head(text, 200)
-                self.wfile.write(text)
-            else:
-                self._send_internal_server_error()
         else:
             self._send_404()
+
+        if text:
+            self._send_head(text, 200)
+            self.wfile.write(text)
+        else:
+            self._send_internal_server_error()
     #----------------------------------------------------------------------
     def do_HEAD(self):
         """
