@@ -220,11 +220,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_POST(self):
-        if self.path == "/URLRequest":
-            form = cgi.FieldStorage(
+        form = cgi.FieldStorage(
                 fp=self.rfile,
                 headers=self.headers,
                 environ={'REQUEST_METHOD':'POST'})
+        if self.path == "/URLRequest":  
             # TODO: Check for valid URL and avoid SQL injection later
             # inside this function
             if 'URL' in form and len(form['URL'].value) < 4096:
@@ -269,7 +269,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
 
-        elif self.path == '/ContactUs':
+        elif form and self.path == '/ContactUs':
                 email = form['email'].value
                 subj = form['subject'].value
                 descr = form['request'].value
