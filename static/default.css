@@ -54,12 +54,12 @@ BODY, HTML {
 }
 
 /* element styles for input field */
-#main INPUT {
+#main input {
 	font-size: 1.2em;
 }
 
 #main textarea{
-	font-size: 1.2em;
+	font-size: 1.5em;
 }
 
 #main INPUT button {

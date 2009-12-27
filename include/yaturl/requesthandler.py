@@ -135,7 +135,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         msg['Subject'] = '%s' % (subject)
         msg['From'] = email
-        msg['To'] = self.server.config.get('email','toemail'),
+        msg['To'] = self.server.config.get('email','toemail')
 
         try:
             s = smtplib.SMTP('localhost')
