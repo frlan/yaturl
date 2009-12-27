@@ -15,9 +15,17 @@
 		<div id="header"><span>Contact Us</span></div>
 		<div id="main">
 			<form action="/ContactUs" method="post">
-				<p>Your email: <input name="email" type="text" size="50"/></p>
-				<p>Subject: <input name="subject" type="text" size="50"/></p>
-				<p>Your request: <textarea name="request" cols="50" rows="10"></textarea></p>
+				<table>
+					<tr>
+						<td>Your email:</td><td><input name="email" type="text" size="50"/> </td>
+					</tr>
+					<tr>
+						<td>Subject:</td><td><input name="subject" type="text" size="50"/> </td>
+					</tr>
+					<tr>
+						<td>Your request:</td><td><textarea name="request" cols="50" rows="10"></textarea> </td>
+					</tr>
+				</table>
 				<p><input type="submit" value="Submit"/></p>
 			</form>
 		</div>
