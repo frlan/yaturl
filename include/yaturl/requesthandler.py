@@ -26,7 +26,6 @@ import cgi
 import hashlib
 import os
 import yaturlTemplate
-import encodings.idna
 from db import YuDbError
 import smtplib
 from email.mime.text import MIMEText
@@ -270,7 +269,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
 
-        elif self.path('/ContactUs'):
+        elif self.path == '/ContactUs':
                 email = form['email'].value
                 subj = form['subject'].value
                 descr = form['request'].value
