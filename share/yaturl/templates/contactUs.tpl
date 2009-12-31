@@ -28,6 +28,7 @@
 				</table>
 				<p><input type="submit" value="Submit"/></p>
 			</form>
+			<p><a href="/">home</a></p>
 		</div>
 		<div id="footer"></div>
 	</div>

@@ -16,10 +16,11 @@
 		<div id="header"><span>Contact Us </span></div>
 		<div id="main">
 			<p>%(msg)s</p>
+			<p><a href="/">Home</a></p>
 		</div>
 		<div id="footer"></div>
-	</div>	
-	
+	</div>
+
 </body>
 </html>
 
