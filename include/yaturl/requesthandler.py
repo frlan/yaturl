@@ -67,6 +67,24 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             return host
 
     #----------------------------------------------------------------------
+    def log_request(self, code='-', size='-'):
+        """
+        Overwrite the default log_request() method to make it a no-op.
+        We call the original method ourselves to pass also the response size.
+        """
+        pass
+
+    #----------------------------------------------------------------------
+    def send_response(self, code, message=None, size='-'):
+        """Send the response header and log the response code.
+
+        Also send two standard headers with the server software
+        version and the current date.
+        """
+        BaseHTTPRequestHandler.send_response(self, code, message)
+        BaseHTTPRequestHandler.log_request(self, code, size)
+
+    #----------------------------------------------------------------------
     def log_message(self, format, *args):
         """
         Overwrite the default log_message() method which prints for
@@ -87,14 +105,15 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_head(self, text, code):
-        self.send_response(code)
+        size = len(text)
+        self.send_response(code, None, size)
         if self.path.endswith(".css"):
             self.send_header('Content-Type', 'text/css')
         elif self.path.endswith(".ico"):
             self.send_header('Content-Type', 'image/vnd.microsoft.icon')
         else:
             self.send_header('Content-Type', 'text/html')
-        self.send_header("Content-Length", len(text))
+        self.send_header("Content-Length", size)
         self.end_headers()
 
     #----------------------------------------------------------------------
