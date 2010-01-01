@@ -96,12 +96,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", len(text))
         self.end_headers()
+
     #----------------------------------------------------------------------
     def _send_301(self, new_url):
         self.send_response(301)
         self.send_header('Location', new_url)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
+
     #----------------------------------------------------------------------
     def _send_404(self, header_only=False):
         text = yaturlTemplate.template(
@@ -154,7 +156,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         except Exception, e:
             print 'Mail could not be sent (%s)' % e
             return -1
-
 
     #----------------------------------------------------------------------
     def _sanitize_path(self, path):
@@ -299,6 +300,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(text)
         else:
             self._send_internal_server_error()
+
     #----------------------------------------------------------------------
     def do_HEAD(self):
         """
