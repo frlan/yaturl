@@ -25,6 +25,7 @@ import socket
 import cgi
 import hashlib
 import os
+import time
 import yaturlTemplate
 from db import YuDbError
 import smtplib
@@ -72,8 +73,17 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         some reason to stderr which we don't want.  Instead, use a
         logger.
         """
-        format = '%s: %s' % (self.address_string(), format)
-        self.server.accesslog.info(format%args)
+        values = dict(
+            client=self.address_string(),
+            identity='-',
+            user='-',
+            timestr=time.strftime('%d/%a/%Y:%H:%M:%S %z'),
+            request=format % args,
+            referrer='"-"',
+            useragent='"-"'
+        )
+        format = '%(client)s %(identity)s %(user)s [%(timestr)s] %(request)s %(referrer)s %(useragent)s'
+        self.server.accesslog.info(format % values)
 
     #----------------------------------------------------------------------
     def _send_head(self, text, code):
@@ -224,7 +234,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 fp=self.rfile,
                 headers=self.headers,
                 environ={'REQUEST_METHOD':'POST'})
-        if self.path == "/URLRequest":  
+        if self.path == "/URLRequest":
             # TODO: Check for valid URL and avoid SQL injection later
             # inside this function
             if 'URL' in form and len(form['URL'].value) < 4096:

@@ -104,11 +104,9 @@ def main():
     pid.close()
 
     # (error) logging
-    # TODO write a formatter for access log
-    accesslog = setup_logging(config, 'accesslog',
-        '%(asctime)s: %(message)s')
+    accesslog = setup_logging(config, 'accesslog', '%(message)s')
     errorlog = setup_logging(config, 'errorlog',
-        '%(asctime)s: %(process)d: (%(funcName)s():%(lineno)d): %(levelname)s: %(message)s')
+        '%(asctime)s: (%(funcName)s():%(lineno)d): %(levelname)s: %(message)s')
 
     # handle signals
     signal(SIGINT,  signal_handler)
