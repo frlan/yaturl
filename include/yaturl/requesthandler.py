@@ -30,8 +30,8 @@ import yaturlTemplate
 from db import YuDbError
 import smtplib
 from email.mime.text import MIMEText
-from urlparse import urlparse
-
+from urlparse import urlsplit
+from urlparse import urlunsplit
 
 # we need to hard-code this one at least in case of the file cannot be found on disk
 template_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -265,7 +265,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 # there.
                 if not url.find("://") > -1:
                     url = 'http://%s' % (url)
-                hash = hashlib.sha1(url).hexdigest()
+                url_split = urlsplit(url)
+                url_new = urlunsplit((url_split.scheme,
+                          url_split.netloc.decode("utf-8 ").encode("idna"),
+                          url_split.path, url_split.query,
+                          url_split.fragment))
+
+                hash = hashlib.sha1(url_new).hexdigest()
 
                 # Begin the response
                 try:
@@ -275,11 +281,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     return
                 if not result:
                     try:
-                        short = self.server.db.add_link_to_db(hash, url)
+                        short = self.server.db.add_link_to_db(hash, url_new)
                     except YuDbError:
                         self._send_database_problem()
                         return
-                    new_URL= '<a href="hfttp://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
+                    new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
                     text = yaturlTemplate.template(
                            self.server.config.get('templates','staticresultpage'),
                            URL=new_URL)
