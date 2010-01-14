@@ -68,7 +68,8 @@ class YuDb(object):
         try:
             conn = SafeMySQLConnection(host=hostname, db=database, user=self._user, passwd=self._passwd,
                 port=self._port, use_unicode=True, charset='utf8',
-                init_command='SET TRANSACTION ISOLATION LEVEL READ COMMITTED')
+                init_command='SET TRANSACTION ISOLATION LEVEL READ COMMITTED',
+                logger=self.logger)
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError('Database error: %s' % e)
