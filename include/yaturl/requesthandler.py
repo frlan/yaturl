@@ -200,12 +200,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'),
                 msg="")
-            if text:
-                self._send_head(text, 200)
-                if header_only == False:
-                    self.wfile.write(text)
-            else:
-                self._send_internal_server_error(header_only)
         elif self.path.startswith('/static/'):
             # remove '../' and friends
             path = self._sanitize_path(self.path)
@@ -216,36 +210,18 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 # actually deliver the requested file
                 file = open(path)
                 text = file.read()
-                self._send_head(text, 200)
-                if header_only == False:
-                    self.wfile.write(text)
             except IOError:
                 self._send_404(header_only)
+                return
         elif self.path.startswith('/ContactUs'):
             text = yaturlTemplate.template(
                 self.server.config.get('templates', 'contactuspage'))
-            if text:
-                self._send_head(text, 200)
-                self.end_headers()
-                if header_only == False:
-                    self.wfile.write(text)
-            else:
-                self._send_internal_server_error(header_only)
         elif self.path ==  "/URLRequest":
             # In case of there is a GET reuqest to this page, just
             # return the homepage
             text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'),
                 msg="<p>Please check your input</p>")
-
-            if text:
-                self._send_head(text, 200)
-                self.end_headers()
-                if header_only == False:
-                    self.wfile.write(text)
-            else:
-                self._send_internal_server_error(header_only)
-
         # Every other page
         else:
             # Assuming, if there is anything else than an alphanumeric
@@ -258,10 +234,21 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     return
                 if result:
                     self._send_301(result[0])
+                    return
                 else:
                     self._send_404(header_only)
+                    return
             else:
                 self._send_404(header_only)
+                return
+
+        if text:
+            self._send_head(text, 200)
+            self.end_headers()
+            if header_only == False:
+                self.wfile.write(text)
+        else:
+            self._send_internal_server_error(header_only)
 
     #----------------------------------------------------------------------
     def do_POST(self):
