@@ -44,6 +44,7 @@ BODY, HTML {
 
 #footer a {
 	color: lime;
+	text-decoration: none;
 }
 
 /* content area padding to find a nice place for the input field  */

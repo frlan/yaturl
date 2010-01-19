@@ -17,18 +17,18 @@
 	<title>yatURL.net - Result</title>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 	<meta name="generator" content="Geany 0.19" />
-	<link rel="stylesheet" href="/static/default.css" type="text/css"/>
+	<link rel="stylesheet" href="http://yaturl.net/static/default.css" type="text/css"/>
 </head>
 
-<body>	
+<body>
 	<div id="container">
 		<div id="header"><span>New URL</span></div>
 		<div id="main">
 			<p>Thanks for using our service. Your new short URL is</p>
 			<p>%(URL)s</p>
 		</div>
-		<div id="footer"></div>
-	</div>	
+		<div id="footer"><span><a href="/ContactUs">Contact Us</a></span></div>
+	</div>
 
 </body>
 

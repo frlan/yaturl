@@ -16,11 +16,11 @@
 		<div id="header"><span>500 - Internal Server Error</span></div>
 		<div id="main">
 			<p>500 - Internal server error</p>
-			<p>The server encountered an internal error and was unable 
+			<p>The server encountered an internal error and was unable
 			to complete your request.</p>
 		</div>
-		<div id="footer"></div>
-	</div>	
-	
+		<div id="footer"><span><a href="/ContactUs">Contact Us</a></span></div>
+	</div>
+
 </body>
 </html>
