@@ -23,7 +23,7 @@ import MySQLdb
 from MySQLdb.constants.CR import SERVER_GONE_ERROR, SERVER_LOST
 from MySQLdb.connections import Connection
 from MySQLdb.cursors import Cursor
-
+from inspect import stack
 
 
 class SafeCursor(Cursor):
@@ -91,7 +91,21 @@ class SafeMySQLConnection(Connection):
         Then the base class' __init__() method is called.
         """
         self.arguments = (args, kwargs)
+        if kwargs.has_key('logger'):
+            self.logger = kwargs.get('logger', None)
+            del kwargs['logger']
+        else:
+            self.logger = None
         super(SafeMySQLConnection, self).__init__(*args, **kwargs)
+
+    #----------------------------------------------------------------------
+    def _do_log(self):
+        s = stack()
+        try:
+            caller = s[3][3]
+        except IndexError:
+            caller = '(unknown)'
+        self.logger.warn('%s: Reconnecting to database due to lost connection' % caller)
 
     #----------------------------------------------------------------------
     def reconnect(self):
@@ -101,6 +115,8 @@ class SafeMySQLConnection(Connection):
         """
         self.close()
         args, kwargs = self.arguments
+        if self.logger:
+            self._do_log()
         super(SafeMySQLConnection, self).__init__(*args, **kwargs)
 
     #----------------------------------------------------------------------
