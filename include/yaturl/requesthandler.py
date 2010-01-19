@@ -231,6 +231,21 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(text)
             else:
                 self._send_internal_server_error(header_only)
+        elif self.path ==  "/URLRequest":
+            # In case of there is a GET reuqest to this page, just
+            # return the homepage
+            text = yaturlTemplate.template(
+                self.server.config.get('templates','statichomepage'),
+                msg="<p>Please check your input</p>")
+
+            if text:
+                self._send_head(text, 200)
+                self.end_headers()
+                if header_only == False:
+                    self.wfile.write(text)
+            else:
+                self._send_internal_server_error(header_only)
+
         # Every other page
         else:
             # Assuming, if there is anything else than an alphanumeric
