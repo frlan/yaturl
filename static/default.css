@@ -1,4 +1,4 @@
-/* reset some global params */
+	/* reset some global params */
 BODY, HTML {
 	font-family: verdana;
 	font-size: 100.1%;
@@ -60,7 +60,8 @@ BODY, HTML {
 }
 
 #main textarea{
-	font-size: 1.5em;
+	font-family: verdana;
+	font-size: 1.2em;
 }
 
 #main INPUT button {
