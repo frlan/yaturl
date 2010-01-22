@@ -30,7 +30,7 @@
 			</form>
 			<p><a href="/">home</a></p>
 		</div>
-		<div id="footer"></div>
+		<div id="footer"><span><a href="/">Home</a></span></div>
 	</div>
 </body>
 </html>
