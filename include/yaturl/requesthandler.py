@@ -219,6 +219,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'),
                 msg="<p>Please check your input</p>")
+        elif self.path == "/About":        
+			# Tell somehting about the Authors 
+			text = yaturlTemplate.template(
+				self.server.config.get('templates', 'aboutpage'))
         # Every other page
         else:
             # Assuming, if there is anything else than an alphanumeric

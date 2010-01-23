@@ -25,6 +25,8 @@ databaseissuelink: share/yaturl/templates/databaseerror.tpl
 servererror: share/yaturl/templates/500.tpl
 contactuspage: share/yaturl/templates/contactUs.tpl
 contactusresultpage: share/yaturl/templates/contactUsResult.tpl
+aboutpage: share/yaturl/templates/about.tpl
+
 
 [email]
 fromemail: example@example.org
