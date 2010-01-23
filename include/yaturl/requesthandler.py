@@ -118,10 +118,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_301(self, new_url):
-        self.send_response(301)
-        self.send_header('Location', new_url)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+        try:
+            self.send_response(301)
+            self.send_header('Location', new_url)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+        except:
+            self._send_internal_server_error()
 
     #----------------------------------------------------------------------
     def _send_404(self, header_only=False):
