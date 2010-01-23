@@ -91,14 +91,23 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         some reason to stderr which we don't want.  Instead, use a
         logger.
         """
+        try:
+            useragent = self.headers['User-Agent']
+        except KeyError:
+            useragent = '-'
+        try:
+            referrer = self.headers['Referer']
+        except KeyError:
+            referrer = '-'
+
         values = dict(
             client=self.address_string(),
             identity='-',
             user='-',
             timestr=time.strftime('%d/%a/%Y:%H:%M:%S %z'),
             request=format % args,
-            referrer='"-"',
-            useragent='"-"'
+            referrer='"%s"' % referrer,
+            useragent='"%s"' % useragent
         )
         format = '%(client)s %(identity)s %(user)s [%(timestr)s] %(request)s %(referrer)s %(useragent)s'
         self.server.accesslog.info(format % values)
