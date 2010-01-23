@@ -28,31 +28,16 @@ import os
 import time
 import yaturlTemplate
 from db import YuDbError
+from contants import *
 import smtplib
 from email.mime.text import MIMEText
 from urlparse import urlsplit
 from urlparse import urlunsplit
 
-# we need to hard-code this one at least in case of the file cannot be found on disk
-template_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-
-<head>
-    <title>yatURL.net - Internal server error</title>
-    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-    <meta name="generator" content="Geany 0.18" />
-</head>
-
-<body>
-    <p>500 - Internal server error</p>
-
-    <p>The server encountered an internal error and was unable to complete your request.</p>
-</body>
-</html>
-'''
 
 class YuRequestHandler(BaseHTTPRequestHandler):
+
+    server_version = '%s/%s' % (SERVER_NAME, SERVER_VERSION)
 
     #----------------------------------------------------------------------
     def address_string(self):
@@ -156,7 +141,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         text = yaturlTemplate.template(self.server.config.get('templates','servererror'))
         if not text:
             # fallback to hard-coded template
-            text = template_500
+            text = TEMPLATE_500
         self._send_head(text, 500)
         if header_only == False:
             self.wfile.write(text)
