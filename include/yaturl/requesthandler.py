@@ -117,7 +117,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Location', new_url)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-        except:
+        except UnicodeEncodeError:
             self._send_internal_server_error()
 
     #----------------------------------------------------------------------
