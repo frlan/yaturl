@@ -27,7 +27,7 @@
 			<h1>Development and License and Contribution/donation</h1>
 			<p>Yaturl.net is developed and can be reused under terms 
 			and conditions of GPLv2+. You can find the source code 
-			at <a href="http://git.uvena.de/yaturl">git.uvena.de</a>.</p>
+			at <a href="http://git.uvena.de/yaturl/">git.uvena.de</a>.</p>
 			
 			<p>If you liketo contribute or donate to this projekct, 
 			please feel free to send a patch to improve some 
