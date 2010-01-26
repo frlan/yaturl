@@ -3,6 +3,7 @@ charset: UTF8
 pid_file_path: run/yaturl.pid
 accesslog: log/access.log
 errorlog: log/error.log
+staticdocumentroot: static/
 #user: yaturl
 
 [http]

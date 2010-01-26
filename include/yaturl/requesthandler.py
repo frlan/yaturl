@@ -193,56 +193,55 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self, header_only=False):
         # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
-        if self.path.endswith("/"):
-            text = yaturlTemplate.template(
-                self.server.config.get('templates','statichomepage'),
-                msg="")
-        elif self.path.startswith('/static/'):
-            # remove '../' and friends
-            path = self._sanitize_path(self.path)
-            try:
-                # check whether the path is still what we want
-                if not path.startswith('static/'):
-                    raise IOError
-                # actually deliver the requested file
-                file = open(path)
-                text = file.read()
-            except IOError:
-                self._send_404(header_only)
-                return
-        elif self.path.startswith('/ContactUs'):
-            text = yaturlTemplate.template(
-                self.server.config.get('templates', 'contactuspage'))
-        elif self.path ==  "/URLRequest":
-            # In case of there is a GET reuqest to this page, just
-            # return the homepage
-            text = yaturlTemplate.template(
-                self.server.config.get('templates','statichomepage'),
-                msg="<p>Please check your input</p>")
-        elif self.path == "/About":        
-			# Tell somehting about the Authors 
-			text = yaturlTemplate.template(
-				self.server.config.get('templates', 'aboutpage'))
-        # Every other page
-        else:
-            # Assuming, if there is anything else than an alphanumeric
-            # character after the starting /, it's not a valid hash at all
-            if self.path[1:].isalnum():
-                try:
-                    result = self.server.db.get_link_from_db(self.path[1:])
-                except YuDbError:
-                    self._send_database_problem(header_only)
-                    return
-                if result:
-                    self._send_301(result[0])
-                    return
+        
+        docroot = self.server.config.get('main', 'staticdocumentroot') 
+        local_path = self._sanitize_path(self.path)
+        path =  docroot + self._sanitize_path(self.path)
+
+        try:
+            # actually try deliver the requested file - First we try to send
+            # every static content 
+            print path
+            file = open(path)
+            text = file.read()
+        except IOError:
+            if self.path == "/":
+                text = yaturlTemplate.template(
+                    self.server.config.get('templates','statichomepage'),
+                    msg="")
+            elif self.path == '/ContactUs':
+                text = yaturlTemplate.template(
+                    self.server.config.get('templates', 'contactuspage'))
+            elif self.path ==  '/URLRequest':
+                # In case of there is a GET reuqest to this page, just
+                # return the homepage
+                text = yaturlTemplate.template(
+                    self.server.config.get('templates','statichomepage'),
+                    msg="<p>Please check your input</p>")
+            elif self.path == "/About":        
+                # Tell somehting about the Authors 
+                text = yaturlTemplate.template(
+                    self.server.config.get('templates', 'aboutpage'))
+            # Every other page
+            else:
+                # Assuming, if there is anything else than an alphanumeric
+                # character after the starting /, it's not a valid hash at all
+                if self.path[1:].isalnum():
+                    try:
+                        result = self.server.db.get_link_from_db(self.path[1:])
+                    except YuDbError:
+                        self._send_database_problem(header_only)
+                        return
+                    if result:
+                        self._send_301(result[0])
+                        return
+                    else:
+                        self._send_404(header_only)
+                        return
                 else:
                     self._send_404(header_only)
-                    return
-            else:
-                self._send_404(header_only)
-                return
-
+                    return 
+            
         if text:
             self._send_head(text, 200)
             self.end_headers()

@@ -6,7 +6,7 @@
     <title>yatURL.net - Yet another tiny URL service</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <meta name="generator" content="Geany 0.19" />
-    <link rel="stylesheet" href="/static/default.css" type="text/css"/>
+    <link rel="stylesheet" href="/default.css" type="text/css"/>
 </head>
 
 <body>
