@@ -193,15 +193,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self, header_only=False):
         # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
-        
-        docroot = self.server.config.get('main', 'staticdocumentroot') 
+
+        docroot = self.server.config.get('main', 'staticdocumentroot')
         local_path = self._sanitize_path(self.path)
         path =  docroot + self._sanitize_path(self.path)
 
         try:
             # actually try deliver the requested file - First we try to send
-            # every static content 
-            print path
+            # every static content
             file = open(path)
             text = file.read()
         except IOError:
@@ -233,8 +232,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         return
                 else:
                     self._send_404(header_only)
-                    return 
-            
+                    return
+
         if text:
             self._send_head(text, 200)
             self.end_headers()
