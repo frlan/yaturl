@@ -20,7 +20,6 @@
 					<input type="submit" value="Submit"/></p>
 				</form>
 		</div>
-		<div id="footer"><span><a href="/ContactUs">Contact Us</a></span></div>
-	</div>
+		<div id="footer"><span><a href="/ContactUs">Contact Us</a> &nbsp;&nbsp; <a href="/About">About</a></span></div>	</div>
 </body>
 </html>
