@@ -18,9 +18,3 @@
 			<p>%(msg)s</p>
 			<p><a href="/">Home</a></p>
 		</div>
-		<div id="footer"></div>
-	</div>
-
-</body>
-</html>
-

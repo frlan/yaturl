@@ -27,13 +27,3 @@
 			<p>Thanks for using our service. Your new short URL is</p>
 			<p>%(URL)s</p>
 		</div>
-		<div id="footer"><span><a href="/ContactUs">Contact Us</a> &nbsp;&nbsp; <a href="/About">About</a></span></div>
-	</div>
-
-</body>
-
-</html>
-
-</body>
-
-</html>

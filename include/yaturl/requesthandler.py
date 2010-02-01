@@ -238,7 +238,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self._send_head(text, 200)
             self.end_headers()
             if header_only == False:
-                self.wfile.write(text)
+                self.wfile.write(text + "\n")
         else:
             self._send_internal_server_error(header_only)
 

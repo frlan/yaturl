@@ -19,11 +19,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
+
+from contants import FOOTER
+
 def template(file, **vars):
     try:
         f = open(file, 'r')
         result = f.read() % vars
         f.close()
-        return result
+        return result + FOOTER
     except IOError:
         return ''
