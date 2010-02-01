@@ -21,11 +21,13 @@
 # MA 02110-1301, USA.
 
 from contants import FOOTER
+from contants import HEADER
 
-def template(file, **vars):
+def template(file, title, header, **vars):
+    head = HEADER % (title, header)
     try:
         f = open(file, 'r')
-        result = f.read() % vars
+        result = head + f.read() % vars
         f.close()
         return result + FOOTER
     except IOError:

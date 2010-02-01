@@ -124,7 +124,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     def _send_404(self, header_only=False):
         text = yaturlTemplate.template(
             self.server.config.get('templates','corruptlink'),
-            URL="Nothing")
+                title='yatURL.net - 404',
+                header='404 &mdash Page not found',
+                URL="Nothing")
         if text:
             self._send_head(text, 404)
             if header_only == False:
@@ -138,7 +140,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_internal_server_error(self, header_only=False):
-        text = yaturlTemplate.template(self.server.config.get('templates','servererror'))
+        text = yaturlTemplate.template(self.server.config.get('templates','servererror'),
+            title='yatURL.net - Internal Error',
+            header='Internal error')
         if not text:
             # fallback to hard-coded template
             text = TEMPLATE_500
@@ -148,7 +152,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_database_problem(self, header_only=False):
-        text = yaturlTemplate.template(self.server.config.get('templates','databaseissuelink'))
+        text = yaturlTemplate.template(self.server.config.get('templates','databaseissuelink'),
+            title='yatURL.net - Datebase error',
+            header='Database error')
         if not text:
             self._send_internal_server_error()
             return
@@ -207,13 +213,17 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             if self.path == "/":
                 text = yaturlTemplate.template(
                     self.server.config.get('templates','statichomepage'),
-                    msg="")
+                        title='yatURL.net',
+                        header='yatURL.net',
+                        msg='')
             elif self.path ==  '/URLRequest':
-                # In case of there is a GET reuqest to this page, just
+                # In case of there is a GET request to this page, just
                 # return the homepage
                 text = yaturlTemplate.template(
                     self.server.config.get('templates','statichomepage'),
-                    msg="<p>Please check your input</p>")
+                    title='yatURL.net',
+                    header='yatURL.net',
+                    msg='')
             # Every other page
             else:
                 # Assuming, if there is anything else than an alphanumeric
@@ -282,6 +292,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
                     text = yaturlTemplate.template(
                            self.server.config.get('templates','staticresultpage'),
+                           title='yatURL.net &mdash; Result',
+                           header='New URL',
                            URL=new_URL)
                 else:
                     # It appears link is already stored or you have found
@@ -294,10 +306,15 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
                     text = yaturlTemplate.template(
                            self.server.config.get('templates','staticresultpage'),
+                           title='yatURL.net - Short URL Result',
+                           header='new URL',
                            URL=new_URL)
             else:
                 text = yaturlTemplate.template(
-                self.server.config.get('templates','statichomepage'), msg="<p>Please check your input</p>")
+                self.server.config.get('templates','statichomepage'),
+                    title='yatURL.net',
+                    header='yatURL.net',
+                    msg="<p>Please check your input</p>")
 
         elif form and self.path == '/ContactUs':
                 email = form['email'].value
@@ -306,6 +323,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 if (self._send_mail(subj, descr, email) is None):
                     text = yaturlTemplate.template(
                         self.server.config.get('templates','contactUsResultpage'),
+                        title='',
+                        header='Mail sent',
                         msg="Your request has been sent. You will receive an answer soon.")
                 else:
                     self._send_internal_server_error()
