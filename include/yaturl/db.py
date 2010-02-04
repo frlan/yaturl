@@ -168,9 +168,11 @@ class YuDb(object):
             short = hash[:i]
             try:
                 conn, c = self._get_connection()
-                c.execute('''INSERT INTO %s.`link`
+                link = link.replace("'","")
+                c.execute("""INSERT INTO %s.`link`
                          (`link_shorthash`,`link_hash`,`link_link`)
-                         VALUES ('%s', '%s','%s')''' % (self._database, short, hash, link))
+                         VALUES ('%s', '%s', '%s')""" % (self._database, 
+                         short, hash, link))
                 conn.commit()
                 c.close()
                 return short
