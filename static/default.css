@@ -26,12 +26,10 @@ BODY, HTML {
 }
 
 
-/* dress header and footer in black */
 #header, #footer {
-	background: #666666;
+	background: #888888;
 }
 
-/* put header specific stuff here */
 #header {
 	padding: 10px 2% 0px 10px;
 	text-align: right;
