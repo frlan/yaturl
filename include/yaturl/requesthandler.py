@@ -261,12 +261,24 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         if self.path == "/URLRequest":
             # TODO: Check for valid URL and avoid SQL injection later
             # inside this function
-            if 'URL' in form and len(form['URL'].value) < 4096:
-                # Calculating the output and doing some minor input checks
+
+            # Doing some basic checks for submitted URL.  We assume,
+            # if inside the inserted URL our domain name is included
+            # its most likely an attempt to build up a circle which we
+            # like to prevent from being established. If its not
+            # intented to become a circle, well, its still something
+            # unusual which we might don't want to have.
+
+            if ('URL' in form and 
+                len(form['URL'].value) < 4096 and
+                not form['URL'].value.find("yaturl.net") > -1):
+
                 url = form['URL'].value
+
                 # Now check, whether some protocol prefix is
                 # available. If not, assume http:// was intended to put
                 # there.
+
                 if not url.find("://") > -1:
                     url = 'http://%s' % (url)
                 url_split = urlsplit(url)
