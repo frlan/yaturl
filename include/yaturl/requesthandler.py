@@ -192,6 +192,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         if os.path.isabs(path):
             # skip leading slashes
             path = path[1:]
+        # drop query string
+        query_string_start = path.find('?')
+        if query_string_start > -1:
+            path = path[0:query_string_start]
         # sanitize path
         return os.path.normpath(path)
 
