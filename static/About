@@ -14,29 +14,29 @@
 		<div id="header"><span>yaturl.net</span></div>
 		<div id="main">
 			<h1>General</h1>
-			<p>Yaturl.net is project to offer a free short URL 
-			service based on free software.</p> 
+			<p>Yaturl.net is project to offer a free short URL
+			service based on free software.</p>
 
 			<h1>Terms of usage</h1>
-			<p>Please feel free to use the service when ever you 
-			think its making sense using it. Basically we don not 
-			restrict the usage but ask our users to make usage of 
-			it by turning on brain before acting. Please act 
+			<p>Please feel free to use the service whenever you
+			think it is appropriate to use it. Basically, we do not
+			restrict the usage but ask our users to make usage of
+			it by turning on brain before acting. Please act
 			responsible.</p>
-			
-			<h1>Development and License and Contribution/donation</h1>
-			<p>Yaturl.net is developed and can be reused under terms 
-			and conditions of GPLv2+. You can find the source code 
+
+			<h1>Development, License and Contribution/Donation</h1>
+			<p>Yaturl.net is developed and can be reused under terms
+			and conditions of GPLv2+. You can find the source code
 			at <a href="http://git.uvena.de/yaturl/">git.uvena.de</a>.</p>
-			
-			<p>If you liketo contribute or donate to this projekct, 
-			please feel free to send a patch to improve some 
-			function of this tool. To do so, please use the 
+
+			<p>If you like to contribute or donate to this project,
+			please feel free to send a patch to improve some
+			functions of this tool. To do so, please use the
 			<a href="/ContactUs">contact form</a> to do so.</p>
 
 			<h1>Contact</h1>
-			
-			<p>If you need to get in contact with the, please check 
+
+			<p>If you need to get in contact with the authors, please check
 			the whois of this domain or use our <a href="/ContactUs"
 			>contact form </a> to send you request..</p>
 
