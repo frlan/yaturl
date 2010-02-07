@@ -202,7 +202,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         docroot = self.server.config.get('main', 'staticdocumentroot')
         local_path = self._sanitize_path(self.path)
-        path =  docroot + self._sanitize_path(self.path)
+        path =  docroot + local_path
 
         try:
             # actually try deliver the requested file - First we try to send
@@ -269,7 +269,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             # intented to become a circle, well, its still something
             # unusual which we might don't want to have.
 
-            if ('URL' in form and 
+            if ('URL' in form and
                 len(form['URL'].value) < 4096 and
                 not form['URL'].value.find("yaturl.net") > -1):
 
