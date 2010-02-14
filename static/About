@@ -24,7 +24,7 @@
 			it by turning on brain before acting. Please act
 			responsible.</p>
 
-			<h1>Development, License and Contribution/Donation</h1>
+			<h1>Development, License and Contribution/Donation <a name="license"></a></h1>
 			<p>Yaturl.net is developed and can be reused under terms
 			and conditions of GPLv2+. You can find the source code
 			at <a href="http://git.uvena.de/yaturl/">git.uvena.de</a>.</p>
