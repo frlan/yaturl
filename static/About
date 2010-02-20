@@ -15,7 +15,7 @@
         <div id="main">
             <h1>General</h1>
             <p>Yaturl.net is project to offer a free short URL
-            service based on free software.</p>
+            service based on <a href="http://www.fsf.org/">free software</a>.</p>
 
             <p><a href="/">Home</a></p>
 
