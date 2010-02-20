@@ -24,11 +24,11 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 import socket
 import cgi
 import hashlib
-import os
 import time
 import yaturlTemplate
 from db import YuDbError
 from constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500
+from yaturl.helpers import sanitize_path
 from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
 from urlparse import urlsplit, urlunsplit
@@ -345,26 +345,3 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         data.... As so, we only need to call do_GET with parameter.
         """
         self.do_GET(True)
-
-
-#----------------------------------------------------------------------
-# TODO: move into a separate module
-def sanitize_path(path):
-    """
-    Check whether the given path is valid and remove any '..'
-
-    @param path (str) - the path to check
-    @return the full normalized absolute path (str)
-    """
-    if not path:
-        return ''
-    if os.path.isabs(path):
-        # skip leading slashes
-        path = path[1:]
-    # drop query string
-    query_string_start = path.find('?')
-    if query_string_start > -1:
-        path = path[0:query_string_start]
-    # sanitize path
-    return os.path.normpath(path)
-
