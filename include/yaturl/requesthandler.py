@@ -242,28 +242,26 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 fp=self.rfile,
                 headers=self.headers,
                 environ={'REQUEST_METHOD':'POST'})
+
         if self.path == "/URLRequest":
             # TODO: Check for valid URL and avoid SQL injection later
             # inside this function
 
             # Doing some basic checks for submitted URL.  We assume,
             # if inside the inserted URL our domain name is included
-            # its most likely an attempt to build up a circle which we
-            # like to prevent from being established. If its not
-            # intented to become a circle, well, its still something
+            # it's most likely an attempt to build up a circle which we
+            # like to prevent from being established. If it's not
+            # intented to become a circle, well, it's still something
             # unusual which we might don't want to have.
 
-            if ('URL' in form and
-                len(form['URL'].value) < 4096 and
-                not form['URL'].value.find("yaturl.net") > -1):
-
-                url = form['URL'].value
+            url = form['URL'].value if form.has_key('URL') else None
+            if url and len(url) < 4096 and not 'yaturl.net' in url:
 
                 # Now check, whether some protocol prefix is
                 # available. If not, assume http:// was intended to put
                 # there.
 
-                if not url.find("://") > -1:
+                if not '://' in url:
                     url = 'http://%s' % (url)
                 url_split = urlsplit(url)
                 # TODO rewrite this to something readable
@@ -295,7 +293,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                            URL=new_url)
                 else:
                     # It appears link is already stored or you have found
-                    # an collision on sha1
+                    # a collision on sha1
                     try:
                         short = self.server.db.get_short_for_hash_from_db(link_hash)[0]
                     except YuDbError:
@@ -316,7 +314,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     header=SERVER_NAME,
                     msg="<p>Please check your input</p>")
 
-        elif form and self.path == '/ContactUs':
+        elif self.path == '/ContactUs':
             email = form['email'].value
             subj = form['subject'].value
             descr = form['request'].value
