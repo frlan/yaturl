@@ -178,8 +178,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             smtp_conn.sendmail(msg['From'], [msg['To']], msg.as_string())
             smtp_conn.quit()
         except SMTPException, e:
-            print 'Mail could not be sent (%s)' % e
-            return -1
+            self.server.errorlog('Mail could not be sent (%s)' % e)
+            return False
+        return True
 
     #----------------------------------------------------------------------
     def do_GET(self, header_only=False):
@@ -318,7 +319,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             email = form['email'].value
             subj = form['subject'].value
             descr = form['request'].value
-            if (self._send_mail(subj, descr, email) is None):
+            if self._send_mail(subj, descr, email):
                 text = yaturlTemplate.template(
                     self.server.config.get('templates','contactUsResultpage'),
                     title='',
@@ -327,7 +328,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             else:
                 self._send_internal_server_error()
                 return
-
         else:
             self._send_404()
 
