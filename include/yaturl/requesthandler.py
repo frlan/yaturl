@@ -62,7 +62,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def send_response(self, code, message=None, size='-'):
-        """Send the response header and log the response code.
+        """
+        Send the response header and log the response code.
 
         Also send two standard headers with the server software
         version and the current date.
@@ -123,8 +124,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_404(self, header_only=False):
+        template_filename = self.server.config.get('templates','corruptlink')
         text = read_template(
-            self.server.config.get('templates','corruptlink'),
+                template_filename,
                 title='yatURL.net - 404',
                 header='404 &mdash Page not found',
                 URL="Nothing")
@@ -141,7 +143,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_internal_server_error(self, header_only=False):
-        text = read_template(self.server.config.get('templates','servererror'),
+        template_filename = self.server.config.get('templates','servererror')
+        text = read_template(
+            template_filename,
             title='yatURL.net - Internal Error',
             header='Internal error')
         if not text:
@@ -153,8 +157,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_database_problem(self, header_only=False):
-        text = read_template(self.server.config.get('templates','databaseissuelink'),
-            title='yatURL.net - Datebase error',
+        template_filename = self.server.config.get('templates','databaseissuelink')
+        text = read_template(
+            template_filename,
+            title='%s - Datebase error' % SERVER_NAME,
             header='Database error')
         if not text:
             self._send_internal_server_error()
@@ -195,21 +201,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             text = requested_file.read()
             requested_file.close()
         except IOError:
-            if self.path == "/":
+            if self.path in ('/', '/URLRequest'):
+                template_filename = self.server.config.get('templates','statichomepage')
                 text = read_template(
-                    self.server.config.get('templates','statichomepage'),
-                        title='yatURL.net',
-                        header='yatURL.net',
+                        template_filename,
+                        title=SERVER_NAME,
+                        header=SERVER_NAME,
                         msg='')
-            elif self.path ==  '/URLRequest':
-                # In case of there is a GET request to this page, just
-                # return the homepage
-                text = read_template(
-                    self.server.config.get('templates','statichomepage'),
-                    title='yatURL.net',
-                    header='yatURL.net',
-                    msg='')
-            # Every other page
+            # Any other page
             else:
                 # Assuming, if there is anything else than an alphanumeric
                 # character after the starting /, it's not a valid hash at all
@@ -288,8 +287,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_database_problem()
                         return
                     new_url = '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short, short)
+                    template_filename = self.server.config.get('templates','staticresultpage')
                     text = read_template(
-                           self.server.config.get('templates','staticresultpage'),
+                           template_filename,
                            title='yatURL.net &mdash; Result',
                            header='New URL',
                            URL=new_url)
@@ -302,16 +302,18 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_database_problem()
                         return
                     new_url = '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short, short)
+                    template_filename = self.server.config.get('templates','staticresultpage')
                     text = read_template(
-                           self.server.config.get('templates','staticresultpage'),
-                           title='yatURL.net - Short URL Result',
+                           template_filename,
+                           title='%s - Short URL Result' % SERVER_NAME,
                            header='new URL',
                            URL=new_url)
             else:
+                template_filename = self.server.config.get('templates','statichomepage')
                 text = read_template(
-                self.server.config.get('templates','statichomepage'),
-                    title='yatURL.net',
-                    header='yatURL.net',
+                    template_filename,
+                    title=SERVER_NAME,
+                    header=SERVER_NAME,
                     msg="<p>Please check your input</p>")
 
         elif form and self.path == '/ContactUs':
@@ -319,8 +321,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             subj = form['subject'].value
             descr = form['request'].value
             if self._send_mail(subj, descr, email):
+                template_filename = self.server.config.get('templates','contactUsResultpage')
                 text = read_template(
-                    self.server.config.get('templates','contactUsResultpage'),
+                    template_filename,
                     title='',
                     header='Mail sent',
                     msg="Your request has been sent. You will receive an answer soon.")
