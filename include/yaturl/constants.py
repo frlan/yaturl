@@ -44,11 +44,13 @@ TEMPLATE_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 </html>
 '''
 
+
 FOOTER = '''\
             <div id="footer"><span><a href="/ContactUs">Contact Us</a> &nbsp;&nbsp; <a href="/About">About</a> &nbsp;&nbsp; <a href="/">Home</a> </span></div>
     </div>
 </body>
 </html>'''
+
 
 HEADER = '''\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
