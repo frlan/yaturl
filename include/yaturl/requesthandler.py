@@ -29,10 +29,9 @@ import time
 import yaturlTemplate
 from db import YuDbError
 from contants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500
-import smtplib
+from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
-from urlparse import urlsplit
-from urlparse import urlunsplit
+from urlparse import urlsplit, urlunsplit
 
 
 class YuRequestHandler(BaseHTTPRequestHandler):
@@ -175,10 +174,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         msg['To'] = self.server.config.get('email','toemail')
 
         try:
-            smtp_conn = smtplib.SMTP('localhost')
+            smtp_conn = SMTP('localhost')
             smtp_conn.sendmail(msg['From'], [msg['To']], msg.as_string())
             smtp_conn.quit()
-        except smtplib.SMTPException, e:
+        except SMTPException, e:
             print 'Mail could not be sent (%s)' % e
             return -1
 
