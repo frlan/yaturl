@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from contants import FOOTER, HEADER
+from constants import FOOTER, HEADER
 
 def template(filename, title, header, **values):
     head = HEADER % (title, header)

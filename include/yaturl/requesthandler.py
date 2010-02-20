@@ -28,7 +28,7 @@ import os
 import time
 import yaturlTemplate
 from db import YuDbError
-from contants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500
+from constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500
 from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
 from urlparse import urlsplit, urlunsplit
