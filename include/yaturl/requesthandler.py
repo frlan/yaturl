@@ -40,11 +40,35 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     server_version = '%s/%s' % (SERVER_NAME, SERVER_VERSION)
 
+
+    #----------------------------------------------------------------------
+    def _get_config_value(self, section, key):
+        """
+        Convenience function to retrieve config settings
+
+        | **param** section (str)
+        | **param** key (str)
+        | **return** value (str)
+        """
+        return self.server.config.get(section, key)
+
+    #----------------------------------------------------------------------
+    def _get_config_template(self, key):
+        """
+        Convenience function to retrieve a template filename from the config
+
+        | **param** key (str)
+        | **return** value (str)
+        """
+        return self._get_config_value('templates', key)
+
     #----------------------------------------------------------------------
     def address_string(self):
         """
         Return the client address formatted for logging.
         Only lookup the hostname if really requested.
+
+        | **return** hostname (str)
         """
         host = self.client_address[0]
         if self.server.resolve_clients:
@@ -124,7 +148,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_404(self, header_only=False):
-        template_filename = self.server.config.get('templates','corruptlink')
+        template_filename = self._get_config_template('corruptlink')
         text = read_template(
                 template_filename,
                 title='yatURL.net - 404',
@@ -143,7 +167,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_internal_server_error(self, header_only=False):
-        template_filename = self.server.config.get('templates','servererror')
+        template_filename = self._get_config_template('servererror')
         text = read_template(
             template_filename,
             title='yatURL.net - Internal Error',
@@ -157,7 +181,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_database_problem(self, header_only=False):
-        template_filename = self.server.config.get('templates','databaseissuelink')
+        template_filename = self._get_config_template('databaseissuelink')
         text = read_template(
             template_filename,
             title='%s - Datebase error' % SERVER_NAME,
@@ -176,7 +200,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         msg['Subject'] = '%s' % (subject)
         msg['From'] = email
-        msg['To'] = self.server.config.get('email','toemail')
+        msg['To'] = self._get_config_value('email','toemail')
 
         try:
             smtp_conn = SMTP('localhost')
@@ -191,7 +215,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self, header_only=False):
         # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
-        docroot = self.server.config.get('main', 'staticdocumentroot')
+        docroot = self._get_config_value('main', 'staticdocumentroot')
         local_path = sanitize_path(self.path)
         path =  docroot + local_path
         try:
@@ -202,7 +226,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             requested_file.close()
         except IOError:
             if self.path in ('/', '/URLRequest'):
-                template_filename = self.server.config.get('templates','statichomepage')
+                template_filename = self._get_config_template('statichomepage')
                 text = read_template(
                         template_filename,
                         title=SERVER_NAME,
@@ -285,7 +309,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_database_problem()
                         return
                     new_url = '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short, short)
-                    template_filename = self.server.config.get('templates','staticresultpage')
+                    template_filename = self._get_config_template('staticresultpage')
                     text = read_template(
                            template_filename,
                            title='yatURL.net &mdash; Result',
@@ -300,14 +324,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_database_problem()
                         return
                     new_url = '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short, short)
-                    template_filename = self.server.config.get('templates','staticresultpage')
+                    template_filename = self._get_config_template('staticresultpage')
                     text = read_template(
                            template_filename,
                            title='%s - Short URL Result' % SERVER_NAME,
                            header='new URL',
                            URL=new_url)
             else:
-                template_filename = self.server.config.get('templates','statichomepage')
+                template_filename = self._get_config_template('statichomepage')
                 text = read_template(
                     template_filename,
                     title=SERVER_NAME,
@@ -319,7 +343,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             subj = form['subject'].value
             descr = form['request'].value
             if self._send_mail(subj, descr, email):
-                template_filename = self.server.config.get('templates','contactUsResultpage')
+                template_filename = self._get_config_template('contactUsResultpage')
                 text = read_template(
                     template_filename,
                     title='',
