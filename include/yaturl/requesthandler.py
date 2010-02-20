@@ -28,10 +28,9 @@ import time
 from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
 from urlparse import urlsplit, urlunsplit
-import yaturlTemplate
 from yaturl.db import YuDbError
 from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500
-from yaturl.helpers import sanitize_path
+from yaturl.helpers import sanitize_path, read_template
 
 
 class YuRequestHandler(BaseHTTPRequestHandler):
@@ -124,7 +123,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_404(self, header_only=False):
-        text = yaturlTemplate.template(
+        text = read_template(
             self.server.config.get('templates','corruptlink'),
                 title='yatURL.net - 404',
                 header='404 &mdash Page not found',
@@ -142,7 +141,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_internal_server_error(self, header_only=False):
-        text = yaturlTemplate.template(self.server.config.get('templates','servererror'),
+        text = read_template(self.server.config.get('templates','servererror'),
             title='yatURL.net - Internal Error',
             header='Internal error')
         if not text:
@@ -154,7 +153,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_database_problem(self, header_only=False):
-        text = yaturlTemplate.template(self.server.config.get('templates','databaseissuelink'),
+        text = read_template(self.server.config.get('templates','databaseissuelink'),
             title='yatURL.net - Datebase error',
             header='Database error')
         if not text:
@@ -197,7 +196,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             requested_file.close()
         except IOError:
             if self.path == "/":
-                text = yaturlTemplate.template(
+                text = read_template(
                     self.server.config.get('templates','statichomepage'),
                         title='yatURL.net',
                         header='yatURL.net',
@@ -205,7 +204,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             elif self.path ==  '/URLRequest':
                 # In case of there is a GET request to this page, just
                 # return the homepage
-                text = yaturlTemplate.template(
+                text = read_template(
                     self.server.config.get('templates','statichomepage'),
                     title='yatURL.net',
                     header='yatURL.net',
@@ -289,7 +288,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_database_problem()
                         return
                     new_url = '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short, short)
-                    text = yaturlTemplate.template(
+                    text = read_template(
                            self.server.config.get('templates','staticresultpage'),
                            title='yatURL.net &mdash; Result',
                            header='New URL',
@@ -303,13 +302,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_database_problem()
                         return
                     new_url = '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short, short)
-                    text = yaturlTemplate.template(
+                    text = read_template(
                            self.server.config.get('templates','staticresultpage'),
                            title='yatURL.net - Short URL Result',
                            header='new URL',
                            URL=new_url)
             else:
-                text = yaturlTemplate.template(
+                text = read_template(
                 self.server.config.get('templates','statichomepage'),
                     title='yatURL.net',
                     header='yatURL.net',
@@ -320,7 +319,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             subj = form['subject'].value
             descr = form['request'].value
             if self._send_mail(subj, descr, email):
-                text = yaturlTemplate.template(
+                text = read_template(
                     self.server.config.get('templates','contactUsResultpage'),
                     title='',
                     header='Mail sent',
