@@ -28,16 +28,29 @@ from yaturl.requesthandler import YuRequestHandler
 
 
 class YuServer(ThreadingMixIn, HTTPServer):
+    """
+    Simple, threaded HTTP server
+    """
 
     def __init__(self, config, errorlog, accesslog):
         host = config.get('http', 'host')
         port = config.getint('http', 'port')
         HTTPServer.__init__(self, (host, port), YuRequestHandler)
 
+        if config.has_option('http', 'hostname'):
+            hostname = config.get('http', 'hostname')
+            if port != 80:
+                hostname = '%s:%s' % (hostname, port)
+        else:
+            # TODO we could get the hostname from the IP the server is
+            # bound to if we want this, for now we use a stupid fallback
+            hostname = 'yaturl.net'
+
         # store important information here to be able to access it in the request handler
         self.config = config
         self.errorlog = errorlog
         self.accesslog = accesslog
+        self.hostname = hostname
         self.resolve_clients = config.get('http', 'resolve_clients')
         # create a database object, the connection is established automatically when needed
         self.db = YuDb(config, errorlog)

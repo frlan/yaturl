@@ -279,14 +279,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             # unusual which we might don't want to have.
 
             url = form['URL'].value if form.has_key('URL') else None
-            if url and len(url) < 4096 and not 'yaturl.net' in url:
+            if url and len(url) < 4096 and not self.server.hostname.lower() in url.lower():
 
                 # Now check, whether some protocol prefix is
                 # available. If not, assume http:// was intended to put
                 # there.
-
                 if not '://' in url:
                     url = 'http://%s' % (url)
+
                 url_split = urlsplit(url)
                 # TODO rewrite this to something readable
                 url_new = urlunsplit((url_split.scheme,
@@ -308,7 +308,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     except YuDbError:
                         self._send_database_problem()
                         return
-                    new_url = '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short, short)
+                    new_url = '<a href="http://%(hostname)s/%(path)s">http://%(hostname)s/%(path)s</a>' % \
+                        {'hostname':self.server.hostname, 'path':short}
                     template_filename = self._get_config_template('staticresultpage')
                     text = read_template(
                            template_filename,
@@ -323,7 +324,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     except YuDbError:
                         self._send_database_problem()
                         return
-                    new_url = '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short, short)
+                    new_url = '<a href="http://%(hostname)s/%(path)s">http://%(hostname)s/%(path)s</a>' % \
+                        {'hostname':self.server.hostname, 'path':short}
                     template_filename = self._get_config_template('staticresultpage')
                     text = read_template(
                            template_filename,
