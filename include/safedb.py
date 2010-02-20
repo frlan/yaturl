@@ -124,8 +124,8 @@ class SafeMySQLConnection(Connection):
         """
         Create a cursor on which queries may be performed.
         """
-        cc = cursorclass or self.cursorclass
-        if cc == SafeCursor:
-            return cc(self, retry_count)
+        cursor = cursorclass or self.cursorclass
+        if cursor == SafeCursor:
+            return cursor(self, retry_count)
         else:
-            return cc(self)
+            return cursor(self)

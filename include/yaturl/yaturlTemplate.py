@@ -20,15 +20,14 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from contants import FOOTER
-from contants import HEADER
+from contants import FOOTER, HEADER
 
-def template(file, title, header, **vars):
+def template(filename, title, header, **values):
     head = HEADER % (title, header)
     try:
-        f = open(file, 'r')
-        result = head + f.read() % vars
-        f.close()
+        filep = open(filename, 'r')
+        result = head + filep.read() % values
+        filep.close()
         return result + FOOTER
     except IOError:
         return ''

@@ -25,9 +25,7 @@ from BaseHTTPServer import HTTPServer
 from SocketServer import ThreadingMixIn
 from yaturl.db import YuDb
 from yaturl.requesthandler import YuRequestHandler
-import os
 
-# TODO test threading
 
 class YuServer(ThreadingMixIn, HTTPServer):
 

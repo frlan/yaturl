@@ -22,7 +22,7 @@
 
 
 SERVER_NAME = 'yatURL.net'
-SERVER_VERSION= '1.0'
+SERVER_VERSION = '1.0'
 
 
 # we need to hard-code this one at least in case of the file cannot be found on disk
@@ -44,24 +44,24 @@ TEMPLATE_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 </html>
 '''
 
-FOOTER='''\
+FOOTER = '''\
             <div id="footer"><span><a href="/ContactUs">Contact Us</a> &nbsp;&nbsp; <a href="/About">About</a> &nbsp;&nbsp; <a href="/">Home</a> </span></div>
-	</div>
+    </div>
 </body>
 </html>'''
 
-HEADER='''\
+HEADER = '''\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-	<title>%s</title>
-	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-	<meta name="generator" content="Geany 0.19" />
-	<link rel="stylesheet" href="/default.css" type="text/css"/>
+    <title>%s</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <meta name="generator" content="Geany 0.19" />
+    <link rel="stylesheet" href="/default.css" type="text/css"/>
 </head>
 
 <body>
-	<div id="container">
-		<div id="header"><span>%s</span></div>'''
+    <div id="container">
+        <div id="header"><span>%s</span></div>'''

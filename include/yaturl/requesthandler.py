@@ -28,7 +28,7 @@ import os
 import time
 import yaturlTemplate
 from db import YuDbError
-from contants import *
+from contants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500
 import smtplib
 from email.mime.text import MIMEText
 from urlparse import urlsplit
@@ -36,6 +36,9 @@ from urlparse import urlunsplit
 
 
 class YuRequestHandler(BaseHTTPRequestHandler):
+    """
+    Custom request handler to process HEAD, GET and POST requests
+    """
 
     server_version = '%s/%s' % (SERVER_NAME, SERVER_VERSION)
 
@@ -70,10 +73,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         BaseHTTPRequestHandler.log_request(self, code, size)
 
     #----------------------------------------------------------------------
-    def log_message(self, format, *args):
+    def log_message(self, msg_format, *args):
         """
         Overwrite the default log_message() method which prints for
-        some reason to stderr which we don't want.  Instead, use a
+        some reason to stderr which we don't want.  Instead, we use a
         logger.
         """
         try:
@@ -90,12 +93,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             identity='-',
             user='-',
             timestr=time.strftime('%d/%a/%Y:%H:%M:%S %z'),
-            request=format % args,
+            request=msg_format % args,
             referrer='"%s"' % referrer,
             useragent='"%s"' % useragent
         )
-        format = '%(client)s %(identity)s %(user)s [%(timestr)s] %(request)s %(referrer)s %(useragent)s'
-        self.server.accesslog.info(format % values)
+        msg_format = '%(client)s %(identity)s %(user)s [%(timestr)s] %(request)s %(referrer)s %(useragent)s'
+        self.server.accesslog.info(msg_format % values)
 
     #----------------------------------------------------------------------
     def _send_head(self, text, code):
@@ -172,47 +175,26 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         msg['To'] = self.server.config.get('email','toemail')
 
         try:
-            s = smtplib.SMTP('localhost')
-            s.sendmail(msg['From'], [msg['To']], msg.as_string())
-            s.quit()
-        except Exception, e:
+            smtp_conn = smtplib.SMTP('localhost')
+            smtp_conn.sendmail(msg['From'], [msg['To']], msg.as_string())
+            smtp_conn.quit()
+        except smtplib.SMTPException, e:
             print 'Mail could not be sent (%s)' % e
             return -1
-
-    #----------------------------------------------------------------------
-    def _sanitize_path(self, path):
-        """
-        Check whether the given path is valid and remove any '..'
-
-        @param path (str) - the path to check
-        @return the full normalized absolute path (str)
-        """
-        if not path:
-            return ''
-        if os.path.isabs(path):
-            # skip leading slashes
-            path = path[1:]
-        # drop query string
-        query_string_start = path.find('?')
-        if query_string_start > -1:
-            path = path[0:query_string_start]
-        # sanitize path
-        return os.path.normpath(path)
 
     #----------------------------------------------------------------------
     def do_GET(self, header_only=False):
         # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
-
         docroot = self.server.config.get('main', 'staticdocumentroot')
-        local_path = self._sanitize_path(self.path)
+        local_path = sanitize_path(self.path)
         path =  docroot + local_path
-
         try:
             # actually try deliver the requested file - First we try to send
             # every static content
-            file = open(path)
-            text = file.read()
+            requested_file = open(path)
+            text = requested_file.read()
+            requested_file.close()
         except IOError:
             if self.path == "/":
                 text = yaturlTemplate.template(
@@ -286,45 +268,46 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 if not url.find("://") > -1:
                     url = 'http://%s' % (url)
                 url_split = urlsplit(url)
-                url_new = urlunsplit((url_split.scheme,
+                # TODO rewrite this to something readable
+                url_new = urlunsplit((url_split. scheme,
                           url_split.netloc.decode("utf-8 ").encode("idna"),
                           url_split.path, url_split.query,
                           url_split.fragment))
 
-                hash = hashlib.sha1(url_new).hexdigest()
+                link_hash = hashlib.sha1(url_new).hexdigest()
 
                 # Begin the response
                 try:
-                    result = self.server.db.is_hash_in_db(hash)
+                    result = self.server.db.is_hash_in_db(link_hash)
                 except YuDbError:
                     self._send_database_problem()
                     return
                 if not result:
                     try:
-                        short = self.server.db.add_link_to_db(hash, url_new)
+                        short = self.server.db.add_link_to_db(link_hash, url_new)
                     except YuDbError:
                         self._send_database_problem()
                         return
-                    new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
+                    new_url = '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short, short)
                     text = yaturlTemplate.template(
                            self.server.config.get('templates','staticresultpage'),
                            title='yatURL.net &mdash; Result',
                            header='New URL',
-                           URL=new_URL)
+                           URL=new_url)
                 else:
                     # It appears link is already stored or you have found
                     # an collision on sha1
                     try:
-                        short = self.server.db.get_short_for_hash_from_db(hash)[0]
+                        short = self.server.db.get_short_for_hash_from_db(link_hash)[0]
                     except YuDbError:
                         self._send_database_problem()
                         return
-                    new_URL= '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short,short)
+                    new_url = '<a href="http://yaturl.net/%s">http://yaturl.net/%s</a>' % (short, short)
                     text = yaturlTemplate.template(
                            self.server.config.get('templates','staticresultpage'),
                            title='yatURL.net - Short URL Result',
                            header='new URL',
-                           URL=new_URL)
+                           URL=new_url)
             else:
                 text = yaturlTemplate.template(
                 self.server.config.get('templates','statichomepage'),
@@ -333,18 +316,18 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     msg="<p>Please check your input</p>")
 
         elif form and self.path == '/ContactUs':
-                email = form['email'].value
-                subj = form['subject'].value
-                descr = form['request'].value
-                if (self._send_mail(subj, descr, email) is None):
-                    text = yaturlTemplate.template(
-                        self.server.config.get('templates','contactUsResultpage'),
-                        title='',
-                        header='Mail sent',
-                        msg="Your request has been sent. You will receive an answer soon.")
-                else:
-                    self._send_internal_server_error()
-                    return
+            email = form['email'].value
+            subj = form['subject'].value
+            descr = form['request'].value
+            if (self._send_mail(subj, descr, email) is None):
+                text = yaturlTemplate.template(
+                    self.server.config.get('templates','contactUsResultpage'),
+                    title='',
+                    header='Mail sent',
+                    msg="Your request has been sent. You will receive an answer soon.")
+            else:
+                self._send_internal_server_error()
+                return
 
         else:
             self._send_404()
@@ -363,3 +346,26 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         data.... As so, we only need to call do_GET with parameter.
         """
         self.do_GET(True)
+
+
+#----------------------------------------------------------------------
+# TODO: move into a separate module
+def sanitize_path(path):
+    """
+    Check whether the given path is valid and remove any '..'
+
+    @param path (str) - the path to check
+    @return the full normalized absolute path (str)
+    """
+    if not path:
+        return ''
+    if os.path.isabs(path):
+        # skip leading slashes
+        path = path[1:]
+    # drop query string
+    query_string_start = path.find('?')
+    if query_string_start > -1:
+        path = path[0:query_string_start]
+    # sanitize path
+    return os.path.normpath(path)
+

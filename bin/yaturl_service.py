@@ -13,10 +13,9 @@ import os
 import pwd
 import sys
 
-base_dir = os.path.abspath('%s/..' % (os.path.dirname(__file__)))
 
 #----------------------------------------------------------------------
-def setup_options(parser):
+def setup_options(base_dir, parser):
     """
     Set up options and defaults
 
@@ -34,15 +33,18 @@ def setup_options(parser):
 
 #----------------------------------------------------------------------
 def signal_handler(signum, frame):
+    """
+    On SIGTERM and SIGINT, cleanup and exit
+    """
     logging.shutdown()
     sys.exit(1)
 
 #----------------------------------------------------------------------
 def is_service_running(pid_file_path):
     if os.path.exists(pid_file_path):
-        f = open(pid_file_path, 'r')
-        pid = f.read().strip()
-        f.close()
+        pid_file = open(pid_file_path, 'r')
+        pid = pid_file.read().strip()
+        pid_file.close()
         if pid:
             try:
                 pid = int(pid)
@@ -72,9 +74,11 @@ def setup_logging(config, name, fmt):
 
 #----------------------------------------------------------------------
 def main():
+    base_dir = os.path.abspath('%s/..' % (os.path.dirname(__file__)))
+
     # arguments
     option_parser = OptionParser()
-    setup_options(option_parser)
+    setup_options(base_dir, option_parser)
     arg_options = option_parser.parse_args()[0]
 
     # configuration
@@ -115,8 +119,8 @@ def main():
     errorlog.info('Server started')
 
     # loop forever listening to connections.
-    sc = YuServer(config, errorlog, accesslog)
-    sc.serve_forever()
+    server = YuServer(config, errorlog, accesslog)
+    server.serve_forever()
 
     # clean up though we usually won't get here
     logging.shutdown()

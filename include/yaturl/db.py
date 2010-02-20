@@ -53,6 +53,9 @@ class YuDb(object):
 
     #----------------------------------------------------------------------
     def _close(self):
+        """
+        Safely close the database connection if it exists.
+        """
         if self._conn:
             try:
                 self._conn.close()
@@ -171,15 +174,15 @@ class YuDb(object):
                 link = link.replace("'","")
                 c.execute("""INSERT INTO %s.`link`
                          (`link_shorthash`,`link_hash`,`link_link`)
-                         VALUES ('%s', '%s', '%s')""" % (self._database, 
-                         short, hash, link))
+                         VALUES ('%s', '%s', '%s')""" %
+                         (self._database, short, hash, link))
                 conn.commit()
                 c.close()
                 return short
             except MySQLdb.DatabaseError, e:
                 if e.args and e.args[0] == DUP_ENTRY:
                     if e[1].endswith("key 2"):
-                        return get_short_for_hash_from_db(hash)
+                        return self.get_short_for_hash_from_db(hash)
                     if e[1].endswith("key 1"):
                         break
                 else:
