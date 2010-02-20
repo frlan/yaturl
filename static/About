@@ -11,11 +11,13 @@
 
 <body>
 	<div id="container">
-		<div id="header"><span>yaturl.net</span></div>
+		<div id="header"><span><a href="yaturl.net">yaturl.net</a></span></div>
 		<div id="main">
 			<h1>General</h1>
 			<p>Yaturl.net is project to offer a free short URL
 			service based on free software.</p>
+
+			<p><a href="/">Home</a></p>
 
 			<h1>Terms of usage</h1>
 			<p>Please feel free to use the service whenever you
@@ -23,6 +25,8 @@
 			restrict the usage but ask our users to make usage of
 			it by turning on brain before acting. Please act
 			responsible.</p>
+
+			<p><a href="/">Home</a></p>
 
 			<h1>Development, License and Contribution/Donation <a name="license"></a></h1>
 			<p>Yaturl.net is developed and can be reused under terms
@@ -34,12 +38,15 @@
 			functions of this tool. To do so, please use the
 			<a href="/ContactUs">contact form</a> to do so.</p>
 
+			<p><a href="/">Home</a></p>
+
 			<h1>Contact</h1>
 
 			<p>If you need to get in contact with the authors, please check
 			the whois of this domain or use our <a href="/ContactUs"
 			>contact form </a> to send you request..</p>
 
+			<p><a href="/">Home</a></p>
 		</div>
 		<div id="footer"><span><a href="/ContactUs">Contact Us</a> &nbsp;&nbsp; <a href="/About">About</a></span></div>
 	</div>

@@ -41,6 +41,11 @@ BODY, HTML {
 	font-weight: bold;
 }
 
+#header	 a {
+	color: black;
+	text-decoration: none;
+}
+
 /* put footer specific stuff here */
 #footer {
 	bottom: 0;
