@@ -151,7 +151,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         template_filename = self._get_config_template('corruptlink')
         text = read_template(
                 template_filename,
-                title='yatURL.net - 404',
+                title='%s - 404' % SERVER_NAME,
                 header='404 &mdash Page not found',
                 URL="Nothing")
         if text:
@@ -170,7 +170,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         template_filename = self._get_config_template('servererror')
         text = read_template(
             template_filename,
-            title='yatURL.net - Internal Error',
+            title='%s - Internal Error' % SERVER_NAME,
             header='Internal error')
         if not text:
             # fallback to hard-coded template
@@ -312,7 +312,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     template_filename = self._get_config_template('staticresultpage')
                     text = read_template(
                            template_filename,
-                           title='yatURL.net &mdash; Result',
+                           title='%s &mdash; Result' % SERVER_NAME,
                            header='New URL',
                            URL=new_url)
                 else:
