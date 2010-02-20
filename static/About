@@ -11,7 +11,7 @@
 
 <body>
 	<div id="container">
-		<div id="header"><span><a href="yaturl.net">yaturl.net</a></span></div>
+		<div id="header"><span><a href="http://yaturl.net">yaturl.net</a></span></div>
 		<div id="main">
 			<h1>General</h1>
 			<p>Yaturl.net is project to offer a free short URL
