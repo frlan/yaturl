@@ -269,7 +269,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     url = 'http://%s' % (url)
                 url_split = urlsplit(url)
                 # TODO rewrite this to something readable
-                url_new = urlunsplit((url_split. scheme,
+                url_new = urlunsplit((url_split.scheme,
                           url_split.netloc.decode("utf-8 ").encode("idna"),
                           url_split.path, url_split.query,
                           url_split.fragment))
