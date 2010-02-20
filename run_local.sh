@@ -1,8 +1,12 @@
 #!/bin/sh
 
+ROOT=`pwd`
+program="${ROOT}/bin/yaturl_service.py"
+
 export PYTHONPATH="include:$PYTHONPATH"
 
-program=`pwd`"/bin/yaturl_service.py"
+# clean old bytecode files
+find "${ROOT}" -name '*.pyc' -delete
 
-#~ python2.5 bin/yaturl_service.py -f
-python2.5 $program -f 
+# start service
+python2.5 $program -f
