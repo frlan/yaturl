@@ -212,6 +212,60 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         return True
 
     #----------------------------------------------------------------------
+    def _insert_url_to_db(self, url = None):
+        """
+        This function is intented to do the part of inserting to database
+        and fetching (if already available) short URL
+
+        If will return
+        - the short hash in case of everything worked well
+        - None in case of there was general issue with the URL
+        - -1 in case of there was an issue with the database.
+        """
+        if url and len(url) < 4096 and not self.server.hostname.lower() in url.lower():
+
+            # Now check, whether some protocol prefix is
+            # available. If not, assume http:// was intended to put
+            # there.
+            if not '://' in url:
+                url = 'http://%s' % (url)
+
+            url_split = urlsplit(url)
+            # TODO rewrite this to something readable
+            url_new = urlunsplit((url_split.scheme,
+                      url_split.netloc.decode("utf-8 ").encode("idna"),
+                      url_split.path, url_split.query,
+                      url_split.fragment))
+
+            link_hash = hashlib.sha1(url_new).hexdigest()
+
+            # Begin the response
+            try:
+                result = self.server.db.is_hash_in_db(link_hash)
+            except YuDbError:
+                # self._send_database_problem()
+                return -1
+            if not result:
+                try:
+                    short = self.server.db.add_link_to_db(link_hash, url_new)
+                except YuDbError:
+                    # self._send_database_problem()
+                    return -1
+            else:
+                # It appears link is already stored or you have found
+                # a collision on sha1
+                try:
+                    short = self.server.db.get_short_for_hash_from_db(link_hash)[0]
+                except YuDbError:
+                    return -1
+        else:
+            # If there is an issue with the URL given, we want to send over a
+            # clear status to caller
+            return None
+
+        return short
+
+    #----------------------------------------------------------------------
     def do_GET(self, header_only=False):
         # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
@@ -268,71 +322,23 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 environ={'REQUEST_METHOD':'POST'})
 
         if self.path == "/URLRequest":
-            # TODO: Check for valid URL and avoid SQL injection later
-            # inside this function
-
-            # Doing some basic checks for submitted URL.  We assume,
-            # if inside the inserted URL our domain name is included
-            # it's most likely an attempt to build up a circle which we
-            # like to prevent from being established. If it's not
-            # intented to become a circle, well, it's still something
-            # unusual which we might don't want to have.
-
             url = form['URL'].value if form.has_key('URL') else None
-            if url and len(url) < 4096 and not self.server.hostname.lower() in url.lower():
-
-                # Now check, whether some protocol prefix is
-                # available. If not, assume http:// was intended to put
-                # there.
-                if not '://' in url:
-                    url = 'http://%s' % (url)
-
-                url_split = urlsplit(url)
-                # TODO rewrite this to something readable
-                url_new = urlunsplit((url_split.scheme,
-                          url_split.netloc.decode("utf-8 ").encode("idna"),
-                          url_split.path, url_split.query,
-                          url_split.fragment))
-
-                link_hash = hashlib.sha1(url_new).hexdigest()
-
-                # Begin the response
-                try:
-                    result = self.server.db.is_hash_in_db(link_hash)
-                except YuDbError:
+            tmp = self._insert_url_to_db(url)
+            if tmp:
+                if tmp == -1:
                     self._send_database_problem()
                     return
-                if not result:
-                    try:
-                        short = self.server.db.add_link_to_db(link_hash, url_new)
-                    except YuDbError:
-                        self._send_database_problem()
-                        return
-                    new_url = '<a href="http://%(hostname)s/%(path)s">http://%(hostname)s/%(path)s</a>' % \
-                        {'hostname':self.server.hostname, 'path':short}
-                    template_filename = self._get_config_template('staticresultpage')
-                    text = read_template(
-                           template_filename,
-                           title='%s &mdash; Result' % SERVER_NAME,
-                           header='New URL',
-                           URL=new_url)
                 else:
-                    # It appears link is already stored or you have found
-                    # a collision on sha1
-                    try:
-                        short = self.server.db.get_short_for_hash_from_db(link_hash)[0]
-                    except YuDbError:
-                        self._send_database_problem()
-                        return
                     new_url = '<a href="http://%(hostname)s/%(path)s">http://%(hostname)s/%(path)s</a>' % \
                         {'hostname':self.server.hostname, 'path':short}
                     template_filename = self._get_config_template('staticresultpage')
                     text = read_template(
-                           template_filename,
-                           title='%s - Short URL Result' % SERVER_NAME,
-                           header='new URL',
-                           URL=new_url)
+                            template_filename,
+                            title='%s - Short URL Result' % SERVER_NAME,
+                            header='new URL',
+                            URL=new_url)
             else:
+                # There was a general issue with URL
                 template_filename = self._get_config_template('statichomepage')
                 text = read_template(
                     template_filename,
@@ -357,10 +363,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         else:
             self._send_404()
 
-        if text:
+        try:
             self._send_head(text, 200)
             self.wfile.write(text)
-        else:
+        except UnboundLocalError:
             self._send_internal_server_error()
 
     #----------------------------------------------------------------------
