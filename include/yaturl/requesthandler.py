@@ -329,6 +329,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self._send_database_problem()
                     return
                 else:
+                    short = tmp
                     new_url = '<a href="http://%(hostname)s/%(path)s">http://%(hostname)s/%(path)s</a>' % \
                         {'hostname':self.server.hostname, 'path':short}
                     template_filename = self._get_config_template('staticresultpage')
