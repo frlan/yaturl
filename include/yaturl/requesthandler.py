@@ -288,8 +288,17 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         msg='')
             # Any other page
             else:
-                # Assuming, if there is anything else than an alphanumeric
-                # character after the starting /, it's not a valid hash at all
+                # First check, whether we want to have a real redirect
+                # or just an info
+                if self.path.startswith('/show/'):
+                    self.path = self.path[5:]
+                    print self.path
+                    show = True
+                else:
+                    show = False
+                # Assuming, if there is anything else than an
+                # alphanumeric character after the starting /, it's
+                # not a valid hash at all
                 if self.path[1:].isalnum():
                     try:
                         result = self.server.db.get_link_from_db(self.path[1:])
@@ -297,8 +306,18 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_database_problem(header_only)
                         return
                     if result:
-                        self._send_301(result[0])
-                        return
+                        if show == True:
+                            template_filename = self._get_config_template('showpage')
+                            new_url = '<a href="%(result)s">%(result)s</a>' % \
+                                      {'result':result[0]}
+                            text = read_template(
+                                        template_filename,
+                                        title=SERVER_NAME,
+                                        header=SERVER_NAME,
+                                        msg=new_url)
+                        else:
+                            self._send_301(result[0])
+                            return
                     else:
                         self._send_404(header_only)
                         return

@@ -26,6 +26,7 @@ corruptlink: share/yaturl/templates/404.tpl
 databaseissuelink: share/yaturl/templates/databaseerror.tpl
 servererror: share/yaturl/templates/500.tpl
 contactusresultpage: share/yaturl/templates/contactUsResult.tpl
+showpage: share/yaturl/templates/show.tpl
 
 
 [email]
