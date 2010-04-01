@@ -292,7 +292,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 # or just an info
                 if self.path.startswith('/show/'):
                     self.path = self.path[5:]
-                    print self.path
                     show = True
                 else:
                     show = False
