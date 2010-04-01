@@ -380,8 +380,30 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             else:
                 self._send_internal_server_error()
                 return
+        elif self.path == '/Show':
+            shortURL = form['ShortURL'].value if form.has_key('ShortURL') else None
+            if shortURL != None and shortURL.isalnum():
+                try:
+                    result = self.server.db.get_link_from_db(shortURL)
+                except YuDbError:
+                    self._send_database_problem(header_only)
+                    return
+                template_filename = self._get_config_template('showpage')
+                if result:
+                    new_url = '<a href="%(result)s">%(result)s</a>' % \
+                              {'result':result[0]}
+                else:
+                    new_url = 'No URL found for this string. Please double check your\
+                                <a href="/ShowURL">input and try again</a>'
+                text = read_template(template_filename, title=SERVER_NAME,
+                          header=SERVER_NAME, msg=new_url)
+            else:
+                self._send_404()
+                return
+
         else:
             self._send_404()
+            return
 
         try:
             self._send_head(text, 200)
