@@ -16,8 +16,8 @@
         <div id="main">
 	  <p>Please enter the short URL you wish to know, which long
 	  URL is behind. Please enter only the digits after the slash
-	  so e.g. out of http://yaturl.net/abcde please insert abcde
-	  below.</p>
+	  so e.g. out of <em>http://yaturl.net/abcde</em> please insert
+	  <em>abcde</em> below.</p>
 	  <form action="/Show" method="post">
 	    <p><input name="ShortURL" type="text" size="50"/>
 	      <input type="submit" value="Submit"/></p>
