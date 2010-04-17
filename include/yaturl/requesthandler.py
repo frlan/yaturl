@@ -380,10 +380,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 self._send_internal_server_error()
                 return
         elif self.path == '/Show':
-            shortURL = form['ShortURL'].value if form.has_key('ShortURL') else None
-            if shortURL != None and shortURL.isalnum():
+            short_url = form['ShortURL'].value if form.has_key('ShortURL') else None
+            if short_url != None and short_url.isalnum():
                 try:
-                    result = self.server.db.get_link_from_db(shortURL)
+                    result = self.server.db.get_link_from_db(short_url)
                 except YuDbError:
                     self._send_database_problem(header_only)
                     return
