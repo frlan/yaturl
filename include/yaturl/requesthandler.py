@@ -271,7 +271,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         # Needs to be extended later with things like FAQ etc.
         docroot = self._get_config_value('main', 'staticdocumentroot')
         local_path = sanitize_path(self.path)
-        path =  docroot + local_path
+        path = docroot + local_path
         try:
             # actually try deliver the requested file - First we try to send
             # every static content
@@ -290,17 +290,18 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             else:
                 # First check, whether we want to have a real redirect
                 # or just an info
+                request_path = self.path
                 if self.path.startswith('/show/'):
-                    self.path = self.path[5:]
+                    request_path = self.path[5:]
                     show = True
                 else:
                     show = False
                 # Assuming, if there is anything else than an
                 # alphanumeric character after the starting /, it's
                 # not a valid hash at all
-                if self.path[1:].isalnum():
+                if request_path[1:].isalnum():
                     try:
-                        result = self.server.db.get_link_from_db(self.path[1:])
+                        result = self.server.db.get_link_from_db(request_path[1:])
                     except YuDbError:
                         self._send_database_problem(header_only)
                         return
