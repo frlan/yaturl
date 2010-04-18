@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-    <title>yatURL.net - Show what is behind</title>
+    <title>yatURL.net - Show target URL</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <meta name="generator" content="Geany 0.18" />
     <link rel="stylesheet" href="/default.css" type="text/css"/>
@@ -12,12 +12,13 @@
 
 <body>
     <div id="container">
-        <div id="header"><span>Show URL behind</span></div>
+        <div id="header"><span>Show target URL</span></div>
         <div id="main">
-	  <p>Please enter the short URL you wish to know, which long
-	  URL is behind. Please enter only the digits after the slash
-	  so e.g. out of <em>http://yaturl.net/abcde</em> please insert
-	  <em>abcde</em> below.</p>
+	  <p>Please enter a short URL. The target URL of the entered
+	  short URL will be displayed on the next site.
+	  Please enter only the characters after the slash of a
+	  short URL, e.g. <em>http://yaturl.net/abcde</em> gets
+	  <em>abcde</em>.</p>
 	  <form action="/Show" method="post">
 	    <p><input name="ShortURL" type="text" size="50"/>
 	      <input type="submit" value="Submit"/></p>
