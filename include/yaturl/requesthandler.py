@@ -250,6 +250,25 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         return True
 
     #----------------------------------------------------------------------
+    def _split_url(self, url):
+        """
+        Split the URL, decode the Network location part and unsplit the URL again
+
+        | **param** url (str)
+        | **return url_splitted (str)
+        """
+        url_split = urlsplit(url)
+        decoded_netloc = url_split.netloc.decode("utf-8 ").encode("idna")
+        url_parts = (
+            url_split.scheme,
+            decoded_netloc,
+            url_split.path,
+            url_split.query,
+            url_split.fragment)
+        url_splitted = urlunsplit(url_parts)
+        return url_splitted
+
+    #----------------------------------------------------------------------
     def _insert_url_to_db(self, url=None):
         """
         This function is intented to do the part of inserting to database
@@ -271,12 +290,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             if not '://' in url:
                 url = 'http://%s' % (url)
 
-            url_split = urlsplit(url)
-            # TODO rewrite this to something readable
-            url_new = urlunsplit((url_split.scheme,
-                      url_split.netloc.decode("utf-8 ").encode("idna"),
-                      url_split.path, url_split.query,
-                      url_split.fragment))
+            url_new = self._split_url(url)
 
             link_hash = hashlib.sha1(url_new).hexdigest()
 
