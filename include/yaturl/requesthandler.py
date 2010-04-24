@@ -434,7 +434,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 try:
                     result = self.server.db.get_link_from_db(short_url)
                 except YuDbError:
-                    self._send_database_problem(header_only)
+                    self._send_database_problem(False)
                     return
                 template_filename = self._get_config_template('showpage')
                 if result:
