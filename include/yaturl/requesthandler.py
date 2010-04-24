@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Author:  Enrico Tröger
@@ -91,6 +90,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         Also send two standard headers with the server software
         version and the current date.
+
+        | **param** code (int)
+        | **param** message (str)
+        | **param** size (str)
         """
         BaseHTTPRequestHandler.send_response(self, code, message)
         BaseHTTPRequestHandler.log_request(self, code, size)
@@ -101,6 +104,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         Overwrite the default log_message() method which prints for
         some reason to stderr which we don't want.  Instead, we use a
         logger.
+
+        | **param** msg_format (str)
+        | **return** args (seq of mixed)
         """
         try:
             useragent = self.headers['User-Agent']
@@ -125,6 +131,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_head(self, text, code):
+        """
+        Send common headers
+
+        | **param** text (str)
+        | **param** code (int)
+        """
         size = len(text)
         self.send_response(code, None, size)
         if self.path.endswith(".css"):
@@ -138,6 +150,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_301(self, new_url):
+        """
+        Send HTTP status code 301
+
+        | **param** new_url (str)
+        """
         try:
             self.send_response(301)
             self.send_header('Location', new_url)
@@ -148,6 +165,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_404(self, header_only=False):
+        """
+        Send HTTP status code 404
+
+        | **param** header_only (bool)
+        """
         template_filename = self._get_config_template('corruptlink')
         text = read_template(
                 template_filename,
@@ -167,6 +189,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_internal_server_error(self, header_only=False):
+        """
+        Send HTTP status code 500
+
+        | **param** header_only (bool)
+        """
         template_filename = self._get_config_template('servererror')
         text = read_template(
             template_filename,
@@ -181,6 +208,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_database_problem(self, header_only=False):
+        """
+        Send HTTP status code 500 due to a database connection error
+
+        | **param** header_only (bool)
+        """
         template_filename = self._get_config_template('databaseissuelink')
         text = read_template(
             template_filename,
@@ -195,7 +227,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _send_mail(self, subject, content, email):
+        """
+        Send a mail
 
+        | **param** subject (str)
+        | **param** content (str)
+        | **param** email (str)
+        """
         msg = MIMEText(content, 'plain', 'utf-8')
 
         msg['Subject'] = '%s' % (subject)
@@ -212,7 +250,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         return True
 
     #----------------------------------------------------------------------
-    def _insert_url_to_db(self, url = None):
+    def _insert_url_to_db(self, url=None):
         """
         This function is intented to do the part of inserting to database
         and fetching (if already available) short URL
@@ -221,6 +259,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         - the short hash in case of everything worked well
         - None in case of there was general issue with the URL
         - -1 in case of there was an issue with the database.
+
+        | **param** url (str)
         """
         if url and len(url) < 4096 and not self.server.hostname.lower() in url.lower():
 
@@ -267,6 +307,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_GET(self, header_only=False):
+        """
+        GET HTTP request entry point
+
+        | **param** header_only (bool)
+        """
         # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
         docroot = self._get_config_value('main', 'staticdocumentroot')
@@ -309,7 +354,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         if show == True:
                             template_filename = self._get_config_template('showpage')
                             new_url = '<a href="%(result)s">%(result)s</a>' % \
-                                      {'result':result[0]}
+                                      {'result':result}
                             text = read_template(
                                         template_filename,
                                         title=SERVER_NAME,
@@ -335,6 +380,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def do_POST(self):
+        """
+        POST HTTP request entry point
+        """
         form = cgi.FieldStorage(
                 fp=self.rfile,
                 headers=self.headers,
@@ -391,7 +439,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 template_filename = self._get_config_template('showpage')
                 if result:
                     new_url = '<a href="%(result)s">%(result)s</a>' % \
-                              {'result':result[0]}
+                              {'result':result}
                 else:
                     new_url = 'No URL found for this string. Please double check your\
                                 <a href="/ShowURL">input and try again</a>'

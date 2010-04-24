@@ -22,7 +22,6 @@
 import MySQLdb
 from MySQLdb.constants.ER import DUP_ENTRY
 from safedb import SafeMySQLConnection
-import sys
 
 
 class YuDbError(Exception):
@@ -41,7 +40,7 @@ class YuDb(object):
         # error if it is missing
         self._user = config.get('database', 'user')
         self._passwd = config.get('database', 'password')
-        self._host = config.get('database', 'host')
+        self._hostname = config.get('database', 'host')
         self._port = config.getint('database', 'port')
         self._database = config.get('database', 'database')
         self._conn = None
@@ -64,15 +63,19 @@ class YuDb(object):
             self._conn = None
 
     #----------------------------------------------------------------------
-    def _open(self, hostname, database=''):
+    def _open(self):
         """
         Open the database connection.
+
+        | **return** conn (SafeMySQLConnection)
         """
         try:
-            conn = SafeMySQLConnection(host=hostname, db=database, user=self._user, passwd=self._passwd,
+            conn = SafeMySQLConnection(host=self._hostname, db=self._database, user=self._user,
+                passwd=self._passwd,
                 port=self._port, use_unicode=True, charset='utf8',
                 init_command='SET TRANSACTION ISOLATION LEVEL READ COMMITTED',
                 logger=self.logger)
+            conn.cursor().execute('SET time_zone = "+00:00";')
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError('Database error: %s' % e)
@@ -83,62 +86,75 @@ class YuDb(object):
     def _get_connection(self):
         """
         Return the existing connection or open a new one
+
+        | **return** connection, cursor (SafeMySQLConnection, MySQLdb.Cursor)
         """
         if not self._conn:
-            self._conn = self._open(self._host)
+            self._conn = self._open()
 
-        c = self._conn.cursor()
-        return (self._conn, c)
+        cursor = self._conn.cursor()
+        return (self._conn, cursor)
 
     #-------------------------------------------------------------------------
-    def get_short_for_hash_from_db(self, hash):
+    def get_short_for_hash_from_db(self, url_hash):
         """
-        Checks, whether a short hash is already stored inside
-        database. If its stored, the function will return the hash for
-        this shorthash
+        Checks, whether a short hash is already stored in the
+        database. If it is stored, the function will return the hash for
+        this shorthash, otherwise None
+
+        | **param** url_hash (str)
+        | **return** short_hash (str)
         """
         try:
-            conn, c = self._get_connection()
-            c.execute('''SELECT link.link_shorthash
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT link.link_shorthash
                          FROM %s.link
-                         WHERE link.link_hash='%s' LIMIT 1''' % (self._database, hash))
-            result = c.fetchone()
-            c.close()
-            return result
+                         WHERE link.link_hash='%s' LIMIT 1''' % (self._database, url_hash))
+            result = cursor.fetchone()
+            cursor.close()
+            if result:
+                return result[0]
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError('Database error: %s' % e)
 
     #----------------------------------------------------------------------
-    def get_link_from_db(self, hash):
+    def get_link_from_db(self, url_hash):
         """
-        Fetches the link from database based on given hash
+        Fetches the link from database based on given url_hash
+
+        | **param** url_hash (str)
+        | **return** url (str)
         """
         try:
-            conn, c = self._get_connection()
-            c.execute('''SELECT link.link_link
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT link.link_link
                          FROM %s.link
-                         WHERE link.link_shorthash='%s' LIMIT 1''' % (self._database, hash))
-            result = c.fetchone()
-            c.close()
-            return result
+                         WHERE link.link_shorthash='%s' LIMIT 1''' % (self._database, url_hash))
+            result = cursor.fetchone()
+            cursor.close()
+            if result:
+                return result[0]
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError('Database error: %s' % e)
 
     #-------------------------------------------------------------------
-    def is_hash_in_db(self, hash):
+    def is_hash_in_db(self, url_hash):
         """
-        Returns the link ID for a hash in case of its available inside
+        Returns the link ID for a hash in case of it's available in the
         database.
+
+        | **param** url_hash (str)
+        | **return** link_id (int)
         """
         try:
-            conn, c = self._get_connection()
-            c.execute('''SELECT link.link_id
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT link.link_id
                          FROM %s.link
-                         WHERE link.link_hash='%s' ''' % (self._database, hash))
-            result = c.fetchone()
-            c.close()
+                         WHERE link.link_hash='%s' ''' % (self._database, url_hash))
+            result = cursor.fetchone()
+            cursor.close()
             return result
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
@@ -147,42 +163,49 @@ class YuDb(object):
     #-------------------------------------------------------------------
     def is_shorthash_in_db(self, short):
         """
-        Checks whether a shorthash is stored inside database. If so,
-        its returning the link ID of database entry.
+        Checks whether a shorthash is stored in the database. If so,
+        it returns the link ID of the database entry.
+
+        | **param** short (str)
+        | **return** link_id (int)
         """
         try:
-            conn, c = self._get_connection()
-            c.execute('''SELECT link.link_id
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT link.link_id
                          FROM %s.link
                          WHERE link.link_shorthash='%s' ''' % (self._database, short))
-            result = c.fetchone()
-            c.close()
+            result = cursor.fetchone()
+            cursor.close()
             return result
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError('Database error: %s' % e)
 
     #-------------------------------------------------------------------
-    def add_link_to_db(self, hash, link):
+    def add_link_to_db(self, url_hash, link):
         """
         Takes the given hash and link and put it into database.
+
+        | **param** url_hash (str)
+        | **param** link (str)
+        | **return** short_hash (str)
         """
-        for i in range(4, len(hash)):
-            short = hash[:i]
+        for i in range(4, len(url_hash)):
+            short = url_hash[:i]
             try:
-                conn, c = self._get_connection()
+                conn, cursor = self._get_connection()
                 link = link.replace("'","")
-                c.execute("""INSERT INTO %s.`link`
+                cursor.execute("""INSERT INTO %s.`link`
                          (`link_shorthash`,`link_hash`,`link_link`)
                          VALUES ('%s', '%s', '%s')""" %
-                         (self._database, short, hash, link))
+                         (self._database, short, url_hash, link))
                 conn.commit()
-                c.close()
+                cursor.close()
                 return short
             except MySQLdb.DatabaseError, e:
                 if e.args and e.args[0] == DUP_ENTRY:
                     if e[1].endswith("key 2"):
-                        return self.get_short_for_hash_from_db(hash)
+                        return self.get_short_for_hash_from_db(url_hash)
                     if e[1].endswith("key 1"):
                         break
                 else:

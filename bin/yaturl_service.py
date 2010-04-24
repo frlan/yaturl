@@ -41,6 +41,12 @@ def signal_handler(signum, frame):
 
 #----------------------------------------------------------------------
 def is_service_running(pid_file_path):
+    """
+    Check whether the service is already running
+
+    | **param** pid_file_path (str)
+    | **return** is_running (bool)
+    """
     if os.path.exists(pid_file_path):
         pid_file = open(pid_file_path, 'r')
         pid = pid_file.read().strip()
@@ -62,6 +68,14 @@ def is_service_running(pid_file_path):
 
 #----------------------------------------------------------------------
 def setup_logging(config, name, fmt):
+    """
+    Set up logging
+
+    | **param** confg (SafeConfigParser)
+    | **param** name (str)
+    | **param** fmt (str)
+    | **return** logger (logging.Logger)
+    """
     logger = logging.getLogger(name)
     # TODO maybe use (Timed)RotatingFileHandler
     handler = logging.FileHandler(config.get('main', name))
@@ -74,6 +88,11 @@ def setup_logging(config, name, fmt):
 
 #----------------------------------------------------------------------
 def main():
+    """
+    main()
+
+    | **return** exit_code (int)
+    """
     base_dir = os.path.abspath('%s/..' % (os.path.dirname(__file__)))
 
     # arguments
