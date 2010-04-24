@@ -434,7 +434,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 try:
                     result = self.server.db.get_link_from_db(short_url)
                 except YuDbError:
-                    self._send_database_problem(False)
+                    self._send_database_problem(header_only=False)
                     return
                 template_filename = self._get_config_template('showpage')
                 if result:
@@ -466,4 +466,4 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         the same as the do_GET at the moment w/o sending the real
         data.... As so, we only need to call do_GET with parameter.
         """
-        self.do_GET(True)
+        self.do_GET(header_only=True)
