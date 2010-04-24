@@ -24,10 +24,19 @@ from MySQLdb.constants.ER import DUP_ENTRY
 from safedb import SafeMySQLConnection
 
 
-class YuDbError(Exception):
+class YuDbError(MySQLdb.DatabaseError):
     """
     Generic database error
     """
+    #----------------------------------------------------------------------
+    def __init__(self, msg):
+        super(YuDbError, self).__init__()
+        self._msg = msg
+
+    #----------------------------------------------------------------------
+    def __str__(self):
+        return u"Database Error: %s" % self._msg
+
 
 
 class YuDb(object):
@@ -78,7 +87,7 @@ class YuDb(object):
             conn.cursor().execute('SET time_zone = "+00:00";')
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError('Database error: %s' % e)
+            raise YuDbError(str(e))
 
         return conn
 
@@ -116,7 +125,7 @@ class YuDb(object):
                 return result[0]
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError('Database error: %s' % e)
+            raise YuDbError(str(e))
 
     #----------------------------------------------------------------------
     def get_link_from_db(self, url_hash):
@@ -137,7 +146,7 @@ class YuDb(object):
                 return result[0]
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError('Database error: %s' % e)
+            raise YuDbError(str(e))
 
     #-------------------------------------------------------------------
     def is_hash_in_db(self, url_hash):
@@ -159,7 +168,7 @@ class YuDb(object):
                 return result[0]
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError('Database error: %s' % e)
+            raise YuDbError(str(e))
 
     #-------------------------------------------------------------------
     def is_shorthash_in_db(self, short):
@@ -181,7 +190,7 @@ class YuDb(object):
                 return result[0]
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError('Database error: %s' % e)
+            raise YuDbError(str(e))
 
     #-------------------------------------------------------------------
     def add_link_to_db(self, url_hash, link):
@@ -212,4 +221,4 @@ class YuDb(object):
                         break
                 else:
                     self.logger.warn('Database error: %s' % e)
-                    raise YuDbError('Database error: %s' % e)
+                    raise YuDbError(str(e))
