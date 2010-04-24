@@ -155,7 +155,8 @@ class YuDb(object):
                          WHERE link.link_hash='%s' ''' % (self._database, url_hash))
             result = cursor.fetchone()
             cursor.close()
-            return result
+            if result:
+                return result[0]
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError('Database error: %s' % e)
@@ -176,7 +177,8 @@ class YuDb(object):
                          WHERE link.link_shorthash='%s' ''' % (self._database, short))
             result = cursor.fetchone()
             cursor.close()
-            return result
+            if result:
+                return result[0]
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError('Database error: %s' % e)

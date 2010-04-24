@@ -295,7 +295,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 # It appears link is already stored or you have found
                 # a collision on sha1
                 try:
-                    short = self.server.db.get_short_for_hash_from_db(link_hash)[0]
+                    short = self.server.db.get_short_for_hash_from_db(link_hash)
                 except YuDbError:
                     return -1
         else:
