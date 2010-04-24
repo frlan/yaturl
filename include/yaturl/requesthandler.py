@@ -255,12 +255,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         This function is intented to do the part of inserting to database
         and fetching (if already available) short URL
 
-        If will return
+        It will return
         - the short hash in case of everything worked well
         - None in case of there was general issue with the URL
         - -1 in case of there was an issue with the database.
 
         | **param** url (str)
+        | **return** status (mixed)
         """
         if url and len(url) < 4096 and not self.server.hostname.lower() in url.lower():
 
