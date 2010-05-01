@@ -376,7 +376,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                         header=SERVER_NAME,
                                         msg=new_url)
                         else:
-                            self._send_301(result[0])
+                            self._send_301(result)
                             return
                     else:
                         self._send_404(header_only)
