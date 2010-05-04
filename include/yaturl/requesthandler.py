@@ -415,7 +415,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     return
                 else:
                     short = tmp
-                    new_url = '<a href="http://%(hostname)s/%(path)s">http://%(hostname)s/%(path)s</a>' % \
+                    new_url = '<a href="http://%(hostname)s/s/%(path)s">http://%(hostname)s/s/%(path)s</a>' % \
                         {'hostname':self.server.hostname, 'path':short}
                     template_filename = self._get_config_template('staticresultpage')
                     text = read_template(
