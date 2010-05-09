@@ -99,3 +99,8 @@ BODY, HTML {
 #main h1{
 	padding-top: 1em;
 }
+
+.warning {
+	color: red;
+	font-weight: bold;
+}

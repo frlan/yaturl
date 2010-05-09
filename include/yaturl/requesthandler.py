@@ -430,7 +430,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     template_filename,
                     title=SERVER_NAME,
                     header=SERVER_NAME,
-                    msg="<p>Please check your input</p>")
+                    msg='<p class="warning">Please check your input</p>')
 
         elif self.path == '/ContactUs':
             email = form['email'].value
@@ -456,11 +456,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     return
                 template_filename = self._get_config_template('showpage')
                 if result:
-                    new_url = '<a href="%(result)s">%(result)s</a>' % \
+                    new_url = '<p><a href="%(result)s">%(result)s</a></p>' % \
                               {'result':result}
                 else:
-                    new_url = 'No URL found for this string. Please double check your\
-                                <a href="/ShowURL">input and try again</a>'
+                    new_url = '<p class="warning">No URL found for this string. Please double check your\
+                                <a href="/ShowURL">input and try again</a></p>'
                 text = read_template(template_filename, title=SERVER_NAME,
                           header=SERVER_NAME, msg=new_url)
             else:
