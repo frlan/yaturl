@@ -448,6 +448,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 return
         elif self.path == '/Show':
             short_url = form['ShortURL'].value if form.has_key('ShortURL') else None
+            if short_url != None and short_url.find("yaturl.net") > -1:
+                tmp = short_url.rfind("/")
+                if tmp > -1 and short_url != "":
+                    tmp = tmp + 1
+                    short_url = short_url[tmp:]
             if short_url != None and short_url.isalnum():
                 try:
                     result = self.server.db.get_link_from_db(short_url)
