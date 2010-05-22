@@ -128,6 +128,27 @@ class YuDb(object):
             raise YuDbError(str(e))
 
     #----------------------------------------------------------------------
+    def get_link_from_db_by_complete_hash(self, url_hash):
+        """
+        Fetches the link from database based on given complete url_hash
+
+        | **param** url_hash (str)
+        | **return** url (str)
+        """
+        try:
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT link.link_link
+                         FROM %s.link
+                         WHERE link.link_hash='%s' LIMIT 1''' % (self._database, url_hash))
+            result = cursor.fetchone()
+            cursor.close()
+            if result:
+                return result[0]
+        except MySQLdb.DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError(str(e))
+        
+    #----------------------------------------------------------------------
     def get_link_from_db(self, url_hash):
         """
         Fetches the link from database based on given url_hash

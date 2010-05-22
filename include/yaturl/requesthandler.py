@@ -278,6 +278,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         - the short hash in case of everything worked well
         - None in case of there was general issue with the URL
         - -1 in case of there was an issue with the database.
+        - -2 in case of the hash is already in database, but URL are
+             differing (SHA collision)
 
         | **param** url (str)
         | **return** status (mixed)
@@ -309,8 +311,17 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             else:
                 # It appears link is already stored or you have found
                 # a collision on sha1
+                # Let's check for a collision
                 try:
-                    short = self.server.db.get_short_for_hash_from_db(link_hash)
+                    url = self.server.db.get_link_from_db_by_complete_hash(link_hash)
+
+                    if url_new == url:
+                    # OK. We already have the url in DB. Good.
+                        short = self.server.db.get_short_for_hash_from_db(link_hash)
+                    else:
+                    # Bad. We found a collision
+                    # TODO: This might could be done more elegant by using an exception. 
+                        return -2
                 except YuDbError:
                     return -1
         else:
@@ -410,7 +421,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             url = form['URL'].value if form.has_key('URL') else None
             tmp = self._insert_url_to_db(url)
             if tmp:
-                if tmp == -1:
+                if tmp < 0:
                     self._send_database_problem()
                     return
                 else:
