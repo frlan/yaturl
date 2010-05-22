@@ -66,4 +66,5 @@ HEADER = '''\
 
 <body>
     <div id="container">
-        <div id="header"><span>%s</span></div>'''
+        <div id="header"><span>%s</span></div>
+'''
