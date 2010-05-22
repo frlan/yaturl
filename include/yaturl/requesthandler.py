@@ -425,18 +425,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self._send_database_problem()
                     return
                 else:
-                    short = tmp
-                    new_url = '<a href="http://%(hostname)s/s/%(path)s">http://%(hostname)s/s/%(path)s</a>' % \
-                        {'hostname':self.server.hostname, 'path':short}
-                    new_url_2 = '<a href="http://%(hostname)s/%(path)s">http://%(hostname)s/%(path)s</a>' % \
-                        {'hostname':self.server.hostname, 'path':short}
                     template_filename = self._get_config_template('staticresultpage')
                     text = read_template(
                             template_filename,
                             title='%s - Short URL Result' % SERVER_NAME,
                             header='new URL',
-                            URL=new_url,
-                            URL2=new_url_2)
+                            path = tmp,
+                            hostname = self.server.hostname)
             else:
                 # There was a general issue with URL
                 template_filename = self._get_config_template('statichomepage')
