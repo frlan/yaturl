@@ -22,7 +22,6 @@
 
 from BaseHTTPServer import HTTPServer
 from SocketServer import ThreadingMixIn
-from yaturl.db import YuDb
 from yaturl.requesthandler import YuRequestHandler
 
 
@@ -51,7 +50,5 @@ class YuServer(ThreadingMixIn, HTTPServer):
         self.accesslog = accesslog
         self.hostname = hostname
         self.resolve_clients = config.get('http', 'resolve_clients')
-        # create a database object, the connection is established automatically when needed
-        self.db = YuDb(config, errorlog)
 
 
