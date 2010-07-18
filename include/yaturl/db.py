@@ -116,9 +116,9 @@ class YuDb(object):
         """
         try:
             cursor = self._get_connection()[1]
-            cursor.execute('''SELECT link.link_shorthash
-                         FROM %s.link
-                         WHERE link.link_hash='%s' LIMIT 1''' % (self._database, url_hash))
+            cursor.execute('''SELECT `link`.`link_shorthash`
+                         FROM `link`
+                         WHERE `link`.`link_hash` = %s LIMIT 1''', (url_hash))
             result = cursor.fetchone()
             cursor.close()
             if result:
@@ -137,9 +137,9 @@ class YuDb(object):
         """
         try:
             cursor = self._get_connection()[1]
-            cursor.execute('''SELECT link.link_link
-                         FROM %s.link
-                         WHERE link.link_hash='%s' LIMIT 1''' % (self._database, url_hash))
+            cursor.execute('''SELECT `link`.`link_link`
+                         FROM `link`
+                         WHERE `link`.`link_hash` = %s LIMIT 1''', (url_hash))
             result = cursor.fetchone()
             cursor.close()
             if result:
@@ -158,9 +158,9 @@ class YuDb(object):
         """
         try:
             cursor = self._get_connection()[1]
-            cursor.execute('''SELECT link.link_link
-                         FROM %s.link
-                         WHERE link.link_shorthash='%s' LIMIT 1''' % (self._database, url_hash))
+            cursor.execute('''SELECT `link`.`link_link`
+                         FROM `link`
+                         WHERE `link`.`link_shorthash` = %s LIMIT 1''', (url_hash))
             result = cursor.fetchone()
             cursor.close()
             if result:
@@ -180,9 +180,9 @@ class YuDb(object):
         """
         try:
             cursor = self._get_connection()[1]
-            cursor.execute('''SELECT link.link_id
-                         FROM %s.link
-                         WHERE link.link_hash='%s' ''' % (self._database, url_hash))
+            cursor.execute('''SELECT `link`.`link_id`
+                         FROM `link`
+                         WHERE `link`.`link_hash` = %s''', (url_hash))
             result = cursor.fetchone()
             cursor.close()
             if result:
@@ -202,9 +202,9 @@ class YuDb(object):
         """
         try:
             cursor = self._get_connection()[1]
-            cursor.execute('''SELECT link.link_id
-                         FROM %s.link
-                         WHERE link.link_shorthash='%s' ''' % (self._database, short))
+            cursor.execute('''SELECT `link`.`link_id`
+                         FROM `link`
+                         WHERE `link`.`link_shorthash` = %s''', (short))
             result = cursor.fetchone()
             cursor.close()
             if result:
@@ -226,11 +226,10 @@ class YuDb(object):
             short = url_hash[:i]
             try:
                 conn, cursor = self._get_connection()
-                link = link.replace("'", "")
-                cursor.execute("""INSERT INTO %s.`link`
+                cursor.execute("""INSERT INTO `link`
                          (`link_shorthash`,`link_hash`,`link_link`)
-                         VALUES ('%s', '%s', '%s')""" %
-                         (self._database, short, url_hash, link))
+                         VALUES (%s, %s, %s)""",
+                         (short, url_hash, link))
                 conn.commit()
                 cursor.close()
                 return short
