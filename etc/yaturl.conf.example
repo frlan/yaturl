@@ -12,6 +12,11 @@ port: 24882
 resolve_clients: true
 hostname: yaturl.net
 
+[telnet]
+enable: true
+host: 127.0.0.1
+port: 24883
+
 [database]
 user: user
 password: pw
