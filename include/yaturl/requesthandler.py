@@ -401,7 +401,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         if text:
             self._send_head(text, 200)
-            self.end_headers()
             if header_only == False:
                 self.wfile.write(text + "\n")
         else:
