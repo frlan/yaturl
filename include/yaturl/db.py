@@ -147,7 +147,7 @@ class YuDb(object):
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError(str(e))
-        
+
     #----------------------------------------------------------------------
     def get_link_from_db(self, url_hash):
         """
@@ -226,7 +226,7 @@ class YuDb(object):
             short = url_hash[:i]
             try:
                 conn, cursor = self._get_connection()
-                link = link.replace("'","")
+                link = link.replace("'", "")
                 cursor.execute("""INSERT INTO %s.`link`
                          (`link_shorthash`,`link_hash`,`link_link`)
                          VALUES ('%s', '%s', '%s')""" %

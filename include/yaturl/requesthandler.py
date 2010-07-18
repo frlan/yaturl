@@ -238,7 +238,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         msg['Subject'] = '%s' % (subject)
         msg['From'] = email
-        msg['To'] = self._get_config_value('email','toemail')
+        msg['To'] = self._get_config_value('email', 'toemail')
 
         try:
             smtp_conn = SMTP('localhost')
