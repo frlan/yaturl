@@ -107,6 +107,10 @@ class TelnetInteractiveConsoleServer(object):
         else:
             raise ValueError, 'Server already started'
 
+    def shutdown(self):
+        """Alias for stop()"""
+        self.stop()
+
     def stop(self):
         """Cleanly shutdown and kill this console session"""
         self.has_exit = True
