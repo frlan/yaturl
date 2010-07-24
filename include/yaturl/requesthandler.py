@@ -23,6 +23,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 import socket
 import cgi
 import hashlib
+import socket
 import time
 from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
@@ -244,7 +245,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             smtp_conn = SMTP('localhost')
             smtp_conn.sendmail(msg['From'], [msg['To']], msg.as_string())
             smtp_conn.quit()
-        except SMTPException, e:
+        except (socket.error, SMTPException), e:
             self.server.errorlog('Mail could not be sent (%s)' % e)
             return False
         return True
