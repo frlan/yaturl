@@ -22,6 +22,7 @@
 
 
 from console import TelnetInteractiveConsoleServer
+from yaturl.console.monitor import SystemMonitor
 
 
 ########################################################################
@@ -45,6 +46,18 @@ class ConsoleManager(object):
     #----------------------------------------------------------------------
     def get_telnet_server(self):
         return self._telnet_server
+
+    #----------------------------------------------------------------------
+    @classmethod
+    def get_system_status(self):
+        monitor = SystemMonitor()
+        threads = monitor.get_running_threads()
+        uptime = monitor.get_uptime()
+        pool = monitor.get_connection_pool()
+
+        print 'Uptime:', uptime
+        print 'DB Pool:', pool
+        print 'Running threads:', threads
 
     #----------------------------------------------------------------------
     def _start_telnet_server(self):
