@@ -246,7 +246,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             smtp_conn.sendmail(msg['From'], [msg['To']], msg.as_string())
             smtp_conn.quit()
         except (socket.error, SMTPException), e:
-            self.server.errorlog('Mail could not be sent (%s)' % e)
+            self.server.errorlog.warn('Mail could not be sent (%s)' % e)
             return False
         return True
 
