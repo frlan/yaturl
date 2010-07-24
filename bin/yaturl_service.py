@@ -21,6 +21,7 @@
 # MA 02110-1301, USA.
 
 
+from yaturl.thread import YuServerThread
 from yaturl.server import YuServer
 from console import TelnetInteractiveConsoleServer
 from ConfigParser import SafeConfigParser
@@ -32,11 +33,10 @@ import logging
 import os
 import pwd
 import sys
-import threading
+from threading import Event
 
 
-TELNET_CONSOLE_SERVER = None
-HTTP_SERVER = None
+shutdown = Event()
 
 
 #----------------------------------------------------------------------
@@ -56,19 +56,21 @@ def setup_options(base_dir, parser):
         default=True,
         help=u'stay in foreground, do not daemonize')
 
+
 #----------------------------------------------------------------------
-def cleanup():
-    if TELNET_CONSOLE_SERVER:
-        TELNET_CONSOLE_SERVER.stop()
-    logging.shutdown()
+def get_error_logger():
+    return logging.getLogger('errorlog')
+
 
 #----------------------------------------------------------------------
 def signal_handler(signum, frame):
     """
     On SIGTERM and SIGINT, cleanup and exit
     """
-    cleanup()
-    sys.exit(1)
+    logger = get_error_logger()
+    logger.info(u'Received signal %s, initiating shutdown' % signum)
+    shutdown.set()
+
 
 #----------------------------------------------------------------------
 def is_service_running(pid_file_path):
@@ -97,6 +99,7 @@ def is_service_running(pid_file_path):
         return True
     return False
 
+
 #----------------------------------------------------------------------
 def setup_logging(config, name, fmt):
     """
@@ -117,16 +120,67 @@ def setup_logging(config, name, fmt):
 
     return logger
 
+
 #----------------------------------------------------------------------
-def start_telnet_console(config, _locals):
-    global TELNET_CONSOLE_SERVER
-    if config.getboolean('telnet', 'enable'):
-        # fire up telnet server console
+def create_server_threads(config, errorlog, accesslog):
+
+    def set_telnet_server_locals():
+        locals_ = dict(
+            config=config,
+            errorlog=errorlog,
+            accesslog=accesslog,
+            http_server=http_server,
+            telnet_server=telnet_server)
+        telnet_server.set_locals(locals_)
+
+    def create_telnet_server():
+        if not config.getboolean('telnet', 'enable'):
+            return None
         host = config.get('telnet', 'host')
         port = config.getint('telnet', 'port')
-        TELNET_CONSOLE_SERVER = TelnetInteractiveConsoleServer(host=host, port=port, _locals=_locals)
-        console_thread = threading.Thread(target=TELNET_CONSOLE_SERVER.accept_interactions)
-        console_thread.start()
+        telnet_server = TelnetInteractiveConsoleServer(host=host, port=port)
+        telnet_server_thread = YuServerThread(
+            target=telnet_server.accept_interactions,
+            name='Telnet Console Server',
+            instance=telnet_server)
+        server_threads.append(telnet_server_thread)
+        return telnet_server
+
+    def create_http_server():
+        http_server = YuServer(config, errorlog, accesslog)
+        http_server_thread = YuServerThread(
+            target=http_server.serve_forever,
+            name='HTTP Server',
+            instance=http_server)
+        server_threads.append(http_server_thread)
+        return http_server
+
+    server_threads = []
+
+    http_server = create_http_server()
+    telnet_server = create_telnet_server()
+    set_telnet_server_locals()
+
+    return server_threads
+
+
+#----------------------------------------------------------------------
+def watch_running_threads(running_threads):
+    # watch running threads
+    logger = get_error_logger()
+    while not shutdown.isSet():
+        for server_thread in running_threads:
+            if not server_thread.isAlive():
+                logger.error(u'Server thread %s died, shutting down' % server_thread.getName())
+                shutdown.set()
+        shutdown.wait(300)
+
+    # stop remaining threads
+    for server_thread in running_threads:
+        if server_thread.isAlive():
+            server_thread.shutdown()
+            server_thread.join()
+
 
 #----------------------------------------------------------------------
 def main():
@@ -135,7 +189,6 @@ def main():
 
     | **return** exit_code (int)
     """
-    global HTTP_SERVER
 
     base_dir = os.path.abspath('%s/..' % (os.path.dirname(__file__)))
 
@@ -174,23 +227,27 @@ def main():
     accesslog = setup_logging(config, 'accesslog', '%(message)s')
     errorlog = setup_logging(config, 'errorlog',
         '%(asctime)s: (%(funcName)s():%(lineno)d): %(levelname)s: %(message)s')
+    errorlog.info('Application starts up')
 
     # handle signals
     signal(SIGINT,  signal_handler)
     signal(SIGTERM, signal_handler)
 
-    errorlog.info('Server started')
+    server_threads = create_server_threads(config, errorlog, accesslog)
 
-    server = HTTP_SERVER = YuServer(config, errorlog, accesslog)
+    # start server threads
+    for server_thread in server_threads:
+        server_thread.start()
+        errorlog.info('%s started' % server_thread.getName())
 
-    _locals = dict(server=server, config=config, errorlog=errorlog, accesslog=accesslog)
-    start_telnet_console(config, _locals)
+    watch_running_threads(server_threads)
 
-    # loop forever listening to connections.
-    server.serve_forever()
+    errorlog.info(u'Shutdown')
 
-    cleanup()
-    exit(0)
+    # cleanup
+    logging.shutdown()
+
+    return 0
 
 
 if __name__ == "__main__":
