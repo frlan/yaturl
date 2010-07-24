@@ -104,7 +104,7 @@ class TelnetInteractiveConsoleServer(object):
         """"""
         if not self.running:
             self.locals_ = locals_
-        else
+        else:
             raise ValueError, 'Server already started'
 
     def stop(self):
