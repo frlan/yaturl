@@ -25,7 +25,7 @@ import sys
 from telnetlib import Telnet
 import rlcompleter
 import readline
-readline.parse_and_bind("tab: complete")
+import __main__
 
 
 
@@ -64,9 +64,29 @@ class TelnetClient(object):
         return (self._next_prompt is not None)
 
     #----------------------------------------------------------------------
+    def _get_remote_locals(self):
+        """
+        Read the locals() from the remote console and then add their keys
+        into the local main namespace to get them auto completed as they were
+        'real' locals.
+        """
+        self._client.write('locals().keys()')
+        received_data = self._client.read_until(self._prompt_default)
+        received_data = received_data[:-4]
+        keys = eval(received_data)
+        for key in keys:
+            if not __main__.__dict__.has_key(key):
+                __main__.__dict__[key] = getattr(__main__, key, None)
+
+    #----------------------------------------------------------------------
     def _get_initial_prompt(self):
         received_data = self._client.read_until(self._prompt_default)
         sys.stdout.write(received_data[:-4])
+
+        remote_locals = self._get_remote_locals()
+        # enable readline completion after we filled __main__.__dict__ with the
+        # locals of the remote console
+        readline.parse_and_bind("tab: complete")
 
     #----------------------------------------------------------------------
     def _run(self):
