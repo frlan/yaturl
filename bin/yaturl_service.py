@@ -36,7 +36,7 @@ import sys
 from threading import Event
 
 
-shutdown = Event()
+shutdown_event = Event()
 
 
 #----------------------------------------------------------------------
@@ -63,13 +63,20 @@ def get_error_logger():
 
 
 #----------------------------------------------------------------------
+def shutdown():
+    logger = get_error_logger()
+    logger.info(u'Initiating shutdown')
+    shutdown_event.set()
+
+
+#----------------------------------------------------------------------
 def signal_handler(signum, frame):
     """
     On SIGTERM and SIGINT, trigger shutdown
     """
     logger = get_error_logger()
-    logger.info(u'Received signal %s, initiating shutdown' % signum)
-    shutdown.set()
+    logger.info(u'Received signal %s' % signum)
+    shutdown()
 
 
 #----------------------------------------------------------------------
@@ -169,12 +176,12 @@ def create_server_threads(config, errorlog, accesslog):
 def watch_running_threads(running_threads, timeout=300):
     # watch running threads
     logger = get_error_logger()
-    while not shutdown.isSet():
+    while not shutdown_event.isSet():
         for server_thread in running_threads:
             if not server_thread.isAlive():
                 logger.error(u'Server thread %s died, shutting down' % server_thread.getName())
-                shutdown.set()
-        shutdown.wait(timeout)
+                shutdown_event.set()
+        shutdown_event.wait(timeout)
 
     # stop remaining threads
     for server_thread in running_threads:
