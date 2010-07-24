@@ -55,9 +55,11 @@ class ConsoleManager(object):
         uptime = monitor.get_uptime()
         pool = monitor.get_connection_pool()
 
-        print 'Uptime:', uptime
-        print 'DB Pool:', pool
-        print 'Running threads:', threads
+        print 'Uptime: %s days, %s' % (uptime['uptime_days'], uptime['uptime_rest'])
+        print 'DB Pool: %s' % pool
+        print 'Running threads:'
+        for running_thread in threads:
+            print '   %s' % running_thread
 
     #----------------------------------------------------------------------
     def _start_telnet_server(self):

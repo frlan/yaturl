@@ -59,7 +59,7 @@ class SystemMonitor(object):
         """
         uptime = float(time() - start_time)
         if uptime > 0:
-            uptime_days = floor(uptime / 86400)
+            uptime_days = int(floor(uptime / 86400))
             t_val = gmtime(uptime - (uptime_days * 86400))
             return dict(uptime=uptime,
                         uptime_days=uptime_days,
