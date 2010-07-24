@@ -99,8 +99,6 @@ class TelnetInteractiveConsoleServer(object):
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
         self.client_sockets = {}
 
-        self.locals_['console_server'] = self
-
     def stop(self):
         """Cleanly shutdown and kill this console session"""
         self.has_exit = True
