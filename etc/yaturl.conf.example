@@ -5,6 +5,7 @@ accesslog: log/access.log
 errorlog: log/error.log
 staticdocumentroot: static/
 #user: yaturl
+thread_watch_timeout: 300
 
 [http]
 host: 0.0.0.0

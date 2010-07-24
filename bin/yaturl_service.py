@@ -165,7 +165,7 @@ def create_server_threads(config, errorlog, accesslog):
 
 
 #----------------------------------------------------------------------
-def watch_running_threads(running_threads):
+def watch_running_threads(running_threads, timeout=300):
     # watch running threads
     logger = get_error_logger()
     while not shutdown.isSet():
@@ -173,7 +173,7 @@ def watch_running_threads(running_threads):
             if not server_thread.isAlive():
                 logger.error(u'Server thread %s died, shutting down' % server_thread.getName())
                 shutdown.set()
-        shutdown.wait(300)
+        shutdown.wait(timeout)
 
     # stop remaining threads
     for server_thread in running_threads:
@@ -223,6 +223,8 @@ def main():
     pid.write(str(os.getpid()))
     pid.close()
 
+    thread_watch_timeout = config.getint('main', 'thread_watch_timeout')
+
     # (error) logging
     accesslog = setup_logging(config, 'accesslog', '%(message)s')
     errorlog = setup_logging(config, 'errorlog',
@@ -240,7 +242,7 @@ def main():
         server_thread.start()
         errorlog.info('%s started' % server_thread.getName())
 
-    watch_running_threads(server_threads)
+    watch_running_threads(server_threads, thread_watch_timeout)
 
     errorlog.info(u'Shutdown')
 
