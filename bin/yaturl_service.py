@@ -23,7 +23,7 @@
 
 from yaturl.thread import YuServerThread
 from yaturl.server import YuServer
-from console import TelnetInteractiveConsoleServer
+from yaturl.console.manager import ConsoleManager
 from ConfigParser import SafeConfigParser
 from optparse import OptionParser
 from signal import signal, SIGINT, SIGTERM
@@ -65,7 +65,7 @@ def get_error_logger():
 #----------------------------------------------------------------------
 def signal_handler(signum, frame):
     """
-    On SIGTERM and SIGINT, cleanup and exit
+    On SIGTERM and SIGINT, trigger shutdown
     """
     logger = get_error_logger()
     logger.info(u'Received signal %s, initiating shutdown' % signum)
@@ -124,27 +124,28 @@ def setup_logging(config, name, fmt):
 #----------------------------------------------------------------------
 def create_server_threads(config, errorlog, accesslog):
 
-    def set_telnet_server_locals():
+    def set_console_manager_locals():
         locals_ = dict(
             config=config,
             errorlog=errorlog,
             accesslog=accesslog,
             http_server=http_server,
-            telnet_server=telnet_server)
-        telnet_server.set_locals(locals_)
+            telnet_server=console_manager.get_telnet_server(),
+            console_manager=console_manager)
+        console_manager.set_locals(locals_)
 
     def create_telnet_server():
         if not config.getboolean('telnet', 'enable'):
             return None
         host = config.get('telnet', 'host')
         port = config.getint('telnet', 'port')
-        telnet_server = TelnetInteractiveConsoleServer(host=host, port=port)
+        console_manager = ConsoleManager(host, port)
         telnet_server_thread = YuServerThread(
-            target=telnet_server.accept_interactions,
+            target=console_manager.serve_forever,
             name='Telnet Console Server',
-            instance=telnet_server)
+            instance=console_manager)
         server_threads.append(telnet_server_thread)
-        return telnet_server
+        return console_manager
 
     def create_http_server():
         http_server = YuServer(config, errorlog, accesslog)
@@ -158,8 +159,8 @@ def create_server_threads(config, errorlog, accesslog):
     server_threads = []
 
     http_server = create_http_server()
-    telnet_server = create_telnet_server()
-    set_telnet_server_locals()
+    console_manager = create_telnet_server()
+    set_console_manager_locals()
 
     return server_threads
 
