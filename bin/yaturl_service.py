@@ -138,7 +138,9 @@ def create_server_threads(config, errorlog, accesslog):
             accesslog=accesslog,
             http_server=http_server,
             telnet_server=console_manager.get_telnet_server(),
-            console_manager=console_manager)
+            console_manager=console_manager,
+            shutdown=shutdown,
+            get_system_status=ConsoleManager.get_system_status)
         console_manager.set_locals(locals_)
 
     def create_telnet_server():
