@@ -49,7 +49,7 @@ class ConsoleManager(object):
 
     #----------------------------------------------------------------------
     @classmethod
-    def get_system_status(self):
+    def get_system_status(cls):
         monitor = SystemMonitor()
         threads = monitor.get_running_threads()
         uptime = monitor.get_uptime()
