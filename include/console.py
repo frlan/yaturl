@@ -6,7 +6,6 @@ import code
 import select
 import socket
 import sys
-import SimpleHTTPServer
 
 _stdout = sys.stdout
 _stderr = sys.stderr
@@ -14,13 +13,13 @@ _stderr = sys.stderr
 class StreamInteractiveConsole(code.InteractiveConsole):
     """Interactive console that works off an input and output stream"""
 
-    def __init__(self, input_stream, output_stream, locals=None):
+    def __init__(self, input_stream, output_stream, locals_=None):
         """Initialize an interactive interpreter talking to the provided streams
 
         Both ``input_stream`` and ``output_stream`` are assumed to be file-like
         objects.
         """
-        code.InteractiveConsole.__init__(self, locals)
+        code.InteractiveConsole.__init__(self, locals_)
         self.input_stream = input_stream
         self.output_stream = output_stream
         self._asyn_more = 0
@@ -57,14 +56,14 @@ class StreamInteractiveConsole(code.InteractiveConsole):
 
         self.write(sys.ps1)
 
-    def async_recv(self, bytes=''):
+    def async_recv(self, bytes_=''):
         """Notify this console that there is data to receive"""
-        if not bytes:
-            bytes = self.input_stream.read()
+        if not bytes_:
+            bytes_ = self.input_stream.read()
         encoding = getattr(sys.stdin, 'encoding', None)
 
         # split on both \r\n and \n
-        for line in '\n'.join(bytes.rstrip().split('\r\n')).split('\n'):
+        for line in '\n'.join(bytes_.rstrip().split('\r\n')).split('\n'):
             if line == '\x04': # EOF
                 raise SystemExit
             if encoding and not isinstance(line, unicode):
@@ -76,8 +75,7 @@ class StreamInteractiveConsole(code.InteractiveConsole):
             else:
                 prompt = sys.ps1
             self.write(prompt)
-
-        return bytes
+        return bytes_
 
     def raw_input(self, prompt=''):
         """Override the default behaviour of raw_input to write to the stream"""
@@ -92,16 +90,16 @@ class StreamInteractiveConsole(code.InteractiveConsole):
 class TelnetInteractiveConsoleServer(object):
     """Make an interactive console available via telnet which can interact with your app"""
 
-    def __init__(self, host='127.0.0.1', port=7070, _locals=None):
+    def __init__(self, host='127.0.0.1', port=7070, locals_=None):
         self.host = host
         self.port = port
-        self._locals = _locals
+        self.locals_ = locals_
         self.has_exit = False
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
         self.client_sockets = {}
 
-        self._locals['console_server'] = self
+        self.locals_['console_server'] = self
 
     def stop(self):
         """Cleanly shutdown and kill this console session"""
@@ -134,13 +132,13 @@ class TelnetInteractiveConsoleServer(object):
                 client, _addr = self.server_sock.accept() # accept the connection
                 client_console = StreamInteractiveConsole(client.makefile('r', 0),
                                                           client.makefile('w', 0),
-                                                          self._locals)
+                                                          self.locals_)
                 client_console.async_init()
                 self.client_sockets[client] = client_console
 
             for client in rl:
-                bytes = client.recv(1024)
-                if bytes == '': # client disconnect
+                bytes_ = client.recv(1024)
+                if bytes_ == '': # client disconnect
                     client.close()
                     del self.client_sockets[client]
                 else:
@@ -148,7 +146,7 @@ class TelnetInteractiveConsoleServer(object):
                     sys.stdout = client_console.output_stream
                     sys.stderr = client_console.output_stream
                     try:
-                        bytes = client_console.async_recv(bytes)
+                        bytes_ = client_console.async_recv(bytes_)
                     except (SystemExit,):
                         sys.stdout = _stdout
                         sys.stderr = _stderr
@@ -157,6 +155,7 @@ class TelnetInteractiveConsoleServer(object):
                         client.close()
                         del self.client_sockets[client]
 
+
 if __name__ == '__main__':
-    console_server = TelnetInteractiveConsoleServer(host='127.0.0.1', port=7070, locals=locals())
+    console_server = TelnetInteractiveConsoleServer(host='127.0.0.1', port=7070, locals_=locals())
     console_server.accept_interactions()
