@@ -32,7 +32,7 @@ class ConsoleManager(object):
     """
 
     #----------------------------------------------------------------------
-    def __init__(self, host, port, locals_=None, logger=None):
+    def __init__(self, host, port, locals_=None, logger):
         """"""
         self._host = host
         self._port = port
@@ -73,7 +73,11 @@ class ConsoleManager(object):
         """
         Start the telnet server
         """
-        self._start_telnet_server()
+        try:
+            self._start_telnet_server()
+        except Exception:
+            self._logger.error('An error occurred', exc_info=True)
+            raise
 
     #----------------------------------------------------------------------
     def shutdown(self):
