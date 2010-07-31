@@ -23,6 +23,7 @@
 
 SERVER_NAME = 'yatURL.net'
 SERVER_VERSION = '1.0'
+MYSQL_CONNECTION_POOL_SIZE = 5
 
 
 # we need to hard-code this one at least in case of the file cannot be found on disk

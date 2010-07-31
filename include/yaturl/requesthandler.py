@@ -28,7 +28,7 @@ import time
 from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
 from urlparse import urlsplit, urlunsplit
-from yaturl.db import YuDbError
+from yaturl.db import YuDbError, YuDb
 from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500
 from yaturl.helpers import sanitize_path, read_template
 
@@ -40,6 +40,15 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     server_version = '%s/%s' % (SERVER_NAME, SERVER_VERSION)
 
+
+    #----------------------------------------------------------------------
+    def __init__(self, request, client_address, server):
+        self._db = YuDb(server.config, server.errorlog)
+        BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+
+    #----------------------------------------------------------------------
+    def __del__(self):
+        del self._db
 
     #----------------------------------------------------------------------
     def _get_config_value(self, section, key):
@@ -299,13 +308,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
             # Begin the response
             try:
-                result = self.server.db.is_hash_in_db(link_hash)
+                result = self._db.is_hash_in_db(link_hash)
             except YuDbError:
                 # self._send_database_problem()
                 return -1
             if not result:
                 try:
-                    short = self.server.db.add_link_to_db(link_hash, url_new)
+                    short = self._b.add_link_to_db(link_hash, url_new)
                 except YuDbError:
                     # self._send_database_problem()
                     return -1
@@ -314,11 +323,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 # a collision on sha1
                 # Let's check for a collision
                 try:
-                    url = self.server.db.get_link_from_db_by_complete_hash(link_hash)
+                    url = self._db.get_link_from_db_by_complete_hash(link_hash)
 
                     if url_new == url:
                     # OK. We already have the url in DB. Good.
-                        short = self.server.db.get_short_for_hash_from_db(link_hash)
+                        short = self._db.get_short_for_hash_from_db(link_hash)
                     else:
                     # Bad. We found a collision
                     # TODO: This might could be done more elegant by using an exception.
@@ -376,7 +385,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 # not a valid hash at all
                 if request_path[1:].isalnum():
                     try:
-                        result = self.server.db.get_link_from_db(request_path[1:])
+                        result = self._db.get_link_from_db(request_path[1:])
                     except YuDbError:
                         self._send_database_problem(header_only)
                         return
@@ -472,7 +481,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     short_url = short_url[tmp:]
             if short_url != None and short_url.isalnum():
                 try:
-                    result = self.server.db.get_link_from_db(short_url)
+                    result = self._db.get_link_from_db(short_url)
                 except YuDbError:
                     self._send_database_problem(header_only=False)
                     return

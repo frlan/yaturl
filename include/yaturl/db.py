@@ -19,9 +19,17 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-import MySQLdb
+from yaturl.constants import MYSQL_CONNECTION_POOL_SIZE
+import sqlalchemy.pool as pool
+import MySQLdb as MySQLdb_orig
+# proxy MySQLdb module to enable SQLAlchemy's connection pooling
+MySQLdb = pool.manage(MySQLdb_orig,
+    pool_size=MYSQL_CONNECTION_POOL_SIZE,
+    max_overflow=5,
+    echo=True)
+
 from MySQLdb.constants.ER import DUP_ENTRY
-from safedb import SafeMySQLConnection
+from MySQLdb.constants.CR import SERVER_GONE_ERROR, SERVER_LOST
 
 
 class YuDbError(MySQLdb.DatabaseError):
@@ -78,16 +86,24 @@ class YuDb(object):
 
         | **return** conn (SafeMySQLConnection)
         """
-        try:
-            conn = SafeMySQLConnection(host=self._hostname, db=self._database, user=self._user,
-                passwd=self._passwd,
-                port=self._port, use_unicode=True, charset='utf8',
-                init_command='SET TRANSACTION ISOLATION LEVEL READ COMMITTED',
-                logger=self.logger)
-            conn.cursor().execute('SET time_zone = "+00:00";')
-        except MySQLdb.DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
-            raise YuDbError(str(e))
+        retry_count = MYSQL_CONNECTION_POOL_SIZE
+        while retry_count > 0:
+            try:
+                conn = MySQLdb.connect(host=self._hostname, db=self._database, user=self._user,
+                    passwd=self._passwd,
+                    port=self._port, use_unicode=True, charset='utf8',
+                    init_command='SET TRANSACTION ISOLATION LEVEL READ COMMITTED')
+                conn.cursor().execute('SET time_zone = "+00:00";')
+            except MySQLdb.DatabaseError, e:
+                if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and \
+                        retry_count > 0:
+                    retry_count -= 1
+                    # try again by requesting another connection from the pool
+                    continue
+                else:
+                    self.logger.warn('Database error: %s' % e)
+                    raise YuDbError(str(e))
+            break
 
         return conn
 
