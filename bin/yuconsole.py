@@ -64,7 +64,7 @@ class TelnetClient(object):
         return (self._next_prompt is not None)
 
     #----------------------------------------------------------------------
-    def _get_remote_locals(self):
+    def _fetch_remote_locals(self):
         """
         Read the locals() from the remote console and then add their keys
         into the local main namespace to get them auto completed as they were
@@ -84,7 +84,7 @@ class TelnetClient(object):
             received_data = self._client.read_until(self._prompt_default)
             sys.stdout.write(received_data[:-4])
             # do some magic for auto completion
-            remote_locals = self._get_remote_locals()
+            self._fetch_remote_locals()
             # enable readline completion after we filled __main__.__dict__ with the
             # locals of the remote console
             readline.parse_and_bind("tab: complete")
