@@ -90,7 +90,8 @@ class StreamInteractiveConsole(code.InteractiveConsole):
 class TelnetInteractiveConsoleServer(object):
     """Make an interactive console available via telnet which can interact with your app"""
 
-    def __init__(self, host='127.0.0.1', port=7070, locals_=None):
+    def __init__(self, host='127.0.0.1', port=7070, locals_=None, logger=None):
+        self.logger = logger
         self.host = host
         self.port = port
         self.locals_ = locals_
@@ -106,6 +107,11 @@ class TelnetInteractiveConsoleServer(object):
             self.locals_ = locals_
         else:
             raise ValueError, 'Server already started'
+
+    def log(self, level, msg):
+        if self.logger:
+            logger_func = getattr(self.logger, level)
+            logger_func(msg)
 
     def stop(self):
         """Cleanly shutdown and kill this console session"""
@@ -142,10 +148,13 @@ class TelnetInteractiveConsoleServer(object):
                                                           self.locals_)
                 client_console.async_init()
                 self.client_sockets[client] = client_console
+                self.log('info', 'Client "%s:%s" connected to telnet service' % _addr)
 
             for client in rl:
                 bytes_ = client.recv(1024)
                 if bytes_ == '': # client disconnect
+                    self.log('info',
+                        'Client "%s:%s" disconnected from telnet service' % client.getpeername())
                     client.close()
                     del self.client_sockets[client]
                 else:

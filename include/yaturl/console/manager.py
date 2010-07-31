@@ -32,12 +32,14 @@ class ConsoleManager(object):
     """
 
     #----------------------------------------------------------------------
-    def __init__(self, host, port, locals_=None):
+    def __init__(self, host, port, locals_=None, logger=None):
         """"""
         self._host = host
         self._port = port
         self._locals = None
-        self._telnet_server = TelnetInteractiveConsoleServer(self._host, self._port, self._locals)
+        self._logger = logger
+        self._telnet_server = TelnetInteractiveConsoleServer(
+            self._host, self._port, self._locals, self._logger)
 
     #----------------------------------------------------------------------
     def set_locals(self, locals_):
