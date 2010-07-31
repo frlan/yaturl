@@ -80,13 +80,17 @@ class TelnetClient(object):
 
     #----------------------------------------------------------------------
     def _get_initial_prompt(self):
-        received_data = self._client.read_until(self._prompt_default)
-        sys.stdout.write(received_data[:-4])
-
-        remote_locals = self._get_remote_locals()
-        # enable readline completion after we filled __main__.__dict__ with the
-        # locals of the remote console
-        readline.parse_and_bind("tab: complete")
+        if sys.stdin.isatty():
+            received_data = self._client.read_until(self._prompt_default)
+            sys.stdout.write(received_data[:-4])
+            # do some magic for auto completion
+            remote_locals = self._get_remote_locals()
+            # enable readline completion after we filled __main__.__dict__ with the
+            # locals of the remote console
+            readline.parse_and_bind("tab: complete")
+        else:
+            self._client.read_until(self._prompt_default)
+            self._next_prompt = ''
 
     #----------------------------------------------------------------------
     def _run(self):
