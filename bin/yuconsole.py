@@ -110,6 +110,8 @@ class TelnetClient(object):
         try:
             return self._run()
         except (EOFError, KeyboardInterrupt):
+            pass
+        finally:
             self._client.close()
 
 
