@@ -181,7 +181,7 @@ def watch_running_threads(running_threads, timeout=300):
     while not shutdown_event.isSet():
         for server_thread in running_threads:
             if not server_thread.isAlive():
-                logger.error(u'Server thread %s died, shutting down' % server_thread.getName())
+                logger.error(u'Server thread "%s" died, shutting down' % server_thread.getName())
                 shutdown_event.set()
         shutdown_event.wait(timeout)
 
