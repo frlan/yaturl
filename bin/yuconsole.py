@@ -42,7 +42,8 @@ class TelnetClient(object):
 
     #----------------------------------------------------------------------
     def _read_input(self):
-        data_to_send = str(raw_input(self._next_prompt))
+        prompt = self._next_prompt if sys.stdin.isatty() else ''
+        data_to_send = str(raw_input(prompt))
         if not data_to_send:
             data_to_send = '\n'
         return data_to_send
@@ -80,17 +81,14 @@ class TelnetClient(object):
 
     #----------------------------------------------------------------------
     def _get_initial_prompt(self):
+        received_data = self._client.read_until(self._prompt_default)
         if sys.stdin.isatty():
-            received_data = self._client.read_until(self._prompt_default)
             sys.stdout.write(received_data[:-4])
             # do some magic for auto completion
             self._fetch_remote_locals()
             # enable readline completion after we filled __main__.__dict__ with the
             # locals of the remote console
             readline.parse_and_bind("tab: complete")
-        else:
-            self._client.read_until(self._prompt_default)
-            self._next_prompt = ''
 
     #----------------------------------------------------------------------
     def _run(self):
