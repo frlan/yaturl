@@ -13,6 +13,6 @@
 * Backend:
 	* Do something against linkspam
 * General:
-	* Merge connpool and telnetconsole branches
+	* Merge telnetconsole branches
 	* Refactor and restructure some code, especially requesthandler.py
 	* Add a REST API or something similar for social networks
