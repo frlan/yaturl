@@ -30,6 +30,20 @@ class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
     def __init__(self, host='127.0.0.1', port=7070, locals_=None, logger=None):
         super(TelnetInteractiveConsoleServer, self).__init__(host, port, locals_)
         self._logger = logger
+        self._running = False
+
+    #----------------------------------------------------------------------
+    def set_locals(self, locals_):
+        """"""
+        if not self._running:
+            self.locals_ = locals_
+        else:
+            raise ValueError, 'Server already started'
+
+    #----------------------------------------------------------------------
+    def accept_interactions(self):
+        self._running = True
+        super(TelnetInteractiveConsoleServer, self).accept_interactions()
 
     #----------------------------------------------------------------------
     def client_connect(self, client):

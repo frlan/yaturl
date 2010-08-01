@@ -98,14 +98,6 @@ class TelnetInteractiveConsoleServer(object):
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
         self.client_sockets = {}
-        self.running = False
-
-    def set_locals(self, locals_):
-        """"""
-        if not self.running:
-            self.locals_ = locals_
-        else:
-            raise ValueError, 'Server already started'
 
     def client_connect(self, client):
         """Called when a client successfully connected to the server
@@ -144,7 +136,6 @@ class TelnetInteractiveConsoleServer(object):
             >>> console.stop() # this will end the target method and thread
 
         """
-        self.running = True
         self.server_sock.bind((self.host, self.port))
         self.server_sock.listen(5) # backlog a few connections
 
