@@ -21,7 +21,7 @@
 
 
 
-from console import TelnetInteractiveConsoleServer
+from yaturl.console.server import TelnetInteractiveConsoleServer
 from yaturl.console.monitor import SystemMonitor
 
 
@@ -32,7 +32,7 @@ class ConsoleManager(object):
     """
 
     #----------------------------------------------------------------------
-    def __init__(self, host, port, locals_=None, logger):
+    def __init__(self, host, port, logger, locals_=None):
         """"""
         self._host = host
         self._port = port

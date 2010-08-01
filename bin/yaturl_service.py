@@ -148,7 +148,7 @@ def create_server_threads(config, errorlog, accesslog):
             return None
         host = config.get('telnet', 'host')
         port = config.getint('telnet', 'port')
-        console_manager = ConsoleManager(host, port, logger=errorlog)
+        console_manager = ConsoleManager(host, port, errorlog)
         telnet_server_thread = YuServerThread(
             target=console_manager.serve_forever,
             name='Telnet Console Server',
