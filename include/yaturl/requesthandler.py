@@ -184,7 +184,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         text = read_template(
                 template_filename,
                 title='%s - 404' % SERVER_NAME,
-                header='404 &mdash Page not found',
+                header='404 &mdash; Page not found',
                 URL="Nothing")
         if text:
             self._send_head(text, 404)
