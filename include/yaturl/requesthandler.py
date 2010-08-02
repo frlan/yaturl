@@ -314,7 +314,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 return -1
             if not result:
                 try:
-                    short = self._b.add_link_to_db(link_hash, url_new)
+                    short = self._db.add_link_to_db(link_hash, url_new)
                 except YuDbError:
                     # self._send_database_problem()
                     return -1
