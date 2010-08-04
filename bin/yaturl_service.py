@@ -1,8 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# Author:  Enrico Tröger
+#          Frank Lanitz <frank@frank.uvena.de>
+# License: GPL v2 or later
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+# MA 02110-1301, USA.
 
 
+from yaturl.thread import YuServerThread
 from yaturl.server import YuServer
+from yaturl.console.manager import ConsoleManager
 from ConfigParser import SafeConfigParser
 from optparse import OptionParser
 from signal import signal, SIGINT, SIGTERM
@@ -12,6 +33,10 @@ import logging
 import os
 import pwd
 import sys
+from threading import Event
+
+
+shutdown_event = Event()
 
 
 #----------------------------------------------------------------------
@@ -31,13 +56,28 @@ def setup_options(base_dir, parser):
         default=True,
         help=u'stay in foreground, do not daemonize')
 
+
+#----------------------------------------------------------------------
+def get_error_logger():
+    return logging.getLogger('errorlog')
+
+
+#----------------------------------------------------------------------
+def shutdown():
+    logger = get_error_logger()
+    logger.info(u'Initiating shutdown')
+    shutdown_event.set()
+
+
 #----------------------------------------------------------------------
 def signal_handler(signum, frame):
     """
-    On SIGTERM and SIGINT, cleanup and exit
+    On SIGTERM and SIGINT, trigger shutdown
     """
-    logging.shutdown()
-    sys.exit(1)
+    logger = get_error_logger()
+    logger.info(u'Received signal %s' % signum)
+    shutdown()
+
 
 #----------------------------------------------------------------------
 def is_service_running(pid_file_path):
@@ -66,6 +106,7 @@ def is_service_running(pid_file_path):
         return True
     return False
 
+
 #----------------------------------------------------------------------
 def setup_logging(config, name, fmt):
     """
@@ -86,6 +127,71 @@ def setup_logging(config, name, fmt):
 
     return logger
 
+
+#----------------------------------------------------------------------
+def create_server_threads(config, errorlog, accesslog):
+
+    def set_console_manager_locals():
+        locals_ = dict(
+            config=config,
+            errorlog=errorlog,
+            accesslog=accesslog,
+            http_server=http_server,
+            telnet_server=console_manager.get_telnet_server(),
+            console_manager=console_manager,
+            shutdown=shutdown,
+            get_system_status=ConsoleManager.get_system_status)
+        console_manager.set_locals(locals_)
+
+    def create_telnet_server():
+        if not config.getboolean('telnet', 'enable'):
+            return None
+        host = config.get('telnet', 'host')
+        port = config.getint('telnet', 'port')
+        console_manager = ConsoleManager(host, port, errorlog)
+        telnet_server_thread = YuServerThread(
+            target=console_manager.serve_forever,
+            name='Telnet Console Server',
+            instance=console_manager)
+        server_threads.append(telnet_server_thread)
+        return console_manager
+
+    def create_http_server():
+        http_server = YuServer(config, errorlog, accesslog)
+        http_server_thread = YuServerThread(
+            target=http_server.serve_forever,
+            name='HTTP Server',
+            instance=http_server)
+        server_threads.append(http_server_thread)
+        return http_server
+
+    server_threads = []
+
+    http_server = create_http_server()
+    console_manager = create_telnet_server()
+    set_console_manager_locals()
+
+    return server_threads
+
+
+#----------------------------------------------------------------------
+def watch_running_threads(running_threads, timeout=300):
+    # watch running threads
+    logger = get_error_logger()
+    while not shutdown_event.isSet():
+        for server_thread in running_threads:
+            if not server_thread.isAlive():
+                logger.error(u'Server thread "%s" died, shutting down' % server_thread.getName())
+                shutdown_event.set()
+        shutdown_event.wait(timeout)
+
+    # stop remaining threads
+    for server_thread in running_threads:
+        if server_thread.isAlive():
+            server_thread.shutdown()
+            server_thread.join()
+
+
 #----------------------------------------------------------------------
 def main():
     """
@@ -93,6 +199,7 @@ def main():
 
     | **return** exit_code (int)
     """
+
     base_dir = os.path.abspath('%s/..' % (os.path.dirname(__file__)))
 
     # arguments
@@ -126,24 +233,33 @@ def main():
     pid.write(str(os.getpid()))
     pid.close()
 
+    thread_watch_timeout = config.getint('main', 'thread_watch_timeout')
+
     # (error) logging
     accesslog = setup_logging(config, 'accesslog', '%(message)s')
     errorlog = setup_logging(config, 'errorlog',
         '%(asctime)s: (%(funcName)s():%(lineno)d): %(levelname)s: %(message)s')
+    errorlog.info('Application starts up')
 
     # handle signals
     signal(SIGINT,  signal_handler)
     signal(SIGTERM, signal_handler)
 
-    errorlog.info('Server started')
+    server_threads = create_server_threads(config, errorlog, accesslog)
 
-    # loop forever listening to connections.
-    server = YuServer(config, errorlog, accesslog)
-    server.serve_forever()
+    # start server threads
+    for server_thread in server_threads:
+        server_thread.start()
+        errorlog.info('%s started' % server_thread.getName())
 
-    # clean up though we usually won't get here
+    watch_running_threads(server_threads, thread_watch_timeout)
+
+    errorlog.info(u'Shutdown')
+
+    # cleanup
     logging.shutdown()
-    exit(0)
+
+    return 0
 
 
 if __name__ == "__main__":

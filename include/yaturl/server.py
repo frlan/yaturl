@@ -30,6 +30,7 @@ class YuServer(ThreadingMixIn, HTTPServer):
     Simple, threaded HTTP server
     """
 
+    #----------------------------------------------------------------------
     def __init__(self, config, errorlog, accesslog):
         host = config.get('http', 'host')
         port = config.getint('http', 'port')
