@@ -164,12 +164,13 @@ class TelnetInteractiveConsoleServer(object):
                     try:
                         bytes_ = client_console.async_recv(bytes_)
                     except (SystemExit,):
-                        sys.stdout = _stdout
-                        sys.stderr = _stderr
                         client_console.input_stream.close()
                         client_console.output_stream.close()
                         client.close()
                         del self.client_sockets[client]
+                    finally:
+                        sys.stdout = _stdout
+                        sys.stderr = _stderr
 
 
 if __name__ == '__main__':
