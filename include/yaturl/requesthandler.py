@@ -427,28 +427,36 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 environ={'REQUEST_METHOD':'POST'})
 
         if self.path == "/URLRequest":
-            url = form['URL'].value if form.has_key('URL') else None
-            tmp = self._insert_url_to_db(url)
-            if tmp:
-                if tmp < 0:
-                    self._send_database_problem()
-                    return
-                else:
-                    template_filename = self._get_config_template('staticresultpage')
-                    text = read_template(
-                            template_filename,
-                            title='%s - Short URL Result' % SERVER_NAME,
-                            header='new URL',
-                            path = tmp,
-                            hostname = self.server.hostname)
-            else:
-                # There was a general issue with URL
+            if form.has_key('URL'):
                 template_filename = self._get_config_template('statichomepage')
                 text = read_template(
                     template_filename,
                     title=SERVER_NAME,
                     header=SERVER_NAME,
                     msg='<p class="warning">Please check your input</p>')
+            else:
+                url = form['real_URL'].value if form.has_key('real_URL') else None
+                tmp = self._insert_url_to_db(url)
+                if tmp:
+                    if tmp < 0:
+                        self._send_database_problem()
+                        return
+                    else:
+                        template_filename = self._get_config_template('staticresultpage')
+                        text = read_template(
+                                template_filename,
+                                title='%s - Short URL Result' % SERVER_NAME,
+                                header='new URL',
+                                path = tmp,
+                                hostname = self.server.hostname)
+                else:
+                    # There was a general issue with URL
+                    template_filename = self._get_config_template('statichomepage')
+                    text = read_template(
+                        template_filename,
+                        title=SERVER_NAME,
+                        header=SERVER_NAME,
+                        msg='<p class="warning">Please check your input</p>')
 
         elif self.path == '/ContactUs':
             try:

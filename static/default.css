@@ -87,6 +87,10 @@ BODY, HTML {
 	border: none;
 }
 
+#URL{
+	display:none!important;
+}
+
 #main a{
 	color: lightgray;
 	font-weight: bold;
