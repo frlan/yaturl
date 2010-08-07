@@ -247,13 +247,15 @@ def main():
     signal(SIGTERM, signal_handler)
 
     # Checking for templates
-    for template in yaturl.constants.TEMPLATENAMES:
-            if config.has_option('templates', template) and os.path.exists(config.get('templates', template)):
-                    errorlog.info('Template %s has been set. Good.' % (template))
+    if config.has_option('templates', 'path'):
+        for template in yaturl.constants.TEMPLATENAMES:
+            tmp_path = config.get('templates', 'path') + template
+            if os.path.exists(tmp_path):
+                errorlog.info('Template %s seems to be available. Good.' % (template))
             else:
-                errorlog.info('Templateconfiguration for %s is missing '
-                              'or target file is not existing. Aborting startup' % (template))
-                # Maybe shutdown can be done a bit nicer. 
+                errorlog.info('Template %s seems to be missing. '
+                              'Aborting startup' % (template))
+                # Maybe shutdown can be done a bit nicer.   
                 exit(1)
 
     server_threads = create_server_threads(config, errorlog, accesslog)

@@ -69,7 +69,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         | **param** key (str)
         | **return** value (str)
         """
-        return self._get_config_value('templates', key)
+        tmp_path = self._get_config_value('templates', 'path') + key
+        return tmp_path
 
     #----------------------------------------------------------------------
     def address_string(self):
@@ -180,7 +181,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         | **param** header_only (bool)
         """
-        template_filename = self._get_config_template('corruptlink')
+        template_filename = self._get_config_template('404')
         text = read_template(
                 template_filename,
                 title='%s - 404' % SERVER_NAME,
@@ -204,7 +205,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         | **param** header_only (bool)
         """
-        template_filename = self._get_config_template('servererror')
+        template_filename = self._get_config_template('500')
         text = read_template(
             template_filename,
             title='%s - Internal Error' % SERVER_NAME,
@@ -223,7 +224,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         | **param** header_only (bool)
         """
-        template_filename = self._get_config_template('databaseissuelink')
+        template_filename = self._get_config_template('databaserror')
         text = read_template(
             template_filename,
             title='%s - Datebase error' % SERVER_NAME,
@@ -369,7 +370,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             requested_file.close()
         except IOError:
             if self.path in ('/', '/URLRequest'):
-                template_filename = self._get_config_template('statichomepage')
+                template_filename = self._get_config_template('homepage')
                 text = read_template(
                         template_filename,
                         title=SERVER_NAME,
@@ -439,7 +440,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         if self.path == "/URLRequest":
             if form.has_key('URL'):
-                template_filename = self._get_config_template('statichomepage')
+                template_filename = self._get_config_template('homepage')
                 text = read_template(
                     template_filename,
                     title=SERVER_NAME,
@@ -453,7 +454,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_database_problem()
                         return
                     else:
-                        template_filename = self._get_config_template('staticresultpage')
+                        template_filename = self._get_config_template('return')
                         text = read_template(
                                 template_filename,
                                 title='%s - Short URL Result' % SERVER_NAME,
@@ -462,7 +463,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                 hostname = self.server.hostname)
                 else:
                     # There was a general issue with URL
-                    template_filename = self._get_config_template('statichomepage')
+                    template_filename = self._get_config_template('homepage')
                     text = read_template(
                         template_filename,
                         title=SERVER_NAME,
@@ -472,6 +473,22 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         elif self.path == '/ContactUs':
             if form.has_key('URL'):
                 template_filename = self._get_config_template('contactUsResultpage')
+            try:
+                email = form['email'].value
+                subj = form['subject'].value
+                descr = form['request'].value
+                if self._send_mail(subj, descr, email):
+                    template_filename = self._get_config_template('contactUsResult')
+                    text = read_template(
+                        template_filename,
+                        title='',
+                        header='Mail sent',
+                        msg="Your request has been sent. You will receive an answer soon.")
+                else:
+                    self._send_internal_server_error()
+                    return
+            except KeyError:
+                template_filename = self._get_config_template('contactUsResult')
                 text = read_template(
                     template_filename,
                     title='',
@@ -519,8 +536,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 else:
                     new_url = '<p class="warning">No URL found for this string. Please double check your\
                                 <a href="/ShowURL">input and try again</a></p>'
-                text = read_template(template_filename, title=SERVER_NAME,
-                          header=SERVER_NAME, msg=new_url)
+                text = read_template(
+                    template_filename,
+                    title=SERVER_NAME,
+                    header=SERVER_NAME,
+                    msg=new_url)
             else:
                 self._send_404()
                 return
