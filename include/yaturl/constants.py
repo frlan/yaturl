@@ -25,6 +25,8 @@ SERVER_NAME = 'yatURL.net'
 SERVER_VERSION = '1.0'
 MYSQL_CONNECTION_POOL_SIZE = 5
 
+TEMPLATENAMES = ['statichomepage','staticresultpage', 'corruptlink',
+'databaseissuelink', 'servererror', 'contactusresultpage', 'showpage']
 
 # we need to hard-code this one at least in case of the file cannot be found on disk
 TEMPLATE_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"

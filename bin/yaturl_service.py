@@ -33,6 +33,7 @@ import logging
 import os
 import pwd
 import sys
+import yaturl.constants
 from threading import Event
 
 
@@ -244,6 +245,15 @@ def main():
     # handle signals
     signal(SIGINT,  signal_handler)
     signal(SIGTERM, signal_handler)
+
+    # Checking for templates
+    for template in yaturl.constants.TEMPLATENAMES:
+            if config.has_option('templates', template):
+                print 'Template %s has been set. Good.' % (template)
+            else:
+                print 'Templateconfiguration for %s is missing. Aborting' % (template)
+                # Maybe shutdown can be done a bit nicer. 
+                exit(1)
 
     server_threads = create_server_threads(config, errorlog, accesslog)
 
