@@ -249,9 +249,9 @@ def main():
     # Checking for templates
     for template in yaturl.constants.TEMPLATENAMES:
             if config.has_option('templates', template):
-                print 'Template %s has been set. Good.' % (template)
+                errorlog.info('Template %s has been set. Good.' % (template))
             else:
-                print 'Templateconfiguration for %s is missing. Aborting' % (template)
+                errorlog.info('Templateconfiguration for %s is missing. Aborting' % (template))
                 # Maybe shutdown can be done a bit nicer. 
                 exit(1)
 
