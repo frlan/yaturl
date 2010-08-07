@@ -26,14 +26,7 @@ port: 3306
 database: db_name
 
 [templates]
-statichomepage: share/yaturl/templates/homepage.tpl
-staticresultpage: share/yaturl/templates/return.tpl
-corruptlink: share/yaturl/templates/404.tpl
-databaseissuelink: share/yaturl/templates/databaseerror.tpl
-servererror: share/yaturl/templates/500.tpl
-contactusresultpage: share/yaturl/templates/contactUsResult.tpl
-showpage: share/yaturl/templates/showpage.tpl
-
+path = share/yaturl/templates/
 
 [email]
 fromemail: example@example.org
