@@ -23,8 +23,10 @@
 from BaseHTTPServer import HTTPServer
 from SocketServer import ThreadingMixIn
 from yaturl.requesthandler import YuRequestHandler
+from threading import Event
 
 
+########################################################################
 class YuServer(ThreadingMixIn, HTTPServer):
     """
     Simple, threaded HTTP server
@@ -51,5 +53,15 @@ class YuServer(ThreadingMixIn, HTTPServer):
         self.accesslog = accesslog
         self.hostname = hostname
         self.resolve_clients = config.get('http', 'resolve_clients')
+        self._shutdown = Event()
 
+    #----------------------------------------------------------------------
+    def serve_forever(self):
+        self.socket.settimeout(0.5)
+        while not self._shutdown.isSet():
+            self.handle_request()
+
+    #----------------------------------------------------------------------
+    def shutdown(self):
+        self._shutdown.set()
 
