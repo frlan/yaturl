@@ -279,6 +279,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         return url_splitted
 
     #----------------------------------------------------------------------
+    def _get_hash(self, *args):
+        log_hash = hashlib.sha1()
+        for value in args:
+            value = unicode(value).encode('utf-8', 'replace')
+            log_hash.update(value)
+        return log_hash.hexdigest()
+
+    #----------------------------------------------------------------------
     def _insert_url_to_db(self, url=None):
         """
         This function is intented to do the part of inserting to database
@@ -304,7 +312,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
             url_new = self._split_url(url)
 
-            link_hash = hashlib.sha1(url_new).hexdigest()
+            link_hash = self._get_hash(url_new)
 
             # Begin the response
             try:
