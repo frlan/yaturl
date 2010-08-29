@@ -9,4 +9,4 @@ export PYTHONPATH="include:$PYTHONPATH"
 find "${ROOT}" -name '*.pyc' -delete
 
 # start service
-python2.6 $program -f
+python2.5 $program -f
