@@ -280,11 +280,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _get_hash(self, *args):
-        log_hash = hashlib.sha1()
+        url_hash = hashlib.sha1()
         for value in args:
             value = unicode(value).encode('utf-8', 'replace')
-            log_hash.update(value)
-        return log_hash.hexdigest()
+            url_hash.update(value)
+        return url_hash.hexdigest()
 
     #----------------------------------------------------------------------
     def _insert_url_to_db(self, url=None):
