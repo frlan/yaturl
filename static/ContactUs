@@ -24,9 +24,12 @@
                     </tr>
                     <tr>
                         <td>Your request:</td><td><textarea name="request" cols="50" rows="10"></textarea> </td>
+                        
                     </tr>
                 </table>
-                <p><input type="submit" value="Submit"/></p>
+                
+                <p><input type="submit" value="Submit"/> 
+                <input type="text" name="URL" id="URL"/></p>
             </form>
         </div>
         <div id="footer"><span><a href="/ContactUs">Contact Us</a> &nbsp;&nbsp; <a href="/About">About</a>

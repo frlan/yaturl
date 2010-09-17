@@ -467,27 +467,35 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         msg='<p class="warning">Please check your input</p>')
 
         elif self.path == '/ContactUs':
-            try:
-                email = form['email'].value
-                subj = form['subject'].value
-                descr = form['request'].value
-                if self._send_mail(subj, descr, email):
-                    template_filename = self._get_config_template('contactUsResultpage')
-                    text = read_template(
-                        template_filename,
-                        title='',
-                        header='Mail sent',
-                        msg="Your request has been sent. You will receive an answer soon.")
-                else:
-                    self._send_internal_server_error()
-                    return
-            except KeyError:
+            if form.has_key('URL'):
                 template_filename = self._get_config_template('contactUsResultpage')
                 text = read_template(
                     template_filename,
                     title='',
                     header='Mail sent',
-                    msg='It appers you did not fill out all needed fields. <a href="/ContactUs">Please try again</a>.')
+                    msg='There was an issue with your request. Are you a bot? <a href="/ContactUs">Please try again</a>.')
+            else:
+                try:
+                    email = form['email'].value
+                    subj = form['subject'].value
+                    descr = form['request'].value
+                    if self._send_mail(subj, descr, email):
+                        template_filename = self._get_config_template('contactUsResultpage')
+                        text = read_template(
+                            template_filename,
+                            title='',
+                            header='Mail sent',
+                            msg="Your request has been sent. You will receive an answer soon.")
+                    else:
+                        self._send_internal_server_error()
+                        return
+                except KeyError:
+                    template_filename = self._get_config_template('contactUsResultpage')
+                    text = read_template(
+                        template_filename,
+                        title='',
+                        header='Mail sent',
+                        msg='It appers you did not fill out all needed fields. <a href="/ContactUs">Please try again</a>.')
         elif self.path == '/Show':
             short_url = form['ShortURL'].value if form.has_key('ShortURL') else None
             if short_url != None and short_url.find("yaturl.net") > -1:
