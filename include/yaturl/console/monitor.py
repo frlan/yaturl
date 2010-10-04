@@ -25,6 +25,7 @@ from yaturl import start_time
 from threading import enumerate as thread_enumerate
 from math import floor
 from time import time, gmtime, strftime
+import os
 
 
 ########################################################################
@@ -39,6 +40,15 @@ class SystemMonitor(object):
         | **return** running_threads (seq of str)
         """
         return thread_enumerate()
+
+    #----------------------------------------------------------------------
+    def getloadavg(self):
+        """
+        Return the load average of the system
+
+        | **return** loadavg (seq of float)
+        """
+        return os.getloadavg()
 
     #----------------------------------------------------------------------
     def get_connection_pool(self):
