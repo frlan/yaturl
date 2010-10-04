@@ -22,6 +22,7 @@
 
 
 from yaturl import start_time
+from yaturl.db import MySQLdb
 from threading import enumerate as thread_enumerate
 from math import floor
 from time import time, gmtime, strftime
@@ -57,8 +58,8 @@ class SystemMonitor(object):
 
         | **return** status (str)
         """
-        # FIXME
-        return None
+        connection_pool = MySQLdb.get_pool()
+        return connection_pool.status()
 
     #----------------------------------------------------------------------
     def get_uptime(self):
