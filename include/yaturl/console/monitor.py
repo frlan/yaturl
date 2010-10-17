@@ -25,10 +25,9 @@ from yaturl import start_time
 from yaturl.db import MySQLdb
 from threading import enumerate as thread_enumerate
 from math import floor
-from os import getpid
+from os import getloadavg, getpid
 from resource import getrusage, RUSAGE_SELF
 from time import time, gmtime, strftime
-import os
 
 
 ########################################################################
@@ -51,7 +50,7 @@ class SystemMonitor(object):
 
         | **return** loadavg (seq of float)
         """
-        return os.getloadavg()
+        return getloadavg()
 
     #----------------------------------------------------------------------
     def get_resource_usage(self):

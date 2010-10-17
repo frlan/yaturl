@@ -32,7 +32,7 @@ class ConsoleManager(object):
     """
 
     #----------------------------------------------------------------------
-    def __init__(self, host, port, logger, locals_=None):
+    def __init__(self, host, port, logger):
         """"""
         self._host = host
         self._port = port
