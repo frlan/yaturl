@@ -43,7 +43,7 @@ class SystemMonitor(object):
         return thread_enumerate()
 
     #----------------------------------------------------------------------
-    def getloadavg(self):
+    def get_load_avg(self):
         """
         Return the load average of the system
 

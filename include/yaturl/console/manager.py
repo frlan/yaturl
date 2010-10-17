@@ -56,7 +56,7 @@ class ConsoleManager(object):
         threads = monitor.get_running_threads()
         uptime = monitor.get_uptime()
         pool = monitor.get_connection_pool()
-        load = monitor.getloadavg()
+        load = monitor.get_load_avg()
 
         print 'Uptime: %s days, %s' % (uptime['uptime_days'], uptime['uptime_rest'])
         print 'Load: %0.2f %0.2f %0.2f' % load
