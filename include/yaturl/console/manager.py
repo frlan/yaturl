@@ -57,8 +57,13 @@ class ConsoleManager(object):
         uptime = monitor.get_uptime()
         pool = monitor.get_connection_pool()
         load = monitor.get_load_avg()
+        time_usr, time_sys  = monitor.get_resource_usage()
+        rss  = monitor.get_memory_usage()
 
         print 'Uptime: %s days, %s' % (uptime['uptime_days'], uptime['uptime_rest'])
+        print 'Time USR: %0.2f' % time_usr
+        print 'Time SYS: %0.2f' % time_sys
+        print 'Memory (RSS): %0.2f MB' % (rss)
         print 'Load: %0.2f %0.2f %0.2f' % load
         print 'DB Pool: %s' % pool
         print 'Running threads:'
