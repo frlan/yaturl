@@ -1,0 +1,17 @@
+/opt/projects/yaturl/log/access.log {
+        weekly
+        rotate 12
+        copytruncate
+        notifempty
+        missingok
+        compress
+}
+
+/opt/projects/yaturl/log/error.log {
+        weekly
+        rotate 12
+        copytruncate
+        notifempty
+        missingok
+        compress
+}
