@@ -34,7 +34,7 @@ TEMPLATE_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <head>
     <title>yatURL.net - Internal server error</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-    <meta name="generator" content="Geany 0.18" />
+    <meta name="generator" content="Geany 0.19.1" />
 </head>
 
 <body>
@@ -61,7 +61,7 @@ HEADER = '''\
 <head>
     <title>%s</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-    <meta name="generator" content="Geany 0.19" />
+    <meta name="generator" content="Geany 0.19.1" />
     <link rel="stylesheet" href="/default.css" type="text/css"/>
 </head>
 
