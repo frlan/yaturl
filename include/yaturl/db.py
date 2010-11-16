@@ -258,3 +258,19 @@ class YuDb(object):
                 else:
                     self.logger.warn('Database error: %s' % e)
                     raise YuDbError(str(e))
+    #-------------------------------------------------------------------
+    
+    def add_logentry_to_database(self, hash):
+        """
+        Creates a log entry inside DB for a given hash. 
+        
+        | **param** hash (str)
+        """
+        try:
+            conn, cursor = self._get_connection()
+            cursor.execute("""INSERT INTO `accesslog`
+                     (`hash`) VALUES (%s)""",(hash))
+            conn.commit()
+            cursor.close()
+        except MySQLdb.DatabaseError, e:
+            pass

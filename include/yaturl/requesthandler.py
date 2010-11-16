@@ -398,6 +398,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_database_problem(header_only)
                         return
                     if result:
+                        # Logging access to hash to db.
+                        self._db.add_logentry_to_database(request_path[1:])
                         if show == True:
                             template_filename = self._get_config_template('showpage')
                             new_url = '<a href="%(result)s">%(result)s</a>' % \

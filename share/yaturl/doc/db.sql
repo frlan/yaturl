@@ -5,6 +5,16 @@
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 --
+-- Table structure for table `accesslog`
+--
+
+CREATE TABLE IF NOT EXISTS `accesslog` (
+  `accesstime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `hash` varchar(25) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+--
 -- Database: `yaturl1`
 --
 
