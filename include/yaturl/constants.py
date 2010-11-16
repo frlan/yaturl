@@ -35,8 +35,8 @@ TEMPLATE_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     <title>yatURL.net - Internal server error</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <meta name="generator" content="Geany 0.19.1" />
-    <link rel="stylesheet" href="default.css" type="text/css"/>
-    <link rel="icon" href="favicon.ico" type="image/vnd.microsoft.icon">
+    <link rel="stylesheet" href="/default.css" type="text/css"/>
+    <link rel="icon" href="/favicon.ico" type="image/vnd.microsoft.icon">
 </head>
 
 <body>
@@ -64,8 +64,8 @@ HEADER = '''\
     <title>%s</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <meta name="generator" content="Geany 0.19.1" />
-    <link rel="icon" href="favicon.ico" type="image/vnd.microsoft.icon">
-    <link rel="stylesheet" href="default.css" type="text/css"/>
+    <link rel="icon" href="/favicon.ico" type="image/vnd.microsoft.icon">
+    <link rel="stylesheet" href="/default.css" type="text/css"/>
 </head>
 
 <body>
