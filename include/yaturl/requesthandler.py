@@ -403,15 +403,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             new_url = '<a href="%(result)s">%(result)s</a>' % \
                                       {'result':result}
                             stats = self._db.get_statistics_for_hash(request_path[1:])
-                            statistics =('The link has direct accessed \
-                                        %s time(s) by now exclusive \
-                                        this screen' % stats)
                             text = read_template(
                                         template_filename,
                                         title=SERVER_NAME,
                                         header=SERVER_NAME,
                                         msg=new_url,
-                                        stat=statistics)
+                                        stat=stats)
                         else:
                             self._db.add_logentry_to_database(request_path[1:])
                             self._send_301(result)
