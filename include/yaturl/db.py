@@ -274,3 +274,22 @@ class YuDb(object):
             cursor.close()
         except MySQLdb.DatabaseError, e:
             pass
+    #-------------------------------------------------------------------
+    def get_statistics_for_hash(self, hash):
+        """
+        Returns the number of calls for a particular hash 
+            
+        | **param** hash (str)
+        | **return** number of usages (int)
+        """
+        try:
+            conn, cursor = self._get_connection()
+            cursor.execute("""SELECT count(hash)
+                              FROM accesslog
+                              WHERE hash = (%s)""",(hash))
+            conn.commit()
+            result = cursor.fetchone()
+            cursor.close()
+            return result[0]
+        except MySQLdb.DatabaseError, e:
+            pass

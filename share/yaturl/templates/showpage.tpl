@@ -2,4 +2,5 @@
 			<p>Thanks for using our service. The
 			requested target URL is:</p>
 			%(msg)s
+			<p>%(stat)s</p>
 		</div>
