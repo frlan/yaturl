@@ -10,6 +10,9 @@
 	* Rework of template system to be more flexible
 	* Prevent of circle linkage
 	* Add support for cookies e.g. to switch and save used CSS file
+	* Some graphics for link statistics
+	* 
 * General:
 	* Refactor and restructure some code, especially requesthandler.py
 	* Add a REST API or something similar for social networks
+	* Adding a link list available via short URL 
