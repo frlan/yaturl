@@ -29,7 +29,7 @@ from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
 from urlparse import urlsplit, urlunsplit
 from yaturl.db import YuDbError, YuDb
-from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500
+from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPE
 from yaturl.helpers import sanitize_path, read_template
 
 
@@ -150,11 +150,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         """
         size = len(text)
         self.send_response(code, None, size)
-        if self.path.endswith(".css"):
-            self.send_header('Content-Type', 'text/css')
-        elif self.path.endswith(".ico"):
-            self.send_header('Content-Type', 'image/vnd.microsoft.icon')
-        else:
+        # Trying to figure out what we are going to send out.
+        # Maybe this could be improved a bit further but should do
+        # it for now.
+        extension_start = self.path.rfind('.')
+        end = self.path[extension_start:]
+        try:
+            self.send_header('Content-Type', CONTENT_TYPE[end])
+        except KeyError:
             self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", size)
         self.end_headers()

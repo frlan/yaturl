@@ -28,6 +28,10 @@ MYSQL_CONNECTION_POOL_SIZE = 5
 TEMPLATENAMES = ['404','500','contactUsResult','databaseerror',
 'homepage','return','showpage']
 
+CONTENT_TYPE = ({
+    '.css':'text/css',
+    '.ico':'image/vnd.microsoft.icon'})
+
 # we need to hard-code this one at least in case of the file cannot be found on disk
 TEMPLATE_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
