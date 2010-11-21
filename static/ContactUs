@@ -6,8 +6,8 @@
     <title>yatURL.net - Contact us</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <meta name="generator" content="Geany 0.18" />
-    <link rel="stylesheet" href="/default.css" type="text/css"/>
-
+    <link rel="stylesheet" href="/default.css" type="text/css" />
+    <link rel="shortcut icon" href="/favicon.ico" />
 </head>
 
 <body>
@@ -24,11 +24,11 @@
                     </tr>
                     <tr>
                         <td>Your request:</td><td><textarea name="request" cols="50" rows="10"></textarea> </td>
-                        
+
                     </tr>
                 </table>
-                
-                <p><input type="submit" value="Submit"/> 
+
+                <p><input type="submit" value="Submit"/>
                 <input type="text" name="URL" id="URL"/></p>
             </form>
         </div>
