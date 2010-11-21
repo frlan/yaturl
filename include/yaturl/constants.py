@@ -64,8 +64,8 @@ HEADER = '''\
     <title>%s</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
     <meta name="generator" content="Geany 0.19.1" />
-    <link rel="icon" href="/favicon.ico" type="image/vnd.microsoft.icon">
-    <link rel="stylesheet" href="/default.css" type="text/css"/>
+    <link rel="stylesheet" href="/default.css" type="text/css" />
+    <link rel="shortcut icon" href="/favicon.ico" />
 </head>
 
 <body>
