@@ -28,7 +28,7 @@ MYSQL_CONNECTION_POOL_SIZE = 5
 TEMPLATENAMES = ['404','500','contactUsResult','databaseerror',
 'homepage','return','showpage']
 
-CONTENT_TYPE = ({
+CONTENT_TYPES = ({
     '.css':'text/css',
     '.ico':'image/vnd.microsoft.icon'})
 

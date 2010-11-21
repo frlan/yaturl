@@ -29,7 +29,7 @@ from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
 from urlparse import urlsplit, urlunsplit
 from yaturl.db import YuDbError, YuDb
-from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPE
+from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPES
 from yaturl.helpers import sanitize_path, read_template
 
 
@@ -154,9 +154,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         # Maybe this could be improved a bit further but should do
         # it for now.
         extension_start = self.path.rfind('.')
-        end = self.path[extension_start:]
+        extension = self.path[extension_start:]
         try:
-            self.send_header('Content-Type', CONTENT_TYPE[end])
+            self.send_header('Content-Type', CONTENT_TYPES[extension])
         except KeyError:
             self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", size)
