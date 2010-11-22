@@ -268,8 +268,10 @@ class YuDb(object):
         """
         try:
             conn, cursor = self._get_connection()
-            cursor.execute("""INSERT INTO `accesslog`
-                     (`hash`) VALUES (%s)""",(hash))
+            cursor.execute("""INSERT into `access_log` (link_id) 
+                SELECT link_id 
+                FROM link 
+                WHERE link_shorthash = (%s)""",(hash))
             conn.commit()
             cursor.close()
         except MySQLdb.DatabaseError, e:
@@ -284,9 +286,15 @@ class YuDb(object):
         """
         try:
             conn, cursor = self._get_connection()
-            cursor.execute("""SELECT count(hash)
-                              FROM accesslog
-                              WHERE hash = (%s)""",(hash))
+            # Is this real a nice way in terms of memory usage at DB? 
+            cursor.execute("""SELECT count(access_time)
+                              FROM access_log left join link on (access_log.link_id = link.link_id) 
+                              WHERE link.link_shorthash = (%s);""",(hash))
+            # Is SELECT count(access_time) 
+            #    FROM access_log, link 
+            #    WHERE access_log.link_id = link.link_id 
+            #    AND link.link_shorthash = (%s); 
+            # maybe better?
             conn.commit()
             result = cursor.fetchone()
             cursor.close()
