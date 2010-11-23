@@ -450,6 +450,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 environ={'REQUEST_METHOD':'POST'})
 
         if self.path == "/URLRequest":
+            # First we check, whether the formular has been filled by 
+            # something behaving like a bot
             if form.has_key('URL'):
                 template_filename = self._get_config_template('homepage')
                 text = read_template(
@@ -460,10 +462,18 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             else:
                 url = form['real_URL'].value if form.has_key('real_URL') else None
                 tmp = self._insert_url_to_db(url)
+                blocked = self._db.is_hash_blocked(tmp)
                 if tmp:
                     if tmp < 0:
                         self._send_database_problem()
                         return
+                    elif blocked:
+                        template_filename = self._get_config_template('blocked')
+                        text = read_template(
+                                    template_filename,
+                                    title=SERVER_NAME,
+                                    header=SERVER_NAME,
+                                    comment=blocked[3])
                     else:
                         template_filename = self._get_config_template('return')
                         text = read_template(
