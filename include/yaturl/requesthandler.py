@@ -398,10 +398,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 if request_path[1:].isalnum():
                     try:
                         result = self._db.get_link_from_db(request_path[1:])
+                        blocked = self._db.is_hash_blocked(request_path[1:])
                     except YuDbError:
                         self._send_database_problem(header_only)
                         return
-                    if result:
+                    if result and blocked == None:
                         if show == True:
                             template_filename = self._get_config_template('showpage')
                             new_url = '<a href="%(result)s">%(result)s</a>' % \
@@ -417,6 +418,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             self._db.add_logentry_to_database(request_path[1:])
                             self._send_301(result)
                             return
+                    elif blocked:
+                        template_filename = self._get_config_template('blocked')
+                        text = read_template(
+                                    template_filename,
+                                    title=SERVER_NAME,
+                                    header=SERVER_NAME,
+                                    comment=blocked[3])
                     else:
                         self._send_404(header_only)
                         return

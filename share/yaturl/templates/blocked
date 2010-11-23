@@ -1,0 +1,4 @@
+		<div id="main">
+			<p>Unfortunatley this short URL has been blocked because of this reason:</p>
+			%(comment)s
+		</div>

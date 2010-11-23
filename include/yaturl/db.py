@@ -176,7 +176,7 @@ class YuDb(object):
             cursor = self._get_connection()[1]
             cursor.execute('''SELECT `link`.`link_link`
                          FROM `link`
-                         WHERE `link`.`link_shorthash` = %s LIMIT 1''', (url_hash))
+                         WHERE `link`.`link_shorthash` = %s  LIMIT 1 ''', (url_hash))
             result = cursor.fetchone()
             cursor.close()
             if result:
@@ -229,6 +229,31 @@ class YuDb(object):
             self.logger.warn('Database error: %s' % e)
             raise YuDbError(str(e))
 
+    #-------------------------------------------------------------------
+    def is_hash_blocked(self, hash):
+        """
+        Checks whether given hash is marked as blocked and is returning 
+        some data about. If its not blocked, its just returning none.
+        
+        | **param** hash (str)
+        | **return**"""
+        try:
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT `block`.`link_id`, 
+                                     `link`.`link_shorthash`,
+                                     `block`.`entry_date`, `comment` 
+                              FROM `link`, `block` 
+                              WHERE `link`.`link_shorthash` = %s 
+                              AND `link`.`link_id` = `block`.`link_id`; ''', (hash))
+            result = cursor.fetchone()
+            cursor.close()
+            if result:
+                return result
+            else:
+                return None 
+        except MySQLdb.DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError(str(e))
     #-------------------------------------------------------------------
     def add_link_to_db(self, url_hash, link):
         """

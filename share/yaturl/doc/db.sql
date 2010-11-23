@@ -32,5 +32,18 @@ CREATE TABLE IF NOT EXISTS `link` (
   UNIQUE KEY `link_shorthash` (`link_shorthash`)
 ) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+
+CREATE TABLE IF NOT EXISTS `block` (
+  `block_id` bigint(20) unsigned NOT NULL auto_increment,
+  `link_id` bigint(20) unsigned NOT NULL,
+  `entry_date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `comment` text,
+  PRIMARY KEY  (`block_id`),
+  UNIQUE KEY `link_id` (`link_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 ALTER TABLE `access_log`
   ADD CONSTRAINT `access_log_ibfk_1` FOREIGN KEY (`link_id`) REFERENCES `link` (`link_id`) ON DELETE CASCADE;
+
+ALTER TABLE `block`
+  ADD CONSTRAINT `block_ibfk_1` FOREIGN KEY (`link_id`) REFERENCES `link` (`link_id`) ON DELETE CASCADE ON UPDATE NO ACTION;
