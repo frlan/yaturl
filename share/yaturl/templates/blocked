@@ -2,4 +2,6 @@
 			<p>Unfortunatley this short URL has been blocked because of this reason:</p>
 			
 			<p>%(comment)s</p>
+			
+			<p>Back to <a href="/">home</a></p>
 		</div>
