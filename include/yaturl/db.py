@@ -236,7 +236,8 @@ class YuDb(object):
         some data about. If its not blocked, its just returning none.
         
         | **param** hash (str)
-        | **return**"""
+        | **return** list with link_id, shorthash, entry_date and comment
+        """
         try:
             cursor = self._get_connection()[1]
             cursor.execute('''SELECT `block`.`link_id`, 
