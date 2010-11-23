@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `link` (
   PRIMARY KEY  (`link_id`),
   UNIQUE KEY `link_hash` (`link_hash`),
   UNIQUE KEY `link_shorthash` (`link_shorthash`)
-) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=381 ;
+) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 ALTER TABLE `access_log`
   ADD CONSTRAINT `access_log_ibfk_1` FOREIGN KEY (`link_id`) REFERENCES `link` (`link_id`) ON DELETE CASCADE;
