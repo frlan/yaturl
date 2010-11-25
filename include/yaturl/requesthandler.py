@@ -405,8 +405,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     if result and blocked == None:
                         if show == True:
                             template_filename = self._get_config_template('showpage')
-                            new_url = '<a href="%(result)s">%(result)s</a>' % \
-                                      {'result':result}
+                            url = "/" + request_path[1:]
+                            new_url = '<a href="%(url)s">%(result)s</a>' % \
+                                      {'result':result, 'url':url}
                             stats = self._db.get_statistics_for_hash(request_path[1:])
                             text = read_template(
                                         template_filename,
