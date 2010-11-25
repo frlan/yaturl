@@ -558,11 +558,15 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 else:
                     new_url = '<p class="warning">No URL found for this string. Please double check your\
                                 <a href="/ShowURL">input and try again</a></p>'
+                
+                stats = self._db.get_statistics_for_hash(short_url)
+
                 text = read_template(
                     template_filename,
                     title=SERVER_NAME,
                     header=SERVER_NAME,
-                    msg=new_url)
+                    msg=new_url,
+                    stat=stats)
             else:
                 self._send_404()
                 return
