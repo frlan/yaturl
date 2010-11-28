@@ -15,3 +15,4 @@
 	* Refactor and restructure some code, especially requesthandler.py
 	* Add a REST API or something similar for social networks
 	* Adding a link list available via short URL 
+	* Add a RSS for general NEWS
