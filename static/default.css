@@ -104,6 +104,14 @@ BODY, HTML {
 	padding-top: 1em;
 }
 
+#main h2{
+	padding-top: 1em;
+}
+
+.plainlist {
+	list-style-type:none;
+}
+
 .warning {
 	color: red;
 	font-weight: bold;

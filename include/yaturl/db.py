@@ -327,3 +327,63 @@ class YuDb(object):
             return result[0]
         except MySQLdb.DatabaseError, e:
             pass
+    #-------------------------------------------------------------------
+    def get_statistics_for_general_redirects(self, time_range):
+        
+        queries = ({
+            'today' : """SELECT CURDATE( ) , count(`access_log_id`)
+                         FROM `access_log`
+                         WHERE date(`access_time`) = CURDATE( );""",
+            'year'  : """SELECT COUNT(`access_log_id`) 
+                         FROM `access_log`
+                         WHERE YEAR(`access_time`) = YEAR(CURDATE());""",
+            'week'  : """SELECT COUNT(`access_log_id`) 
+                         FROM `access_log` 
+                         WHERE WEEK(`access_time`) = WEEK(CURDATE());""",
+            'month' : """SELECT COUNT(`access_log_id`) 
+                         FROM `access_log` 
+                         WHERE MONTH(`access_time`) = MONTH(CURDATE());""",
+            'all'   : """SELECT COUNT(`access_log_id`) 
+                         FROM `access_log` WHERE 1;"""})
+        try:
+            conn, cursor = self._get_connection()
+            cursor.execute(queries[time_range])
+            conn.commit()
+            result = cursor.fetchone()
+            cursor.close()
+            return result
+        except MySQLdb.DatabaseError, e:
+            return None
+        except KeyError:
+            return None
+            
+    #-------------------------------------------------------------------
+    def get_statistics_for_general_links(self, time_range):
+        
+        queries = ({
+            'today' : """SELECT CURDATE() , count(`link_id`)
+                         FROM `link`
+                         WHERE date(`entry_date`) = CURDATE();""",
+            'year'  : """SELECT count(`link_id`)
+                         FROM `link`
+                         WHERE YEAR(`entry_date`) = YEAR(CURDATE());""",
+            'week'  : """SELECT COUNT(`link_id`) 
+                         FROM `link` 
+                         WHERE WEEK(`entry_date`) = WEEK(CURDATE());""",
+            'month' : """SELECT COUNT(`link_id`) 
+                         FROM `link` 
+                         WHERE MONTH(`entry_date`) = MONTH(CURDATE());""",
+            'all'   : """SELECT COUNT(`link_id`) 
+                         FROM `link` WHERE 1;"""})
+        try:
+            conn, cursor = self._get_connection()
+            cursor.execute(queries[time_range])
+            conn.commit()
+            result = cursor.fetchone()
+            cursor.close()
+            return result
+        except MySQLdb.DatabaseError, e:
+            print e
+            return None
+        except KeyError:
+            return None

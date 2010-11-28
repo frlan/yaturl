@@ -31,6 +31,7 @@ from urlparse import urlsplit, urlunsplit
 from yaturl.db import YuDbError, YuDb
 from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPES
 from yaturl.helpers import sanitize_path, read_template
+from yaturl.stats import YuStats
 
 
 class YuRequestHandler(BaseHTTPRequestHandler):
@@ -379,6 +380,26 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         title=SERVER_NAME,
                         header=SERVER_NAME,
                         msg='')
+            elif self.path == '/stats':
+                # Let's hope this page is not getting to popular .... 
+                # Create a new stats objekt which is fetching data in background 
+                stat = YuStats(self.server)
+                template_filename = self._get_config_template('stats')
+                text = read_template(
+                                template_filename,
+                                title=SERVER_NAME,
+                                header=SERVER_NAME,
+                                number_of_links=stat.links_all,
+                                number_of_redirects=stat.redirect_all,
+                                number_of_redirects_today = stat.redirect_per_day,
+                                number_of_redirects_this_week = stat.redirect_per_week,
+                                number_of_redirects_this_month = stat.redirect_per_month,
+                                number_of_redirects_this_year = stat.redirect_per_year,
+                                number_of_url_today = stat.links_per_day,
+                                number_of_url_this_week = stat.links_per_week,
+                                number_of_url_this_month = stat.links_per_month,
+                                number_of_url_this_year = stat.links_per_year
+                                )
             # Any other page
             else:
                 # First check, whether we want to have a real redirect
