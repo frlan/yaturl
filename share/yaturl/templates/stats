@@ -7,7 +7,7 @@
 				<li>Redirects (since collecting): %(number_of_redirects)s</li>
 			</ul>
 			<h2>Redirect usage</h2>
-			<ul class=plainlist>
+			<ul class="plainlist">
 				<li>Redirects today: %(number_of_redirects_today)s</li>
 				<li>Redirects this week: %(number_of_redirects_this_week)s</li>
 				<li>Redirects this month: %(number_of_redirects_this_month)s</li>
@@ -15,7 +15,7 @@
 			</ul>
 			<p></p>
 			<h2>New short URL</h2>
-			<ul class=plainlist>
+			<ul class="plainlist">
 				<li>New entries today: %(number_of_url_today)s</li>
 				<li>New entries this week: %(number_of_url_this_week)s</li>
 				<li>New entries this month: %(number_of_url_this_month)s</li>
