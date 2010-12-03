@@ -273,15 +273,18 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         | **return url_splitted (str)
         """
         url_split = urlsplit(url)
-        decoded_netloc = url_split.netloc.decode("utf-8 ").encode("idna")
-        url_parts = (
-            url_split.scheme,
-            decoded_netloc,
-            url_split.path,
-            url_split.query,
-            url_split.fragment)
-        url_splitted = urlunsplit(url_parts)
-        return url_splitted
+        try:
+            decoded_netloc = url_split.netloc.decode("utf-8 ").encode("idna")
+            url_parts = (
+                url_split.scheme,
+                decoded_netloc,
+                url_split.path,
+                url_split.query,
+                url_split.fragment)
+            url_splitted = urlunsplit(url_parts)
+            return url_splitted
+        except UnicodeError:
+            return None
 
     #----------------------------------------------------------------------
     def _get_hash(self, *args):
@@ -381,8 +384,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         header=SERVER_NAME,
                         msg='')
             elif self.path == '/stats':
-                # Let's hope this page is not getting to popular .... 
-                # Create a new stats objekt which is fetching data in background 
+                # Let's hope this page is not getting to popular ....
+                # Create a new stats objekt which is fetching data in background
                 stat = YuStats(self.server)
                 template_filename = self._get_config_template('stats')
                 text = read_template(
@@ -472,7 +475,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 environ={'REQUEST_METHOD':'POST'})
 
         if self.path == "/URLRequest":
-            # First we check, whether the formular has been filled by 
+            # First we check, whether the formular has been filled by
             # something behaving like a bot
             if form.has_key('URL'):
                 template_filename = self._get_config_template('homepage')
@@ -579,7 +582,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 else:
                     new_url = '<p class="warning">No URL found for this string. Please double check your\
                                 <a href="/ShowURL">input and try again</a></p>'
-                
+
                 stats = self._db.get_statistics_for_hash(short_url)
 
                 text = read_template(
