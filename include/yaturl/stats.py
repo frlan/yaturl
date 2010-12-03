@@ -22,7 +22,6 @@
 from yaturl.db import YuDbError, YuDb
 from yaturl.constants import SERVER_NAME, SERVER_VERSION
 import time
-import datetime
 
 class YuStats:
     def __init__(self, server):
@@ -47,25 +46,36 @@ class YuStats:
 
     def _get_links_from_db_per_day(self):
         return self._db.get_statistics_for_general_links('today')[1]
+
     def _get_links_from_db_per_week(self):
         return self._db.get_statistics_for_general_links('week')[0]
+
     def _get_links_from_db_per_month(self):
         return self._db.get_statistics_for_general_links('month')[0]
+
     def _get_links_from_db_per_year(self):
         return self._db.get_statistics_for_general_links('year')[0]
+
     def _get_links_from_db_all(self):
         return self._db.get_statistics_for_general_links('all')[0]
+
     def _get_redirects_per_day(self):
         return self._db.get_statistics_for_general_redirects('today')[1]
+
     def _get_redirects_per_week(self):
         return self._db.get_statistics_for_general_redirects('week')[0]
+
     def _get_redirects_per_month(self):
         return self._db.get_statistics_for_general_redirects('month')[0]
+
     def _get_redirects_per_year(self):
         return self._db.get_statistics_for_general_redirects('year')[0]
+
     def _get_redirects_all(self):
         return self._db.get_statistics_for_general_redirects('all')[0]
+
     def _get_date_of_first_redirect(self):
         return self._db.get_date_of_first_entry('redirect')[0]
+
     def _get_date_of_first_link_entry(self):
         return self._db.get_date_of_first_entry('link')[0]
