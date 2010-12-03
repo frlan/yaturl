@@ -329,7 +329,12 @@ class YuDb(object):
             pass
     #-------------------------------------------------------------------
     def get_statistics_for_general_redirects(self, time_range):
+        """
+        Returns the number of redirects inside a give time range.
 
+        | **param** time_range (str)
+        | **return** number of redirects (int)
+        """
         queries = ({
             'today' : """SELECT CURDATE( ) , count(`access_log_id`)
                          FROM `access_log`
@@ -359,7 +364,12 @@ class YuDb(object):
 
     #-------------------------------------------------------------------
     def get_statistics_for_general_links(self, time_range):
+        """
+        Returns the number of added links inside a give time range.
 
+        | **param** time_range (str)
+        | **return** number of new links (int)
+        """
         queries = ({
             'today' : """SELECT CURDATE() , count(`link_id`)
                          FROM `link`
