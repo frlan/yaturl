@@ -26,7 +26,7 @@ SERVER_VERSION = '1.0'
 MYSQL_CONNECTION_POOL_SIZE = 5
 
 TEMPLATENAMES = ['404','500','contactUsResult','databaseerror',
-'homepage','return','showpage']
+'homepage','return','showpage','stats']
 
 CONTENT_TYPES = ({
     '.css':'text/css',
