@@ -4,7 +4,7 @@
 			<p>This is givin some information about general user of plattform:</p>
 			<ul class="plainlist">
 				<li>Short URL in database: %(number_of_links)s</li>
-				<li>Redirects (since collecting): %(number_of_redirects)s</li>
+				<li>Redirects: %(number_of_redirects)s (since %(date_of_first_redirect)s)</li>
 			</ul>
 			<h2>Redirect usage</h2>
 			<ul class="plainlist">
@@ -16,7 +16,7 @@
 			<p></p>
 			<h2>New short URL</h2>
 			<ul class="plainlist">
-				<li>New entries today: %(number_of_url_today)s</li>
+				<li>New entries today: %(number_of_url_today)s </li>
 				<li>New entries this week: %(number_of_url_this_week)s</li>
 				<li>New entries this month: %(number_of_url_this_month)s</li>
 				<li>New entries this year: %(number_of_url_this_year)s</li>

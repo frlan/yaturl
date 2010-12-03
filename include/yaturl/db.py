@@ -232,26 +232,26 @@ class YuDb(object):
     #-------------------------------------------------------------------
     def is_hash_blocked(self, hash):
         """
-        Checks whether given hash is marked as blocked and is returning 
+        Checks whether given hash is marked as blocked and is returning
         some data about. If its not blocked, its just returning none.
-        
+
         | **param** hash (str)
         | **return** list with link_id, shorthash, entry_date and comment
         """
         try:
             cursor = self._get_connection()[1]
-            cursor.execute('''SELECT `block`.`link_id`, 
+            cursor.execute('''SELECT `block`.`link_id`,
                                      `link`.`link_shorthash`,
-                                     `block`.`entry_date`, `comment` 
-                              FROM `link`, `block` 
-                              WHERE `link`.`link_shorthash` = %s 
+                                     `block`.`entry_date`, `comment`
+                              FROM `link`, `block`
+                              WHERE `link`.`link_shorthash` = %s
                               AND `link`.`link_id` = `block`.`link_id`; ''', (hash))
             result = cursor.fetchone()
             cursor.close()
             if result:
                 return result
             else:
-                return None 
+                return None
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError(str(e))
@@ -285,18 +285,18 @@ class YuDb(object):
                     self.logger.warn('Database error: %s' % e)
                     raise YuDbError(str(e))
     #-------------------------------------------------------------------
-    
+
     def add_logentry_to_database(self, hash):
         """
-        Creates a log entry inside DB for a given hash. 
-        
+        Creates a log entry inside DB for a given hash.
+
         | **param** hash (str)
         """
         try:
             conn, cursor = self._get_connection()
-            cursor.execute("""INSERT into `access_log` (link_id) 
-                SELECT link_id 
-                FROM link 
+            cursor.execute("""INSERT into `access_log` (link_id)
+                SELECT link_id
+                FROM link
                 WHERE link_shorthash = (%s)""",(hash))
             conn.commit()
             cursor.close()
@@ -305,21 +305,21 @@ class YuDb(object):
     #-------------------------------------------------------------------
     def get_statistics_for_hash(self, hash):
         """
-        Returns the number of calls for a particular hash 
-            
+        Returns the number of calls for a particular hash
+
         | **param** hash (str)
         | **return** number of usages (int)
         """
         try:
             conn, cursor = self._get_connection()
-            # Is this real a nice way in terms of memory usage at DB? 
+            # Is this real a nice way in terms of memory usage at DB?
             cursor.execute("""SELECT count(access_time)
-                              FROM access_log left join link on (access_log.link_id = link.link_id) 
+                              FROM access_log left join link on (access_log.link_id = link.link_id)
                               WHERE link.link_shorthash = (%s);""",(hash))
-            # Is SELECT count(access_time) 
-            #    FROM access_log, link 
-            #    WHERE access_log.link_id = link.link_id 
-            #    AND link.link_shorthash = (%s); 
+            # Is SELECT count(access_time)
+            #    FROM access_log, link
+            #    WHERE access_log.link_id = link.link_id
+            #    AND link.link_shorthash = (%s);
             # maybe better?
             conn.commit()
             result = cursor.fetchone()
@@ -329,21 +329,21 @@ class YuDb(object):
             pass
     #-------------------------------------------------------------------
     def get_statistics_for_general_redirects(self, time_range):
-        
+
         queries = ({
             'today' : """SELECT CURDATE( ) , count(`access_log_id`)
                          FROM `access_log`
                          WHERE date(`access_time`) = CURDATE( );""",
-            'year'  : """SELECT COUNT(`access_log_id`) 
+            'year'  : """SELECT COUNT(`access_log_id`)
                          FROM `access_log`
                          WHERE YEAR(`access_time`) = YEAR(CURDATE());""",
-            'week'  : """SELECT COUNT(`access_log_id`) 
-                         FROM `access_log` 
+            'week'  : """SELECT COUNT(`access_log_id`)
+                         FROM `access_log`
                          WHERE WEEK(`access_time`) = WEEK(CURDATE());""",
-            'month' : """SELECT COUNT(`access_log_id`) 
-                         FROM `access_log` 
+            'month' : """SELECT COUNT(`access_log_id`)
+                         FROM `access_log`
                          WHERE MONTH(`access_time`) = MONTH(CURDATE());""",
-            'all'   : """SELECT COUNT(`access_log_id`) 
+            'all'   : """SELECT COUNT(`access_log_id`)
                          FROM `access_log` WHERE 1;"""})
         try:
             conn, cursor = self._get_connection()
@@ -356,10 +356,10 @@ class YuDb(object):
             return None
         except KeyError:
             return None
-            
+
     #-------------------------------------------------------------------
     def get_statistics_for_general_links(self, time_range):
-        
+
         queries = ({
             'today' : """SELECT CURDATE() , count(`link_id`)
                          FROM `link`
@@ -367,13 +367,13 @@ class YuDb(object):
             'year'  : """SELECT count(`link_id`)
                          FROM `link`
                          WHERE YEAR(`entry_date`) = YEAR(CURDATE());""",
-            'week'  : """SELECT COUNT(`link_id`) 
-                         FROM `link` 
+            'week'  : """SELECT COUNT(`link_id`)
+                         FROM `link`
                          WHERE WEEK(`entry_date`) = WEEK(CURDATE());""",
-            'month' : """SELECT COUNT(`link_id`) 
-                         FROM `link` 
+            'month' : """SELECT COUNT(`link_id`)
+                         FROM `link`
                          WHERE MONTH(`entry_date`) = MONTH(CURDATE());""",
-            'all'   : """SELECT COUNT(`link_id`) 
+            'all'   : """SELECT COUNT(`link_id`)
                          FROM `link` WHERE 1;"""})
         try:
             conn, cursor = self._get_connection()
@@ -384,6 +384,32 @@ class YuDb(object):
             return result
         except MySQLdb.DatabaseError, e:
             print e
+            return None
+        except KeyError:
+            return None
+    #-------------------------------------------------------------------
+    def get_date_of_first_entry(self, type):
+        """
+        Returns the timestampe of first logged link or redirect
+
+        | **param** type (str)
+        | **return** timestamp (datetime)
+        """
+        queries = ({
+            'link'      : """SELECT MIN( `entry_date` )
+                             FROM `link`
+                             WHERE `entry_date` > '0000-00-00 00:00:00';""",
+            'redirect'  : """SELECT MIN(`access_time`)
+                             FROM `access_log`
+                             WHERE `access_time` > '0000-00-00 00:00:00';"""})
+        try:
+            conn, cursor = self._get_connection()
+            cursor.execute(queries[type])
+            conn.commit()
+            result = cursor.fetchone()
+            cursor.close()
+            return result
+        except MySQLdb.DatabaseError, e:
             return None
         except KeyError:
             return None

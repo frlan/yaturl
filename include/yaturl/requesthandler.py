@@ -401,7 +401,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                 number_of_url_today = stat.links_per_day,
                                 number_of_url_this_week = stat.links_per_week,
                                 number_of_url_this_month = stat.links_per_month,
-                                number_of_url_this_year = stat.links_per_year
+                                number_of_url_this_year = stat.links_per_year,
+                                date_of_first_redirect = stat.date_of_first_redirect,
                                 )
             # Any other page
             else:
