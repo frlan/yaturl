@@ -1,7 +1,7 @@
 		<div id="main">
 			<h1>Some stats</h1>
 			<h2>General</h2>
-			<p>This is givin some information about general user of plattform:</p>
+			<p>A few more general information:</p>
 			<ul class="plainlist">
 				<li>Short URL in database: %(number_of_links)s</li>
 				<li>Redirects: %(number_of_redirects)s (since %(date_of_first_redirect)s)</li>
