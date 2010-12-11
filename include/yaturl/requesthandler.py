@@ -488,8 +488,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             else:
                 url = form['real_URL'].value if form.has_key('real_URL') else None
                 tmp = self._insert_url_to_db(url)
-                blocked = self._db.is_hash_blocked(tmp)
                 if tmp:
+                    blocked = self._db.is_hash_blocked(tmp)
                     if tmp < 0:
                         self._send_database_problem()
                         return
@@ -515,8 +515,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         template_filename,
                         title=SERVER_NAME,
                         header=SERVER_NAME,
-                        msg='<p class="warning">Please check your input</p>')
-
+                        msg='''<p class="warning">Please check your input.</p>''')
         elif self.path == '/ContactUs':
             if form.has_key('URL'):
                 # Here we might have a bot who likes to send the webmaster some spam
