@@ -348,6 +348,10 @@ class YuDb(object):
             'this_month':   """SELECT COUNT(`access_log_id`)
                             FROM `access_log`
                             WHERE MONTH(`access_time`) = MONTH(CURDATE());""",
+            'per_week'  :   """SELECT YEAR(access_time), WEEK(access_time),
+                                count(access_log_id)
+                            FROM `access_log`
+                            GROUP BY YEAR(access_time),WEEK(access_time);""",
             'all'       :   """SELECT COUNT(`access_log_id`)
                             FROM `access_log` WHERE 1;"""})
         try:

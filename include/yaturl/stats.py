@@ -36,6 +36,7 @@ class YuStats:
         self.redirect_this_week = self._get_redirects_this_week()
         self.redirect_this_month = self._get_redirects_this_month()
         self.redirect_this_year = self._get_redirects_this_year()
+        # self.redirect_per_week = self._get_redirects_per_week()
         self.redirect_all = self._get_redirects_all()
         self.date_of_first_redirect = self._get_date_of_first_redirect()
         self.date_of_first_link = self._get_date_of_first_link_entry()
@@ -70,6 +71,10 @@ class YuStats:
 
     def _get_redirects_this_year(self):
         return self._db.get_statistics_for_general_redirects('this_year')[0]
+
+    def _get_redirects_per_week(self):
+        return self._db.get_statistics_for_general_redirects('per_week')
+
 
     def _get_redirects_all(self):
         return self._db.get_statistics_for_general_redirects('all')[0]
