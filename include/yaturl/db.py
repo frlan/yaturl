@@ -232,10 +232,10 @@ class YuDb(object):
     #-------------------------------------------------------------------
     def is_hash_blocked(self, hash):
         """
-        Checks whether given hash is marked as blocked and is returning
+        Checks whether given (short) hash is marked as blocked and is returning
         some data about. If its not blocked, its just returning none.
 
-        | **param** hash (str)
+        | **param** shorthash (str)
         | **return** list with link_id, shorthash, entry_date and comment
         """
         if not hash:
