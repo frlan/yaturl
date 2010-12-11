@@ -289,10 +289,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     #----------------------------------------------------------------------
     def _get_hash(self, *args):
         url_hash = hashlib.sha1()
-        for value in args:
-            value = unicode(value).encode('utf-8', 'replace')
-            url_hash.update(value)
-        return url_hash.hexdigest()
+        try:
+            for value in args:
+                value = unicode(value).encode('utf-8', 'replace')
+                url_hash.update(value)
+            return url_hash.hexdigest()
+        except UnicodeDecodeError:
+            return None
 
     #----------------------------------------------------------------------
     def _insert_url_to_db(self, url=None):
@@ -321,6 +324,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             url_new = self._split_url(url)
 
             link_hash = self._get_hash(url_new)
+
+            # Checking whether we were able to create an hash for that
+            # URL to proceed further
+            if not link_hash:
+                return None
 
             # Begin the response
             try:
