@@ -336,20 +336,20 @@ class YuDb(object):
         | **return** number of redirects (int)
         """
         queries = ({
-            'today' : """SELECT CURDATE( ) , count(`access_log_id`)
-                         FROM `access_log`
-                         WHERE date(`access_time`) = CURDATE( );""",
-            'this_year'  : """SELECT COUNT(`access_log_id`)
-                         FROM `access_log`
-                         WHERE YEAR(`access_time`) = YEAR(CURDATE());""",
-            'this_week'  : """SELECT COUNT(`access_log_id`)
-                         FROM `access_log`
-                         WHERE WEEK(`access_time`) = WEEK(CURDATE());""",
-            'this_month' : """SELECT COUNT(`access_log_id`)
-                         FROM `access_log`
-                         WHERE MONTH(`access_time`) = MONTH(CURDATE());""",
-            'all'   : """SELECT COUNT(`access_log_id`)
-                         FROM `access_log` WHERE 1;"""})
+            'today'     :   """SELECT CURDATE( ) , count(`access_log_id`)
+                            FROM `access_log`
+                            WHERE date(`access_time`) = CURDATE( );""",
+            'this_year' :   """SELECT COUNT(`access_log_id`)
+                            FROM `access_log`
+                            WHERE YEAR(`access_time`) = YEAR(CURDATE());""",
+            'this_week' :   """SELECT COUNT(`access_log_id`)
+                            FROM `access_log`
+                            WHERE WEEK(`access_time`) = WEEK(CURDATE());""",
+            'this_month':   """SELECT COUNT(`access_log_id`)
+                            FROM `access_log`
+                            WHERE MONTH(`access_time`) = MONTH(CURDATE());""",
+            'all'       :   """SELECT COUNT(`access_log_id`)
+                            FROM `access_log` WHERE 1;"""})
         try:
             conn, cursor = self._get_connection()
             cursor.execute(queries[time_range])
@@ -371,20 +371,20 @@ class YuDb(object):
         | **return** number of new links (int)
         """
         queries = ({
-            'today' : """SELECT CURDATE() , count(`link_id`)
-                         FROM `link`
-                         WHERE date(`entry_date`) = CURDATE();""",
-            'this_year'  : """SELECT count(`link_id`)
-                         FROM `link`
-                         WHERE YEAR(`entry_date`) = YEAR(CURDATE());""",
-            'this_week'  : """SELECT COUNT(`link_id`)
-                         FROM `link`
-                         WHERE WEEK(`entry_date`) = WEEK(CURDATE());""",
-            'this_month' : """SELECT COUNT(`link_id`)
-                         FROM `link`
-                         WHERE MONTH(`entry_date`) = MONTH(CURDATE());""",
-            'all'   : """SELECT COUNT(`link_id`)
-                         FROM `link` WHERE 1;"""})
+            'today'     :   """SELECT CURDATE() , count(`link_id`)
+                            FROM `link`
+                            WHERE date(`entry_date`) = CURDATE();""",
+            'this_year' :   """SELECT count(`link_id`)
+                            FROM `link`
+                            WHERE YEAR(`entry_date`) = YEAR(CURDATE());""",
+            'this_week' :   """SELECT COUNT(`link_id`)
+                            FROM `link`
+                            WHERE WEEK(`entry_date`) = WEEK(CURDATE());""",
+            'this_month' :  """SELECT COUNT(`link_id`)
+                            FROM `link`
+                            WHERE MONTH(`entry_date`) = MONTH(CURDATE());""",
+            'all'   :       """SELECT COUNT(`link_id`)
+                            FROM `link` WHERE 1;"""})
         try:
             conn, cursor = self._get_connection()
             cursor.execute(queries[time_range])
