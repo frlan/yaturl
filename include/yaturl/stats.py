@@ -27,15 +27,15 @@ class YuStats:
     def __init__(self, server):
         self._db = YuDb(server.config, server.errorlog)
         self.create_time_stamp = time.clock()
-        self.links_per_day = self._get_links_from_db_per_day()
-        self.links_per_week = self._get_links_from_db_per_week()
-        self.links_per_month = self._get_links_from_db_per_month()
-        self.links_per_year = self._get_links_from_db_per_year()
+        self.links_today = self._get_links_from_db_today()
+        self.links_this_week = self._get_links_from_db_this_week()
+        self.links_this_month = self._get_links_from_db_this_month()
+        self.links_this_year = self._get_links_from_db_this_year()
         self.links_all = self._get_links_from_db_all()
-        self.redirect_per_day = self._get_redirects_per_day()
-        self.redirect_per_week = self._get_redirects_per_week()
-        self.redirect_per_month = self._get_redirects_per_month()
-        self.redirect_per_year = self._get_redirects_per_year()
+        self.redirect_today = self._get_redirects_today()
+        self.redirect_this_week = self._get_redirects_this_week()
+        self.redirect_this_month = self._get_redirects_this_month()
+        self.redirect_this_year = self._get_redirects_this_year()
         self.redirect_all = self._get_redirects_all()
         self.date_of_first_redirect = self._get_date_of_first_redirect()
         self.date_of_first_link = self._get_date_of_first_link_entry()
@@ -44,31 +44,31 @@ class YuStats:
         # Not sure whether this is a nice way on doing this
         self.__init__()
 
-    def _get_links_from_db_per_day(self):
+    def _get_links_from_db_today(self):
         return self._db.get_statistics_for_general_links('today')[1]
 
-    def _get_links_from_db_per_week(self):
+    def _get_links_from_db_this_week(self):
         return self._db.get_statistics_for_general_links('week')[0]
 
-    def _get_links_from_db_per_month(self):
+    def _get_links_from_db_this_month(self):
         return self._db.get_statistics_for_general_links('month')[0]
 
-    def _get_links_from_db_per_year(self):
+    def _get_links_from_db_this_year(self):
         return self._db.get_statistics_for_general_links('year')[0]
 
     def _get_links_from_db_all(self):
         return self._db.get_statistics_for_general_links('all')[0]
 
-    def _get_redirects_per_day(self):
+    def _get_redirects_today(self):
         return self._db.get_statistics_for_general_redirects('today')[1]
 
-    def _get_redirects_per_week(self):
+    def _get_redirects_this_week(self):
         return self._db.get_statistics_for_general_redirects('week')[0]
 
-    def _get_redirects_per_month(self):
+    def _get_redirects_this_month(self):
         return self._db.get_statistics_for_general_redirects('month')[0]
 
-    def _get_redirects_per_year(self):
+    def _get_redirects_this_year(self):
         return self._db.get_statistics_for_general_redirects('year')[0]
 
     def _get_redirects_all(self):
