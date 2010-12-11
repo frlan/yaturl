@@ -48,13 +48,13 @@ class YuStats:
         return self._db.get_statistics_for_general_links('today')[1]
 
     def _get_links_from_db_this_week(self):
-        return self._db.get_statistics_for_general_links('week')[0]
+        return self._db.get_statistics_for_general_links('this_week')[0]
 
     def _get_links_from_db_this_month(self):
-        return self._db.get_statistics_for_general_links('month')[0]
+        return self._db.get_statistics_for_general_links('this_month')[0]
 
     def _get_links_from_db_this_year(self):
-        return self._db.get_statistics_for_general_links('year')[0]
+        return self._db.get_statistics_for_general_links('this_year')[0]
 
     def _get_links_from_db_all(self):
         return self._db.get_statistics_for_general_links('all')[0]
@@ -63,13 +63,13 @@ class YuStats:
         return self._db.get_statistics_for_general_redirects('today')[1]
 
     def _get_redirects_this_week(self):
-        return self._db.get_statistics_for_general_redirects('week')[0]
+        return self._db.get_statistics_for_general_redirects('this_week')[0]
 
     def _get_redirects_this_month(self):
-        return self._db.get_statistics_for_general_redirects('month')[0]
+        return self._db.get_statistics_for_general_redirects('this_month')[0]
 
     def _get_redirects_this_year(self):
-        return self._db.get_statistics_for_general_redirects('year')[0]
+        return self._db.get_statistics_for_general_redirects('this_year')[0]
 
     def _get_redirects_all(self):
         return self._db.get_statistics_for_general_redirects('all')[0]
