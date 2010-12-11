@@ -238,6 +238,8 @@ class YuDb(object):
         | **param** hash (str)
         | **return** list with link_id, shorthash, entry_date and comment
         """
+        if not hash:
+            return None
         try:
             cursor = self._get_connection()[1]
             cursor.execute('''SELECT `block`.`link_id`,
