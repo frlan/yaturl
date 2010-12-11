@@ -521,7 +521,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             if form.has_key('URL'):
                 # Here we might have a bot who likes to send the webmaster some spam
                 # who most likely will be not amused about.
-                template_filename = self._get_config_template('contactUsResultpage')
+                template_filename = self._get_config_template('contactUsResult')
                 text = read_template(
                     template_filename,
                     title='',
@@ -543,7 +543,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_internal_server_error()
                         return
                 except KeyError:
-                    template_filename = self._get_config_template('contactUsResultpage')
+                    template_filename = self._get_config_template('contactUsResult')
                     text = read_template(
                         template_filename,
                         title='',
