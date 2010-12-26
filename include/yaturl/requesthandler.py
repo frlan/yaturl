@@ -420,6 +420,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         # First doing some basis input validation as we don't want to
         # get fucked by the Jesus
+
         if hash == None or not hash.isalnum():
             self._send_404(header_only);
             return
@@ -498,7 +499,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         title=SERVER_NAME,
                         header=SERVER_NAME,
                         msg='')
-            elif self.path.startswith('/stats'):
+            elif self.path.startswith('/stats') or self.path.endswith('+'):
                 if self.path == '/stats':
                     # Doing general statistics here
                     # Let's hope this page is not getting to popular ....
@@ -506,17 +507,39 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self._show_general_stats(header_only)
                     return
                 else:
-                    # Trying to understand for which link we shall print
-                    # out stats. 
-                    splitted = self.path[1:].split('/')
-                    try:
-                        self._show_link_stats(header_only, splitted[1])
-                        return
-                    except IndexError:
-                        # Something went wrong. Most likely there was a
-                        # malformed URL for accessing the stats.
-                        self._send_404()
-                        return
+                    # Check whether we do have the + or the stats kind of URL
+                    if self.path.endswith('+'):
+                        # Well I guess this is the proof you can write
+                        # real ugly code in Python too. 
+                        try:
+                            request_length = len(self.path)
+                            if self.path.startswith('/show/'):
+                                request_path = self.path[5:]
+                            elif self.path.startswith('/s/'):
+                                request_path = self.path[2:]
+                            elif self.path.startswith('/stats/'):
+                                request_path = self.path[6:]
+                        
+                            self._show_link_stats(header_only,
+                                request_path[1:request_path.rfind('+') ])
+                            return
+                        except:
+                            # Oopps. Something went wrong. Most likely
+                            # a malformed link
+                            self._send_404()
+                            return
+                    else:
+                        # Trying to understand for which link we shall print
+                        # out stats. 
+                        splitted = self.path[1:].split('/')
+                        try:
+                            self._show_link_stats(header_only, splitted[1])
+                            return
+                        except IndexError:
+                            # Something went wrong. Most likely there was a
+                            # malformed URL for accessing the stats.
+                            self._send_404()
+                            return
             # Any other page
             else:
                 # First check, whether we want to have a real redirect
@@ -529,7 +552,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     request_path = self.path[2:]
                     show = True
                 else:
-                    show = False
+                    show = False                
                 # Assuming, if there is anything else than an
                 # alphanumeric character after the starting /, it's
                 # not a valid hash at all
