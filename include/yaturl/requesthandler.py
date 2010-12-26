@@ -696,12 +696,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self._send_404()
             return
 
-        try:
-            self._send_head(text, 200)
-            self.wfile.write(text)
-        except UnboundLocalError:
-            self._send_internal_server_error()
-
+        self._send_response(text, 200)
     #----------------------------------------------------------------------
     def do_HEAD(self):
         """
