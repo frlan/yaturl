@@ -366,6 +366,37 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         return short
 
 #------------------------------------------------------------------------
+    def _show_general_stats(self, header_only=False):
+        stat = YuStats(self.server)
+        template_filename = self._get_config_template('stats')
+        text = read_template(
+                    template_filename,
+                    title=SERVER_NAME,
+                    header=SERVER_NAME,
+                    number_of_links=stat.links_all,
+                    number_of_redirects=stat.redirect_all,
+                    number_of_redirects_today = stat.redirect_today,
+                    number_of_redirects_this_week = stat.redirect_this_week,
+                    number_of_redirects_this_month = stat.redirect_this_month,
+                    number_of_redirects_this_year = stat.redirect_this_year,
+                    number_of_url_today = stat.links_today,
+                    number_of_url_this_week = stat.links_this_week,
+                    number_of_url_this_month = stat.links_this_month,
+                    number_of_url_this_year = stat.links_this_year,
+                    date_of_first_redirect = stat.date_of_first_redirect,
+                )
+        if text:
+            self._send_head(text, 200)
+            if header_only == False:
+                try:
+                    self.wfile.write(text)
+                except socket.error:
+                    # clients like to stop reading after they got a 404
+                    pass
+        else:
+            self._send_internal_server_error(header_only)
+
+#------------------------------------------------------------------------
     def _show_link_stats(self, header_only=False, hash=None):
         """
         Shows a page with some statistics for a short URL
@@ -467,24 +498,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     # Doing general statistics here
                     # Let's hope this page is not getting to popular ....
                     # Create a new stats objekt which is fetching data in background
-                    stat = YuStats(self.server)
-                    template_filename = self._get_config_template('stats')
-                    text = read_template(
-                                template_filename,
-                                title=SERVER_NAME,
-                                header=SERVER_NAME,
-                                number_of_links=stat.links_all,
-                                number_of_redirects=stat.redirect_all,
-                                number_of_redirects_today = stat.redirect_today,
-                                number_of_redirects_this_week = stat.redirect_this_week,
-                                number_of_redirects_this_month = stat.redirect_this_month,
-                                number_of_redirects_this_year = stat.redirect_this_year,
-                                number_of_url_today = stat.links_today,
-                                number_of_url_this_week = stat.links_this_week,
-                                number_of_url_this_month = stat.links_this_month,
-                                number_of_url_this_year = stat.links_this_year,
-                                date_of_first_redirect = stat.date_of_first_redirect,
-                                )
+                    self._show_general_stats(header_only)
+                    return
                 else:
                     # Trying to understand for which link we shall print
                     # out stats. 
