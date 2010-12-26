@@ -369,10 +369,10 @@ class YuDb(object):
             'this_month':   """SELECT COUNT(`access_log_id`)
                             FROM `access_log`
                             WHERE MONTH(`access_time`) = MONTH(CURDATE());""",
-            'per_week'  :   """SELECT YEAR(access_time), WEEK(access_time),
-                                count(access_log_id)
+            'per_week'  :   """SELECT YEAR(`access_time`), WEEK(`access_time`),
+                            COUNT(`access_log_id`)
                             FROM `access_log`
-                            GROUP BY YEAR(access_time),WEEK(access_time);""",
+                            GROUP BY YEAR(`access_time`), WEEK(`access_time`);""",
             'all'       :   """SELECT COUNT(`access_log_id`)
                             FROM `access_log` WHERE 1;"""})
         try:
@@ -408,6 +408,10 @@ class YuDb(object):
             'this_month' :  """SELECT COUNT(`link_id`)
                             FROM `link`
                             WHERE MONTH(`entry_date`) = MONTH(CURDATE());""",
+            'per_week'  :   """SELECT YEAR(`entry_date`), WEEK(`entry_date`),
+                            COUNT(`link_id`)
+                            FROM `link`
+                            GROUP BY YEAR(`entry_date`), WEEK(`entry_date`);""",
             'all'   :       """SELECT COUNT(`link_id`)
                             FROM `link` WHERE 1;"""})
         try:
