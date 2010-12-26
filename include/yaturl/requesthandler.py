@@ -513,6 +513,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._show_link_stats(header_only, splitted[1])
                         return
                     except IndexError:
+                        # Something went wrong. Most likely there was a
+                        # malformed URL for accessing the stats.
                         self._send_404()
                         return
             # Any other page
