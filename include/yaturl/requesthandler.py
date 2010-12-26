@@ -163,7 +163,30 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", size)
         self.end_headers()
 
-    #----------------------------------------------------------------------
+    #-------------------------------------------------------------------
+    def _send_response(self, content, code=200, header_only=False):
+        """
+        This function is to be intended to consolidate the
+        sending responses to on function.
+        TODO: Synch with self.send_response() function which is
+              already talking with HTTPServer-interface.
+
+        | **param** content - text of page (str)
+        | **param** code - response code e.g. 404 (int)
+        | **param** header_only - whether only headers should be send (bool)
+        """
+        if content:
+            self._send_head(content, code)
+            if header_only == False:
+                try:
+                    self.wfile.write(content)
+                except socket.error:
+                    # clients like to stop reading after they got a 404
+                    pass
+        else:
+            self._send_internal_server_error(header_only)
+        
+    #-------------------------------------------------------------------
     def _send_301(self, new_url):
         """
         Send HTTP status code 301
@@ -191,16 +214,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 title='%s - 404' % SERVER_NAME,
                 header='404 &mdash; Page not found',
                 URL="Nothing")
-        if text:
-            self._send_head(text, 404)
-            if header_only == False:
-                try:
-                    self.wfile.write(text)
-                except socket.error:
-                    # clients like to stop reading after they got a 404
-                    pass
-        else:
-            self._send_internal_server_error(header_only)
+        self._send_response(text, 404, header_only)
 
     #----------------------------------------------------------------------
     def _send_internal_server_error(self, header_only=False):
