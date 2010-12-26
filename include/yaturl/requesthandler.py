@@ -572,12 +572,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self._send_404(header_only)
                     return
 
-        if text:
-            self._send_head(text, 200)
-            if header_only == False:
-                self.wfile.write(text + "\n")
-        else:
-            self._send_internal_server_error(header_only)
+        self._send_response(text, 200, header_only)
 
     #----------------------------------------------------------------------
     def do_POST(self):
