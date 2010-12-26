@@ -16,3 +16,4 @@
 	* Add a REST API or something similar for social networks
 	* Adding a link list available via short URL 
 	* Add a RSS for general NEWS
+	* Refactor function for sending responses to clean up a bit the mess
