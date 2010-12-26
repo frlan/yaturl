@@ -464,16 +464,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             LAST_REDIRECT=self._db.get_date_of_last_entry
                                 ('hashredirect', hash)[0],
                             NUMBER_OF_REDIRECTS=self._db.get_statistics_for_hash(hash))
-                    if text:
-                        self._send_head(text, 200)
-                        if header_only == False:
-                            try:
-                                self.wfile.write(text)
-                            except socket.error:
-                                # clients like to stop reading after they got a 404
-                                pass
-                    else:
-                        self._send_internal_server_error(header_only)
+                    self._send_response(text, 200, header_only)
                 else:
                     self._send_404(header_only)
                     return 
