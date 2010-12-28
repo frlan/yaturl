@@ -507,7 +507,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                         title=SERVER_NAME,
                                         header=SERVER_NAME,
                                         msg=new_url,
-                                        stat=stats)
+                                        stat=stats,
+                                        statspage="/stats/" + request_path[1:])
                         else:
                             self._db.add_logentry_to_database(request_path[1:])
                             self._send_301(result)

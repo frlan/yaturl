@@ -3,5 +3,5 @@
 			requested target URL is:</p>
 			%(msg)s
 			<p>The link has been directly accessed %(stat)s times excluding
-			this page</p>
+			this page. More statistics can be found <a href="%(statspage)s">here</a>.</p>
 		</div>
