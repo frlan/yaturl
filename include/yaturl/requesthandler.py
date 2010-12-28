@@ -378,10 +378,31 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         if hash == None or not hash.isalnum():
             self._send_404(header_only);
             return
+        # Checking wether URL has been blocked:
+        try:    
+            blocked = self._db.is_hash_blocked(hash)
+            if blocked:
+                template_filename = self._get_config_template('blocked')
+                text = read_template(
+                        template_filename,
+                        title=SERVER_NAME,
+                        header=SERVER_NAME,
+                        comment=blocked[3])
+                if text:
+                    self._send_head(text, 200)
+                    if header_only == False:
+                        try:
+                            self.wfile.write(text)
+                        except socket.error:
+                            # clients like to stop reading after they got a 404
+                            pass
+        except:
+            self._send_database_problem(header_only)
+
         else:
             try:
                 result = self._db.get_link_from_db(hash)
-                if result:
+                if result and blocked == None:
                     template_filename = self._get_config_template('statsLink')
                     url = "/" + hash
                     new_url = '<a href="%(url)s">%(result)s</a>' % \
