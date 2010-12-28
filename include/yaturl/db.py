@@ -399,7 +399,6 @@ class YuDb(object):
             cursor.close()
             return result
         except MySQLdb.DatabaseError, e:
-            print e
             return None
         except KeyError:
             return None
@@ -430,7 +429,6 @@ class YuDb(object):
                 cursor.execute(queries[type])
             conn.commit()
             result = cursor.fetchone()
-            print result
             cursor.close()
             return result
         except MySQLdb.DatabaseError, e:
@@ -438,7 +436,7 @@ class YuDb(object):
         except KeyError:
             return None
 #----------------------------------------------------------------------
-    def get_date_of_first_entry(self, type, hash = None):
+    def get_date_of_last_entry(self, type, hash = None):
         """
         Returns the timestampe of last logged link or redirect
 
@@ -464,7 +462,6 @@ class YuDb(object):
                 cursor.execute(queries[type])
             conn.commit()
             result = cursor.fetchone()
-            print result
             cursor.close()
             return result
         except MySQLdb.DatabaseError, e:
