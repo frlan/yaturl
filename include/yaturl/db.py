@@ -404,7 +404,7 @@ class YuDb(object):
         except KeyError:
             return None
     #-------------------------------------------------------------------
-    def get_date_of_first_entry(self, type):
+    def get_date_of_first_entry(self, type, hash = None):
         """
         Returns the timestampe of first logged link or redirect
 
@@ -412,17 +412,59 @@ class YuDb(object):
         | **return** timestamp (datetime)
         """
         queries = ({
-            'link'      : """SELECT MIN( `entry_date` )
-                             FROM `link`
-                             WHERE `entry_date` > '0000-00-00 00:00:00';""",
-            'redirect'  : """SELECT MIN(`access_time`)
-                             FROM `access_log`
-                             WHERE `access_time` > '0000-00-00 00:00:00';"""})
+            'link'          : """SELECT MIN( `entry_date` )
+                                 FROM `link`
+                                 WHERE `entry_date` > '0000-00-00 00:00:00';""",
+            'redirect'      : """SELECT MIN(`access_time`)
+                                 FROM `access_log`
+                                 WHERE `access_time` > '0000-00-00 00:00:00';""",
+            'hashredirect'  : """SELECT MIN(`access_time`)
+                                 FROM `access_log`, `link`
+                                 WHERE `access_log`.`link_id` = `link`.`link_id`
+                                 AND `link`.`link_shorthash` = '%s';"""})
         try:
             conn, cursor = self._get_connection()
-            cursor.execute(queries[type])
+            if type == 'hashredirect':
+                cursor.execute(queries[type] % hash)
+            else:
+                cursor.execute(queries[type])
             conn.commit()
             result = cursor.fetchone()
+            print result
+            cursor.close()
+            return result
+        except MySQLdb.DatabaseError, e:
+            return None
+        except KeyError:
+            return None
+#----------------------------------------------------------------------
+    def get_date_of_first_entry(self, type, hash = None):
+        """
+        Returns the timestampe of last logged link or redirect
+
+        | **param** type (str)
+        | **return** timestamp (datetime)
+        """
+        queries = ({
+            'link'          : """SELECT MAX( `entry_date` )
+                                 FROM `link`
+                                 WHERE `entry_date` > '0000-00-00 00:00:00';""",
+            'redirect'      : """SELECT MAX(`access_time`)
+                                 FROM `access_log`
+                                 WHERE `access_time` > '0000-00-00 00:00:00';""",
+            'hashredirect'  : """SELECT MAX(`access_time`)
+                                 FROM `access_log`, `link`
+                                 WHERE `access_log`.`link_id` = `link`.`link_id`
+                                 AND `link`.`link_shorthash` = '%s';"""})
+        try:
+            conn, cursor = self._get_connection()
+            if type == 'hashredirect':
+                cursor.execute(queries[type] % hash)
+            else:
+                cursor.execute(queries[type])
+            conn.commit()
+            result = cursor.fetchone()
+            print result
             cursor.close()
             return result
         except MySQLdb.DatabaseError, e:
