@@ -185,7 +185,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     pass
         else:
             self._send_internal_server_error(header_only)
-        
+
     #-------------------------------------------------------------------
     def _send_301(self, new_url):
         """
@@ -425,7 +425,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self._send_404(header_only);
             return
         # Checking wether URL has been blocked:
-        try:    
+        try:
             blocked = self._db.is_hash_blocked(hash)
             if blocked:
                 template_filename = self._get_config_template('blocked')
@@ -442,7 +442,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         except socket.error:
                             # clients like to stop reading after they got a 404
                             pass
-                return 
+                return
         except:
             self._send_database_problem(header_only)
 
@@ -468,11 +468,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     self._send_response(text, 200, header_only)
                 else:
                     self._send_404(header_only)
-                    return 
+                    return
             except:
                 self._send_database_problem(header_only)
-                return 
-            
+                return
+
     #----------------------------------------------------------------------
     def do_GET(self, header_only=False):
         """
@@ -510,18 +510,19 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     # Check whether we do have the + or the stats kind of URL
                     if self.path.endswith('+'):
                         # Well I guess this is the proof you can write
-                        # real ugly code in Python too. 
+                        # real ugly code in Python too.
                         try:
                             request_length = len(self.path)
                             if self.path.startswith('/show/'):
-                                request_path = self.path[5:]
-                            elif self.path.startswith('/s/'):
-                                request_path = self.path[2:]
-                            elif self.path.startswith('/stats/'):
                                 request_path = self.path[6:]
-                        
+                            elif self.path.startswith('/s/'):
+                                request_path = self.path[3:]
+                            elif self.path.startswith('/stats/'):
+                                request_path = self.path[7:]
+                            else:
+                                request_path = self.path[1:]
                             self._show_link_stats(header_only,
-                                request_path[1:request_path.rfind('+') ])
+                                request_path[:request_path.rfind('+') ])
                             return
                         except:
                             # Oopps. Something went wrong. Most likely
@@ -530,7 +531,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             return
                     else:
                         # Trying to understand for which link we shall print
-                        # out stats. 
+                        # out stats.
                         splitted = self.path[1:].split('/')
                         try:
                             self._show_link_stats(header_only, splitted[1])
@@ -552,7 +553,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     request_path = self.path[2:]
                     show = True
                 else:
-                    show = False                
+                    show = False
                 # Assuming, if there is anything else than an
                 # alphanumeric character after the starting /, it's
                 # not a valid hash at all
