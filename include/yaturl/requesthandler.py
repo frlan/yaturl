@@ -396,6 +396,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         except socket.error:
                             # clients like to stop reading after they got a 404
                             pass
+                return 
         except:
             self._send_database_problem(header_only)
 
