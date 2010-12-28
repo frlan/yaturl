@@ -454,6 +454,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     url = "/" + hash
                     new_url = '<a href="%(url)s">%(result)s</a>' % \
                                {'result':result, 'url':url}
+                    # FIXME: Check for None on timestamps and replace it with something like Unknown.
                     text = read_template(
                             template_filename,
                             title='%s - Linkstats' % SERVER_NAME,
