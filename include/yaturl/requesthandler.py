@@ -364,7 +364,55 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             return None
 
         return short
+#------------------------------------------------------------------------
+    def _show_link_stats(self, header_only=False, hash=None):
+        """
+        Shows a page with some statistics for a short URL
 
+        | **param** shorthash (string)
+        """
+
+        # First doing some basis input validation as we don't want to
+        # get fucked by the Jesus
+        if hash == None or not hash.isalnum():
+            self._send_404(header_only);
+            return
+        else:
+            try:
+                if self._db.is_shorthash_in_db(hash):
+                    template_filename = self._get_config_template('statsLink')
+                    result = self._db.get_link_from_db(hash)
+                    url = "/" + hash
+                    new_url = '<a href="%(url)s">%(result)s</a>' % \
+                               {'result':result, 'url':url}
+                    text = read_template(
+                            template_filename,
+                            title='%s - Linkstats' % SERVER_NAME,
+                            header='Stats for Link',
+                            URL=new_url,
+                            CREATION_TIME=self._db.get_link_creation_timestamp(hash)[0],
+                            FIRST_REDIRECT=self._db.get_date_of_first_entry
+                                ('hashredirect', hash)[0],
+                            LAST_REDIRECT=self._db.get_date_of_last_entry
+                                ('hashredirect', hash)[0],
+                            NUMBER_OF_REDIRECTS=self._db.get_statistics_for_hash(hash))
+                    if text:
+                        self._send_head(text, 200)
+                        if header_only == False:
+                            try:
+                                self.wfile.write(text)
+                            except socket.error:
+                                # clients like to stop reading after they got a 404
+                                pass
+                    else:
+                        self._send_internal_server_error(header_only)
+                else:
+                    self._send_404(header_only)
+                    return 
+            except:
+                self._send_database_problem(header_only)
+                return 
+            
     #----------------------------------------------------------------------
     def do_GET(self, header_only=False):
         """
@@ -391,12 +439,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         title=SERVER_NAME,
                         header=SERVER_NAME,
                         msg='')
-            elif self.path == '/stats':
-                # Let's hope this page is not getting to popular ....
-                # Create a new stats objekt which is fetching data in background
-                stat = YuStats(self.server)
-                template_filename = self._get_config_template('stats')
-                text = read_template(
+            elif self.path.startswith('/stats'):
+                if self.path == '/stats':
+                    # Doing general statistics here
+                    # Let's hope this page is not getting to popular ....
+                    # Create a new stats objekt which is fetching data in background
+                    stat = YuStats(self.server)
+                    template_filename = self._get_config_template('stats')
+                    text = read_template(
                                 template_filename,
                                 title=SERVER_NAME,
                                 header=SERVER_NAME,
@@ -412,6 +462,16 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                 number_of_url_this_year = stat.links_this_year,
                                 date_of_first_redirect = stat.date_of_first_redirect,
                                 )
+                else:
+                    # Trying to understand for which link we shall print
+                    # out stats. 
+                    splitted = self.path[1:].split('/')
+                    try:
+                        self._show_link_stats(header_only, splitted[1])
+                        return
+                    except IndexError:
+                        self._send_404()
+                        return
             # Any other page
             else:
                 # First check, whether we want to have a real redirect
