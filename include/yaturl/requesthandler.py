@@ -364,6 +364,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             return None
 
         return short
+
 #------------------------------------------------------------------------
     def _show_link_stats(self, header_only=False, hash=None):
         """
@@ -379,9 +380,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             return
         else:
             try:
-                if self._db.is_shorthash_in_db(hash):
+                result = self._db.get_link_from_db(hash)
+                if result:
                     template_filename = self._get_config_template('statsLink')
-                    result = self._db.get_link_from_db(hash)
                     url = "/" + hash
                     new_url = '<a href="%(url)s">%(result)s</a>' % \
                                {'result':result, 'url':url}
