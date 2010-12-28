@@ -206,6 +206,25 @@ class YuDb(object):
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError(str(e))
+    #-------------------------------------------------------------------
+    def get_link_creation_timestamp(self, hash):
+        """
+        Return the creation timestamp of the link
+
+        | **param** hash (str)
+        | **return** timestamp (datetime)
+        """
+        try:
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT `link`.`entry_date`
+                         FROM `link`
+                         WHERE `link`.`link_shorthash` = %s''', (hash))
+            result = cursor.fetchone()
+            cursor.close()
+            return result
+        except MySQLdb.DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError(str(e))
 
     #-------------------------------------------------------------------
     def is_shorthash_in_db(self, short):
