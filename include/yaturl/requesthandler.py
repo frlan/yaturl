@@ -712,7 +712,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     title=SERVER_NAME,
                     header=SERVER_NAME,
                     msg=new_url,
-                    stat=stats)
+                    stat=stats,
+                    statspage="/stats/" + short_url)
             else:
                 self._send_404()
                 return
