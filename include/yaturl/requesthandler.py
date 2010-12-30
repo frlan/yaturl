@@ -542,6 +542,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             # malformed URL for accessing the stats.
                             self._send_404()
                             return
+            elif self.path == '/faq':
+                template_filename = self._get_config_template('faq')
+                text = read_template(
+                        template_filename,
+                        title=SERVER_NAME,
+                        header=SERVER_NAME,)
             # Any other page
             else:
                 # First check, whether we want to have a real redirect

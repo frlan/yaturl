@@ -26,7 +26,7 @@ SERVER_VERSION = '1.0'
 MYSQL_CONNECTION_POOL_SIZE = 5
 
 TEMPLATENAMES = ['404','500','contactUsResult','databaseerror',
-'homepage','return','showpage','stats','statsLink']
+'homepage','return','showpage','stats','statsLink', 'faq']
 
 CONTENT_TYPES = ({
     '.css':'text/css',
@@ -55,7 +55,7 @@ TEMPLATE_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 
 
 FOOTER = '''
-            <div id="footer"><span><a href="/ContactUs">Contact Us</a> &nbsp;&nbsp; <a href="/About">About</a> &nbsp;&nbsp; <a href="/">Home</a> </span></div>
+            <div id="footer"><span><a href="/ContactUs">Contact Us</a> &nbsp;&nbsp; <a href="/About">About</a> &nbsp;&nbsp; <a href="/">Home</a> &nbsp;&nbsp; <a href="/faq">F.A.Q.</a></span></div>
     </div>
 </body>
 </html>'''
