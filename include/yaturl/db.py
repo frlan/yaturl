@@ -207,18 +207,18 @@ class YuDb(object):
             self.logger.warn('Database error: %s' % e)
             raise YuDbError(str(e))
     #-------------------------------------------------------------------
-    def get_link_creation_timestamp(self, hash):
+    def get_link_creation_timestamp(self, shorthash):
         """
-        Return the creation timestamp of the link
+        Return the creation timestamp of the link based on its shorthash
 
-        | **param** hash (str)
+        | **param** shorthash (str)
         | **return** timestamp (datetime)
         """
         try:
             cursor = self._get_connection()[1]
             cursor.execute('''SELECT `link`.`entry_date`
                          FROM `link`
-                         WHERE `link`.`link_shorthash` = %s''', (hash))
+                         WHERE `link`.`link_shorthash` = %s''', (shorthash))
             result = cursor.fetchone()
             cursor.close()
             return result
@@ -227,19 +227,19 @@ class YuDb(object):
             raise YuDbError(str(e))
 
     #-------------------------------------------------------------------
-    def is_shorthash_in_db(self, short):
+    def is_shorthash_in_db(self, shorthash):
         """
         Checks whether a shorthash is stored in the database. If so,
         it returns the link ID of the database entry.
 
-        | **param** short (str)
+        | **param** shorthash (str)
         | **return** link_id (int)
         """
         try:
             cursor = self._get_connection()[1]
             cursor.execute('''SELECT `link`.`link_id`
                          FROM `link`
-                         WHERE `link`.`link_shorthash` = %s''', (short))
+                         WHERE `link`.`link_shorthash` = %s''', (shorthash))
             result = cursor.fetchone()
             cursor.close()
             if result:
@@ -249,7 +249,7 @@ class YuDb(object):
             raise YuDbError(str(e))
 
     #-------------------------------------------------------------------
-    def is_hash_blocked(self, hash):
+    def is_hash_blocked(self, shorthash):
         """
         Checks whether given (short) hash is marked as blocked and is returning
         some data about. If its not blocked, its just returning none.
@@ -257,7 +257,7 @@ class YuDb(object):
         | **param** shorthash (str)
         | **return** list with link_id, shorthash, entry_date and comment
         """
-        if not hash:
+        if not shorthash:
             return None
         try:
             cursor = self._get_connection()[1]
@@ -266,7 +266,7 @@ class YuDb(object):
                                      `block`.`entry_date`, `comment`
                               FROM `link`, `block`
                               WHERE `link`.`link_shorthash` = %s
-                              AND `link`.`link_id` = `block`.`link_id`; ''', (hash))
+                              AND `link`.`link_id` = `block`.`link_id`; ''', (shorthash))
             result = cursor.fetchone()
             cursor.close()
             if result:
@@ -307,7 +307,7 @@ class YuDb(object):
                     raise YuDbError(str(e))
     #-------------------------------------------------------------------
 
-    def add_logentry_to_database(self, hash):
+    def add_logentry_to_database(self, shorthash):
         """
         Creates a log entry inside DB for a given hash.
 
@@ -318,13 +318,14 @@ class YuDb(object):
             cursor.execute("""INSERT into `access_log` (link_id)
                 SELECT link_id
                 FROM link
-                WHERE link_shorthash = (%s)""",(hash))
+                WHERE link_shorthash = (%s)""",(shorthash))
             conn.commit()
             cursor.close()
-        except MySQLdb.DatabaseError, e:
+        except MySQLdb.DatabaseError:
             pass
+
     #-------------------------------------------------------------------
-    def get_statistics_for_hash(self, hash):
+    def get_statistics_for_hash(self, shorthash):
         """
         Returns the number of calls for a particular hash
 
@@ -336,7 +337,7 @@ class YuDb(object):
             # Is this real a nice way in terms of memory usage at DB?
             cursor.execute("""SELECT count(access_time)
                               FROM access_log left join link on (access_log.link_id = link.link_id)
-                              WHERE link.link_shorthash = (%s);""",(hash))
+                              WHERE link.link_shorthash = (%s);""",(shorthash))
             # Is SELECT count(access_time)
             #    FROM access_log, link
             #    WHERE access_log.link_id = link.link_id
@@ -346,7 +347,7 @@ class YuDb(object):
             result = cursor.fetchone()
             cursor.close()
             return result[0]
-        except MySQLdb.DatabaseError, e:
+        except MySQLdb.DatabaseError:
             pass
     #-------------------------------------------------------------------
     def get_statistics_for_general_redirects(self, time_range):
@@ -382,7 +383,7 @@ class YuDb(object):
             result = cursor.fetchone()
             cursor.close()
             return result
-        except MySQLdb.DatabaseError, e:
+        except MySQLdb.DatabaseError:
             return None
         except KeyError:
             return None
@@ -421,16 +422,18 @@ class YuDb(object):
             result = cursor.fetchone()
             cursor.close()
             return result
-        except MySQLdb.DatabaseError, e:
+        except MySQLdb.DatabaseError:
             return None
         except KeyError:
             return None
     #-------------------------------------------------------------------
-    def get_date_of_first_entry(self, type, hash = None):
+    def get_date_of_first_entry(self, stats_type, shorthash = None):
         """
         Returns the timestampe of first logged link or redirect
 
-        | **param** type (str)
+        | **param** stats_type (str)
+        | **param** shorthash (str) (only needed in combination with
+        |           stats_type == hashredirect
         | **return** timestamp (datetime)
         """
         queries = ({
@@ -446,24 +449,26 @@ class YuDb(object):
                                  AND `link`.`link_shorthash` = '%s';"""})
         try:
             conn, cursor = self._get_connection()
-            if type == 'hashredirect':
-                cursor.execute(queries[type] % hash)
+            if stats_type == 'hashredirect':
+                cursor.execute(queries[stats_type] % shorthash)
             else:
-                cursor.execute(queries[type])
+                cursor.execute(queries[stats_type])
             conn.commit()
             result = cursor.fetchone()
             cursor.close()
             return result
-        except MySQLdb.DatabaseError, e:
+        except MySQLdb.DatabaseError:
             return None
         except KeyError:
             return None
 #----------------------------------------------------------------------
-    def get_date_of_last_entry(self, type, hash = None):
+    def get_date_of_last_entry(self, stats_type, shorthash = None):
         """
         Returns the timestampe of last logged link or redirect
 
-        | **param** type (str)
+        | **param** stats_type (str)
+        | **param** shorthash (str) (only needed in combination with
+        |           stats_type == hashredirect
         | **return** timestamp (datetime)
         """
         queries = ({
@@ -480,14 +485,14 @@ class YuDb(object):
         try:
             conn, cursor = self._get_connection()
             if type == 'hashredirect':
-                cursor.execute(queries[type] % hash)
+                cursor.execute(queries[stats_type] % shorthash)
             else:
-                cursor.execute(queries[type])
+                cursor.execute(queries[stats_type])
             conn.commit()
             result = cursor.fetchone()
             cursor.close()
             return result
-        except MySQLdb.DatabaseError, e:
+        except MySQLdb.DatabaseError:
             return None
         except KeyError:
             return None
