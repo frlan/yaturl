@@ -485,7 +485,7 @@ class YuDb(object):
                                  AND `link`.`link_shorthash` = '%s';"""})
         try:
             conn, cursor = self._get_connection()
-            if type == 'hashredirect':
+            if stats_type == 'hashredirect':
                 cursor.execute(queries[stats_type] % shorthash)
             else:
                 cursor.execute(queries[stats_type])
