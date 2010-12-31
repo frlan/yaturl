@@ -4,6 +4,7 @@ pid_file_path: run/yaturl.pid
 accesslog: log/access.log
 errorlog: log/error.log
 staticdocumentroot: static/
+log_ip_activated: false
 #user: yaturl
 thread_watch_timeout: 300
 

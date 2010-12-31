@@ -80,7 +80,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         | **return** hostname (str)
         """
-        host = self.client_address[0]
+        
+        if self.server.log_ip_activated:
+            host = self.client_address[0]
+        else:
+            host = '127.0.0.1'
         if self.server.resolve_clients:
             return socket.getfqdn(host)
         else:
