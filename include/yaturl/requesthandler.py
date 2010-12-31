@@ -431,58 +431,40 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         # First doing some basis input validation as we don't want to
         # get fucked by the Jesus
-
         if shorthash == None or not shorthash.isalnum():
             self._send_404(header_only)
             return
-        # Checking wether URL has been blocked:
-        try:
+        else:
+            result = self._db.get_link_from_db(shorthash)
             blocked = self._db.is_hash_blocked(shorthash)
-            if blocked:
+            if result and blocked == None:
+                template_filename = self._get_config_template('statsLink')
+                url = "/" + shorthash
+                new_url = '<a href="%(url)s">%(result)s</a>' % \
+                            {'result':result, 'url':url}
+                # FIXME: Check for None on timestamps and replace it with something like Unknown.
+                text = read_template(
+                        template_filename,
+                        title='%s - Linkstats' % SERVER_NAME,
+                        header='Stats for Link',
+                        URL=new_url,
+                        CREATION_TIME=self._db.get_link_creation_timestamp(shorthash)[0],
+                        FIRST_REDIRECT=self._db.get_date_of_first_entry
+                            ('hashredirect', shorthash)[0],
+                        LAST_REDIRECT=self._db.get_date_of_last_entry
+                            ('hashredirect', shorthash)[0],
+                        NUMBER_OF_REDIRECTS=self._db.get_statistics_for_hash(shorthash))
+                self._send_response(text, 200, header_only)
+            elif blocked:
                 template_filename = self._get_config_template('blocked')
                 text = read_template(
                         template_filename,
                         title=SERVER_NAME,
                         header=SERVER_NAME,
                         comment=blocked[3])
-                if text:
-                    self._send_head(text, 200)
-                    if header_only == False:
-                        try:
-                            self.wfile.write(text)
-                        except socket.error:
-                            # clients like to stop reading after they got a 404
-                            pass
-                return
-        except:
-            self._send_database_problem(header_only)
-
-        else:
-            try:
-                result = self._db.get_link_from_db(shorthash)
-                if result and blocked == None:
-                    template_filename = self._get_config_template('statsLink')
-                    url = "/" + hash
-                    new_url = '<a href="%(url)s">%(result)s</a>' % \
-                               {'result':result, 'url':url}
-                    # FIXME: Check for None on timestamps and replace it with something like Unknown.
-                    text = read_template(
-                            template_filename,
-                            title='%s - Linkstats' % SERVER_NAME,
-                            header='Stats for Link',
-                            URL=new_url,
-                            CREATION_TIME=self._db.get_link_creation_timestamp(shorthash)[0],
-                            FIRST_REDIRECT=self._db.get_date_of_first_entry
-                                ('hashredirect', shorthash)[0],
-                            LAST_REDIRECT=self._db.get_date_of_last_entry
-                                ('hashredirect', shorthash)[0],
-                            NUMBER_OF_REDIRECTS=self._db.get_statistics_for_hash(shorthash))
-                    self._send_response(text, 200, header_only)
-                else:
-                    self._send_404(header_only)
-                    return
-            except:
-                self._send_database_problem(header_only)
+                self._send_response(text, 200, header_only)
+            else:
+                self._send_404(header_only)
                 return
 
     #----------------------------------------------------------------------
