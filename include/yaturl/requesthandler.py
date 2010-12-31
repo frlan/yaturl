@@ -23,7 +23,6 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 import socket
 import cgi
 import hashlib
-import socket
 import time
 from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
@@ -302,6 +301,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def _get_hash(self, *args):
+        """
+        Wrapper function which returns the SHA-1-hash of given set of
+        strings
+
+        | **param** args -- set of strings (str)
+        | **return** hash
+        """
         url_hash = hashlib.sha1()
         try:
             for value in args:
@@ -381,6 +387,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
 #------------------------------------------------------------------------
     def _show_general_stats(self, header_only=False):
+        """
+        Prints a page with some serice wide statistics.
+        
+        | **param** header_only (bool)
+        """
         stat = YuStats(self.server)
         template_filename = self._get_config_template('stats')
         text = read_template(
@@ -411,7 +422,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self._send_internal_server_error(header_only)
 
 #------------------------------------------------------------------------
-    def _show_link_stats(self, header_only=False, hash=None):
+    def _show_link_stats(self, header_only=False, shorthash=None):
         """
         Shows a page with some statistics for a short URL
 
@@ -421,12 +432,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         # First doing some basis input validation as we don't want to
         # get fucked by the Jesus
 
-        if hash == None or not hash.isalnum():
-            self._send_404(header_only);
+        if shorthash == None or not shorthash.isalnum():
+            self._send_404(header_only)
             return
         # Checking wether URL has been blocked:
         try:
-            blocked = self._db.is_hash_blocked(hash)
+            blocked = self._db.is_hash_blocked(shorthash)
             if blocked:
                 template_filename = self._get_config_template('blocked')
                 text = read_template(
@@ -448,7 +459,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         else:
             try:
-                result = self._db.get_link_from_db(hash)
+                result = self._db.get_link_from_db(shorthash)
                 if result and blocked == None:
                     template_filename = self._get_config_template('statsLink')
                     url = "/" + hash
@@ -460,12 +471,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             title='%s - Linkstats' % SERVER_NAME,
                             header='Stats for Link',
                             URL=new_url,
-                            CREATION_TIME=self._db.get_link_creation_timestamp(hash)[0],
+                            CREATION_TIME=self._db.get_link_creation_timestamp(shorthash)[0],
                             FIRST_REDIRECT=self._db.get_date_of_first_entry
-                                ('hashredirect', hash)[0],
+                                ('hashredirect', shorthash)[0],
                             LAST_REDIRECT=self._db.get_date_of_last_entry
-                                ('hashredirect', hash)[0],
-                            NUMBER_OF_REDIRECTS=self._db.get_statistics_for_hash(hash))
+                                ('hashredirect', shorthash)[0],
+                            NUMBER_OF_REDIRECTS=self._db.get_statistics_for_hash(shorthash))
                     self._send_response(text, 200, header_only)
                 else:
                     self._send_404(header_only)
@@ -513,7 +524,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         # Well I guess this is the proof you can write
                         # real ugly code in Python too.
                         try:
-                            request_length = len(self.path)
                             if self.path.startswith('/show/'):
                                 request_path = self.path[6:]
                             elif self.path.startswith('/s/'):
@@ -665,7 +675,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     template_filename,
                     title='',
                     header='Mail NOT sent',
-                    msg='There was an issue with your request. Are you a bot? <a href="/ContactUs">Please try again</a>.')
+                    msg='There was an issue with your request. Are you a bot? '
+                    '<a href="/ContactUs">Please try again</a>.')
             else:
                 try:
                     email = form['email'].value
