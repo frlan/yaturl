@@ -20,6 +20,7 @@
 # MA 02110-1301, USA.
 
 from yaturl.constants import MYSQL_CONNECTION_POOL_SIZE
+from MySQLdb import DatabaseError
 import sqlalchemy.pool as pool
 import MySQLdb as MySQLdb_orig
 # proxy MySQLdb module to enable SQLAlchemy's connection pooling
@@ -32,13 +33,13 @@ from MySQLdb.constants.ER import DUP_ENTRY
 from MySQLdb.constants.CR import SERVER_GONE_ERROR, SERVER_LOST
 
 
-class YuDbError(MySQLdb.DatabaseError):
+class YuDbError(DatabaseError):
     """
     Generic database error
     """
     #----------------------------------------------------------------------
     def __init__(self, msg):
-        super(YuDbError, self).__init__()
+        DatabaseError.__init__(self)
         self._msg = msg
 
     #----------------------------------------------------------------------
