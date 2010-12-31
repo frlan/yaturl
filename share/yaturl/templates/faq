@@ -1,7 +1,8 @@
 		<div id="main">
 			<h1>F.A.Q. &mdash; Frequently asked questions</h1>
 			<h2><a name="logging"></a>Which data are stored of my request?</h2>
-			<p>We are not storing personal data. <br/> In detail these are for inserting a link</p>
+			<p>We are not storing personal data. </p>
+			<p>In detail these are for inserting a link:</p>
 			<ul class="yaturllist">
 				<li>Entry time</li>
 			</ul>
