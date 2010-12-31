@@ -98,6 +98,7 @@ BODY, HTML {
 
 #main p{
 	padding-top: 1em;
+	padding-left: 1em;
 }
 
 #main h1{
@@ -110,6 +111,10 @@ BODY, HTML {
 
 .plainlist {
 	list-style-type:none;
+}
+
+.yaturllist {
+	margin-left:2.5em;
 }
 
 .warning {
