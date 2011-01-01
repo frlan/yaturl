@@ -97,16 +97,17 @@ BODY, HTML {
 }
 
 #main p{
-	padding-top: 1em;
 	padding-left: 1em;
 }
 
 #main h1{
 	padding-top: 1em;
+	padding-bottom: 0.5em;
 }
 
 #main h2{
 	padding-top: 1em;
+	padding-bottom: 0.5em;
 }
 
 .plainlist {
