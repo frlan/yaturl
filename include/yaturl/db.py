@@ -344,7 +344,6 @@ class YuDb(object):
             #    WHERE access_log.link_id = link.link_id
             #    AND link.link_shorthash = (%s);
             # maybe better?
-            conn.commit()
             result = cursor.fetchone()
             cursor.close()
             return result[0]
@@ -380,7 +379,6 @@ class YuDb(object):
         try:
             conn, cursor = self._get_connection()
             cursor.execute(queries[time_range])
-            conn.commit()
             result = cursor.fetchone()
             cursor.close()
             return result
@@ -419,7 +417,6 @@ class YuDb(object):
         try:
             conn, cursor = self._get_connection()
             cursor.execute(queries[time_range])
-            conn.commit()
             result = cursor.fetchone()
             cursor.close()
             return result
@@ -454,7 +451,6 @@ class YuDb(object):
                 cursor.execute(queries[stats_type] % shorthash)
             else:
                 cursor.execute(queries[stats_type])
-            conn.commit()
             result = cursor.fetchone()
             cursor.close()
             return result
@@ -489,7 +485,6 @@ class YuDb(object):
                 cursor.execute(queries[stats_type] % shorthash)
             else:
                 cursor.execute(queries[stats_type])
-            conn.commit()
             result = cursor.fetchone()
             cursor.close()
             return result
