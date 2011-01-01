@@ -111,6 +111,7 @@ BODY, HTML {
 
 .plainlist {
 	list-style-type:none;
+	margin-left:1em;
 }
 
 .yaturllist {
