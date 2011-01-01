@@ -10,7 +10,7 @@
 			<ul class="yaturllist">
 				<li>Access time</li>
 				<li>Accessed link</li>
-				<li>* Used browser (user-agent, via logfiles)</li>
+				<li>Used browser (user-agent, via logfiles)</li>
 			</ul>
 			<p>We do not store any IP or other personal data.</p>
 		</div>
