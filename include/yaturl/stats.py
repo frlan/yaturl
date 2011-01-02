@@ -23,6 +23,9 @@ from yaturl.db import YuDb
 import time
 
 class YuStats:
+    """
+    A class to represent some statistic data for yaturl
+    """
     def __init__(self, server):
         self._db = YuDb(server.config, server.errorlog)
         self.create_time_stamp = time.clock()
