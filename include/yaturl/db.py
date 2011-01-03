@@ -165,6 +165,29 @@ class YuDb(object):
             self.logger.warn('Database error: %s' % e)
             raise YuDbError(str(e))
 
+    #-------------------------------------------------------------------
+    def get_link_details(self, shorthash):
+        """
+        Returns a list with complete details of given link.
+        """
+        try:
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT `link`.`link_id`,
+                                     `link`.`link_shorthash`,
+                                     `link`.`link_hash`,
+                                     `link`.`link_link`,
+                                     `link`.`link_comment`,
+                                     `link`.`entry_date`
+                         FROM `link`
+                         WHERE `link`.`link_shorthash` = %s  LIMIT 1 ''', (shorthash))
+            result = cursor.fetchone()
+            cursor.close()
+            if result:
+                return result
+        except MySQLdb.DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError(str(e))
+
     #----------------------------------------------------------------------
     def get_link_from_db(self, url_hash):
         """

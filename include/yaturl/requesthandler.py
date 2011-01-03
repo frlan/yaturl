@@ -439,14 +439,24 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self._send_404(header_only)
             return
         else:
-            result = self._db.get_link_from_db(shorthash)
             blocked = self._db.is_hash_blocked(shorthash)
-            if result and blocked == None:
+            if blocked:
+                template_filename = self._get_config_template('blocked')
+                text = read_template(
+                        template_filename,
+                        title=SERVER_NAME,
+                        header=SERVER_NAME,
+                        comment=blocked[3])
+                self._send_response(text, 200, header_only)
+
+            link_stats = YuLinkStats(self.server, shorthash)
+            # Only proceed if there is a address behind the link,
+            # else sending a 404
+            if link_stats.link_address:
                 template_filename = self._get_config_template('statsLink')
                 url = "/" + shorthash
                 new_url = '<a href="%(url)s">%(result)s</a>' % \
-                            {'result':result, 'url':url}
-                link_stats = YuLinkStats(self.server, shorthash)
+                            {'result':link_stats.link_address, 'url':url}
                 # FIXME: Check for None on timestamps and replace it with something like Unknown.
                 text = read_template(
                         template_filename,
@@ -457,14 +467,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         FIRST_REDIRECT=link_stats.first_redirect,
                         LAST_REDIRECT=link_stats.last_redirect,
                         NUMBER_OF_REDIRECTS=link_stats.number_of_redirects)
-                self._send_response(text, 200, header_only)
-            elif blocked:
-                template_filename = self._get_config_template('blocked')
-                text = read_template(
-                        template_filename,
-                        title=SERVER_NAME,
-                        header=SERVER_NAME,
-                        comment=blocked[3])
                 self._send_response(text, 200, header_only)
             else:
                 self._send_404(header_only)

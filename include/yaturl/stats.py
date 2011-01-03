@@ -130,8 +130,13 @@ class YuLinkStats:
     """
     def __init__(self, server, shorthash):
         self._db = YuDb(server.config, server.errorlog)
-        if hash is not None and self._db is not None:
-            self.creation_time = self._db.get_link_creation_timestamp(shorthash)[0]
+        if shorthash is not None and self._db is not None:
+            link_details = self._db.get_link_details(shorthash)
+            if link_details[5]:
+                self.creation_time = '%s (UTC)' % (link_details[5])
+            else:
+                self.creation_time = 'Unknown'
+            self.link_address = link_details[3]
             self.first_redirect = self._db.get_date_of_first_entry('hashredirect', shorthash)[0]
             self.last_redirect = self._db.get_date_of_last_entry('hashredirect', shorthash)[0]
             self.number_of_redirects = self._db.get_statistics_for_hash(shorthash)
