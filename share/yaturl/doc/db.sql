@@ -27,10 +27,11 @@ CREATE TABLE IF NOT EXISTS `link` (
   `link_hash` varchar(100) NOT NULL,
   `link_link` varchar(4096) NOT NULL,
   `link_comment` varchar(255) default NULL,
+  `entry_date` timestamp NOT NULL default CURRENT_TIMESTAMP,
   PRIMARY KEY  (`link_id`),
   UNIQUE KEY `link_hash` (`link_hash`),
   UNIQUE KEY `link_shorthash` (`link_shorthash`)
-) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 
 CREATE TABLE IF NOT EXISTS `block` (
