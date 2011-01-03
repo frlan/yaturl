@@ -402,9 +402,12 @@ class YuDb(object):
         try:
             conn, cursor = self._get_connection()
             cursor.execute(queries[time_range])
-            result = cursor.fetchone()
+            result = cursor.fetchall()
             cursor.close()
-            return result
+            if time_range == 'per_week':
+                return result
+            else:
+                return result[0]
         except MySQLdb.DatabaseError:
             return None
         except KeyError:
@@ -440,9 +443,12 @@ class YuDb(object):
         try:
             conn, cursor = self._get_connection()
             cursor.execute(queries[time_range])
-            result = cursor.fetchone()
+            result = cursor.fetchall()
             cursor.close()
-            return result
+            if time_range == 'per_week':
+                return result
+            else:
+                return result[0]
         except MySQLdb.DatabaseError:
             return None
         except KeyError:
