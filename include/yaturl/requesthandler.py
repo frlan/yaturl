@@ -30,7 +30,7 @@ from urlparse import urlsplit, urlunsplit
 from yaturl.db import YuDbError, YuDb
 from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPES
 from yaturl.helpers import sanitize_path, read_template
-from yaturl.stats import YuStats
+from yaturl.stats import YuStats, YuLinkStats
 
 
 class YuRequestHandler(BaseHTTPRequestHandler):
@@ -80,7 +80,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         | **return** hostname (str)
         """
-        
+
         if self.server.log_ip_activated:
             host = self.client_address[0]
         else:
@@ -393,7 +393,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     def _show_general_stats(self, header_only=False):
         """
         Prints a page with some serice wide statistics.
-        
+
         | **param** header_only (bool)
         """
         stat = YuStats(self.server)
@@ -446,18 +446,17 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 url = "/" + shorthash
                 new_url = '<a href="%(url)s">%(result)s</a>' % \
                             {'result':result, 'url':url}
+                link_stats = YuLinkStats(self.server, shorthash)
                 # FIXME: Check for None on timestamps and replace it with something like Unknown.
                 text = read_template(
                         template_filename,
                         title='%s - Linkstats' % SERVER_NAME,
                         header='Stats for Link',
                         URL=new_url,
-                        CREATION_TIME=self._db.get_link_creation_timestamp(shorthash)[0],
-                        FIRST_REDIRECT=self._db.get_date_of_first_entry
-                            ('hashredirect', shorthash)[0],
-                        LAST_REDIRECT=self._db.get_date_of_last_entry
-                            ('hashredirect', shorthash)[0],
-                        NUMBER_OF_REDIRECTS=self._db.get_statistics_for_hash(shorthash))
+                        CREATION_TIME=link_stats.creation_time,
+                        FIRST_REDIRECT=link_stats.first_redirect,
+                        LAST_REDIRECT=link_stats.last_redirect,
+                        NUMBER_OF_REDIRECTS=link_stats.number_of_redirects)
                 self._send_response(text, 200, header_only)
             elif blocked:
                 template_filename = self._get_config_template('blocked')

@@ -122,3 +122,21 @@ class YuStats:
         Get timestamp of time of first inserted link from database.
         """
         return self._db.get_date_of_first_entry('link')[0]
+
+
+class YuLinkStats:
+    """
+    Class to represent the link specific stats
+    """
+    def __init__(self, server, shorthash):
+        self._db = YuDb(server.config, server.errorlog)
+        if hash is not None and self._db is not None:
+            self.creation_time = self._db.get_link_creation_timestamp(shorthash)[0]
+            self.first_redirect = self._db.get_date_of_first_entry('hashredirect', shorthash)[0]
+            self.last_redirect = self._db.get_date_of_last_entry('hashredirect', shorthash)[0]
+            self.number_of_redirects = self._db.get_statistics_for_hash(shorthash)
+        else:
+            self.creation_time = None
+            self.first_redirect = None
+            self.last_redirect = None
+            self.number_of_redirects = None
