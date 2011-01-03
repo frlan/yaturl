@@ -43,60 +43,70 @@ class YuStats:
         self.date_of_first_redirect = self._get_date_of_first_redirect()
         self.date_of_first_link = self._get_date_of_first_link_entry()
 
+    #-------------------------------------------------------------------
     def _get_links_from_db_today(self):
         """
         Collecting statistics about links added today from database.
         """
         return self._db.get_statistics_for_general_links('today')[1]
 
+    #-------------------------------------------------------------------
     def _get_links_from_db_this_week(self):
         """
         Collecting statistics about links added this week from database.
         """
         return self._db.get_statistics_for_general_links('this_week')[0]
 
+    #-------------------------------------------------------------------
     def _get_links_from_db_this_month(self):
         """
         Collecting statistics about links added this month from database.
         """
         return self._db.get_statistics_for_general_links('this_month')[0]
 
+    #-------------------------------------------------------------------
     def _get_links_from_db_this_year(self):
         """
         Collecting statistics about links added this year from database.
         """
         return self._db.get_statistics_for_general_links('this_year')[0]
 
+    #-------------------------------------------------------------------
     def _get_links_from_db_all(self):
         """
         Collecting statistics about links added all time from database.
         """
         return self._db.get_statistics_for_general_links('all')[0]
 
+    #-------------------------------------------------------------------
     def _get_redirects_today(self):
         """
         Collecting statistics about done redirects of today from database.
         """
         return self._db.get_statistics_for_general_redirects('today')[1]
 
+    #-------------------------------------------------------------------
     def _get_redirects_this_week(self):
         """
         Collecting statistics about done redirects of this week from database.
         """
         return self._db.get_statistics_for_general_redirects('this_week')[0]
 
+    #-------------------------------------------------------------------
     def _get_redirects_this_month(self):
         """
         Collecting statistics about done redirects of this month from database.
         """
         return self._db.get_statistics_for_general_redirects('this_month')[0]
 
+    #-------------------------------------------------------------------
     def _get_redirects_this_year(self):
         """
         Collecting statistics about done redirects of this year from database.
         """
         return self._db.get_statistics_for_general_redirects('this_year')[0]
 
+    #-------------------------------------------------------------------
     def _get_redirects_per_week(self):
         """
         Collecting statistics about done redirects groupd by week and year
@@ -104,19 +114,21 @@ class YuStats:
         """
         return self._db.get_statistics_for_general_redirects('per_week')
 
-
+    #-------------------------------------------------------------------
     def _get_redirects_all(self):
         """
         Collecting statistics about done redirects ever from database.
         """
         return self._db.get_statistics_for_general_redirects('all')[0]
 
+    #-------------------------------------------------------------------
     def _get_date_of_first_redirect(self):
         """
         Get timestamp of first redirect logged from database.
         """
         return self._db.get_date_of_first_entry('redirect')[0]
 
+    #-------------------------------------------------------------------
     def _get_date_of_first_link_entry(self):
         """
         Get timestamp of time of first inserted link from database.
