@@ -98,16 +98,15 @@ BODY, HTML {
 
 #main p{
 	padding-left: 1em;
+	padding-top: 1em;
 }
 
 #main h1{
 	padding-top: 1em;
-	padding-bottom: 0.5em;
 }
 
 #main h2{
 	padding-top: 1em;
-	padding-bottom: 0.5em;
 }
 
 .plainlist {
@@ -116,6 +115,7 @@ BODY, HTML {
 }
 
 .yaturllist {
+	margin-top: 0.5em;
 	margin-left:2.5em;
 }
 
