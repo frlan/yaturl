@@ -379,6 +379,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     else:
                     # Bad. We found a collision
                     # TODO: This might could be done more elegant by using an exception.
+                        self._send_mail('Collision on SHA found',
+                            '%s vs %s' % (url_new, url), self._get_config_value('email', 'toemail'))
                         return -2
                 except YuDbError:
                     return -1
