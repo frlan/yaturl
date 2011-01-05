@@ -574,7 +574,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         if show == True:
                             template_filename = self._get_config_template('showpage')
                             url = "/" + request_path[1:]
-                            new_url = '<a href="%(url)s">%(result)s</a>' % \
+                            new_url = '<p><a href="%(url)s">%(result)s</a><p>' % \
                                       {'result':result, 'url':url}
                             stats = self._db.get_statistics_for_hash(request_path[1:])
                             text = read_template(
