@@ -401,6 +401,14 @@ class YuDb(object):
                             FROM `access_log`
                             WHERE `access_time` > '0000-00-00 00:00:00'
                             GROUP BY HOUR( `access_time`);""",
+            'per_dow'   :   """SELECT DAYOFWEEK(`access_time`), COUNT(`access_log_id`)
+                            FROM `access_log`
+                            WHERE `access_time` > '0000-00-00 00:00:00'
+                            GROUP BY DAYOFWEEK(`access_time`);""",
+            'per_dom'   :   """SELECT DAYOFMONTH(`access_time`), COUNT(`access_log_id`)
+                            FROM `access_log`
+                            WHERE `access_time` > '0000-00-00 00:00:00'
+                            GROUP BY DAYOFMONTH(`access_time`);""",
             'all'       :   """SELECT COUNT(`access_log_id`)
                             FROM `access_log` WHERE 1;"""})
         try:
@@ -408,7 +416,7 @@ class YuDb(object):
             cursor.execute(queries[time_range])
             result = cursor.fetchall()
             cursor.close()
-            if time_range in ('per_week','per_hour'):
+            if time_range in ('per_week', 'per_hour', 'per_dom', 'per_dow'):
                 return result
             else:
                 return result[0]
@@ -442,18 +450,26 @@ class YuDb(object):
                             COUNT(`link_id`)
                             FROM `link`
                             GROUP BY YEAR(`entry_date`), WEEK(`entry_date`);""",
-            'per_hour' :   """SELECT HOUR( `entry_date` ) , COUNT( `link_id` )
+            'per_hour'  :   """SELECT HOUR(`entry_date`) , COUNT(`link_id`)
                             FROM `link`
                             WHERE `entry_date` > '0000-00-00 00:00:00'
-                            GROUP BY HOUR( `entry_date`);""",
-            'all'   :       """SELECT COUNT(`link_id`)
+                            GROUP BY HOUR(`entry_date`);""",
+            'per_dow'   :   """SELECT DAYOFWEEK(`entry_date`), COUNT(`link_id`)
+                            FROM `link`
+                            WHERE `entry_date` > '0000-00-00 00:00:00'
+                            GROUP BY DAYOFWEEK(`entry_date`);""",
+            'per_dom'   :   """SELECT DAYOFMONTH(`entry_date`), COUNT(`link_id`)
+                            FROM `link`
+                            WHERE `entry_date` > '0000-00-00 00:00:00'
+                            GROUP BY DAYOFMONTH(`entry_date`);""",
+            'all'       :   """SELECT COUNT(`link_id`)
                             FROM `link` WHERE 1;"""})
         try:
             conn, cursor = self._get_connection()
             cursor.execute(queries[time_range])
             result = cursor.fetchall()
             cursor.close()
-            if time_range in ('per_week','per_hour'):
+            if time_range in ('per_week', 'per_hour', 'per_dom', 'per_dow'):
                 return result
             else:
                 return result[0]
