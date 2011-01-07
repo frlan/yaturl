@@ -397,6 +397,10 @@ class YuDb(object):
                             COUNT(`access_log_id`)
                             FROM `access_log`
                             GROUP BY YEAR(`access_time`), WEEK(`access_time`);""",
+            'per_hour' :    """SELECT HOUR( `access_time` ) , COUNT( `access_log_id` )
+                            FROM `access_log`
+                            WHERE `access_time` > '0000-00-00 00:00:00'
+                            GROUP BY HOUR( `access_time`);""",
             'all'       :   """SELECT COUNT(`access_log_id`)
                             FROM `access_log` WHERE 1;"""})
         try:
@@ -404,7 +408,7 @@ class YuDb(object):
             cursor.execute(queries[time_range])
             result = cursor.fetchall()
             cursor.close()
-            if time_range == 'per_week':
+            if time_range in ('per_week','per_hour'):
                 return result
             else:
                 return result[0]
@@ -438,6 +442,10 @@ class YuDb(object):
                             COUNT(`link_id`)
                             FROM `link`
                             GROUP BY YEAR(`entry_date`), WEEK(`entry_date`);""",
+            'per_hour' :   """SELECT HOUR( `entry_date` ) , COUNT( `link_id` )
+                            FROM `link`
+                            WHERE `entry_date` > '0000-00-00 00:00:00'
+                            GROUP BY HOUR( `entry_date`);""",
             'all'   :       """SELECT COUNT(`link_id`)
                             FROM `link` WHERE 1;"""})
         try:
@@ -445,7 +453,7 @@ class YuDb(object):
             cursor.execute(queries[time_range])
             result = cursor.fetchall()
             cursor.close()
-            if time_range == 'per_week':
+            if time_range in ('per_week','per_hour'):
                 return result
             else:
                 return result[0]
