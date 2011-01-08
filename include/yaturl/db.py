@@ -349,6 +349,27 @@ class YuDb(object):
             pass
 
     #-------------------------------------------------------------------
+    def add_blockentry(self, shorthash, comment)
+        """
+        Mark a link as blocked.
+
+        | **param** shorthash (str) -- short hash of link
+        | **comment** comment (str) -- Reason why link has been blocked
+        """
+        try:
+            conn, cursor = self._get_connection()
+            cursor.execute("""INSERT INTO block( `link_id` , `comment` )
+                              VALUES (
+                                (
+                                    SELECT `link`.`link_id`
+                                    FROM `link`
+                                    WHERE `link`.`link_shorthash` = %s
+                                ),%s);""" % (shorthash, comment))
+            conn.commit()
+            cursor.close()
+        except MySQLdb.DatabaseError:
+            pass
+    #-------------------------------------------------------------------
     def get_statistics_for_hash(self, shorthash):
         """
         Returns the number of calls for a particular hash
