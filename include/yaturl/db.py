@@ -349,7 +349,7 @@ class YuDb(object):
             pass
 
     #-------------------------------------------------------------------
-    def add_blockentry(self, shorthash, comment)
+    def add_blockentry(self, shorthash, comment):
         """
         Mark a link as blocked.
 
