@@ -398,23 +398,22 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         | **param** header_only (bool)
         """
-        stat = YuStats(self.server)
         template_filename = self._get_config_template('stats')
         text = read_template(
                     template_filename,
                     title=SERVER_NAME,
                     header=SERVER_NAME,
-                    number_of_links=stat.links_all,
-                    number_of_redirects=stat.redirect_all,
-                    number_of_redirects_today = stat.redirect_today,
-                    number_of_redirects_this_week = stat.redirect_this_week,
-                    number_of_redirects_this_month = stat.redirect_this_month,
-                    number_of_redirects_this_year = stat.redirect_this_year,
-                    number_of_url_today = stat.links_today,
-                    number_of_url_this_week = stat.links_this_week,
-                    number_of_url_this_month = stat.links_this_month,
-                    number_of_url_this_year = stat.links_this_year,
-                    date_of_first_redirect = stat.date_of_first_redirect,
+                    number_of_links=self.server.stats.links_all,
+                    number_of_redirects=self.server.stats.redirect_all,
+                    number_of_redirects_today = self.server.stats.redirect_today,
+                    number_of_redirects_this_week = self.server.stats.redirect_this_week,
+                    number_of_redirects_this_month = self.server.stats.redirect_this_month,
+                    number_of_redirects_this_year = self.server.stats.redirect_this_year,
+                    number_of_url_today = self.server.stats.links_today,
+                    number_of_url_this_week = self.server.stats.links_this_week,
+                    number_of_url_this_month = self.server.stats.links_this_month,
+                    number_of_url_this_year = self.server.stats.links_this_year,
+                    date_of_first_redirect = self.server.stats.date_of_first_redirect,
                 )
         if text:
             self._send_head(text, 200)

@@ -24,6 +24,7 @@ from BaseHTTPServer import HTTPServer
 from SocketServer import ThreadingMixIn
 from yaturl.requesthandler import YuRequestHandler
 from threading import Event
+from yaturl.stats import YuStats
 
 
 ########################################################################
@@ -54,6 +55,7 @@ class YuServer(ThreadingMixIn, HTTPServer):
         self.hostname = hostname
         self.resolve_clients = config.getboolean('http', 'resolve_clients')
         self.log_ip_activated = config.getboolean('main', 'log_ip_activated')
+        self.stats = YuStats(self)
         self._shutdown = Event()
 
     #----------------------------------------------------------------------
