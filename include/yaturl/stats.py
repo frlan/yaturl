@@ -28,6 +28,13 @@ class YuStats:
     """
     def __init__(self, server):
         self._db = YuDb(server.config, server.errorlog)
+        self._update()
+
+    #-------------------------------------------------------------------
+    def _update(self):
+        """
+        Updates the values of the stats object.
+        """
         self.create_time_stamp = time.clock()
         self.links_today = self._get_links_from_db_today()
         self.links_this_week = self._get_links_from_db_this_week()
