@@ -30,7 +30,9 @@ TEMPLATENAMES = ['404', '500', 'contactUsResult', 'databaseerror',
 
 CONTENT_TYPES = ({
     '.css':'text/css',
-    '.ico':'image/vnd.microsoft.icon'})
+    '.ico':'image/vnd.microsoft.icon',
+    '.png':'image/png'
+})
 
 # we need to hard-code this one at least in case of the file cannot be found on disk
 TEMPLATE_500 = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
