@@ -26,7 +26,7 @@ import hashlib
 import time
 from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
-from urlparse import urlsplit, urlunsplit
+from urlparse import urlsplit, urlunsplit, urlparse
 from yaturl.db import YuDbError, YuDb
 from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPES
 from yaturl.helpers import sanitize_path, read_template
@@ -492,115 +492,150 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             text = requested_file.read()
             requested_file.close()
         except IOError:
-            if self.path in ('/', '/URLRequest'):
-                template_filename = self._get_config_template('homepage')
-                text = read_template(
-                        template_filename,
-                        title=SERVER_NAME,
-                        header=SERVER_NAME,
-                        msg='')
-            elif self.path.startswith('/stats') or self.path.endswith('+'):
-                if self.path == '/stats':
-                    # Doing general statistics here
-                    # Let's hope this page is not getting to popular ....
-                    # Create a new stats objekt which is fetching data in background
-                    self._show_general_stats(header_only)
-                    return
-                else:
-                    # Check whether we do have the + or the stats kind of URL
-                    if self.path.endswith('+'):
-                        # Well I guess this is the proof you can write
-                        # real ugly code in Python too.
-                        try:
-                            if self.path.startswith('/show/'):
-                                request_path = self.path[6:]
-                            elif self.path.startswith('/s/'):
-                                request_path = self.path[3:]
-                            elif self.path.startswith('/stats/'):
-                                request_path = self.path[7:]
-                            else:
-                                request_path = self.path[1:]
-                            self._show_link_stats(header_only,
-                                request_path[:request_path.rfind('+') ])
-                            return
-                        except:
-                            # Oopps. Something went wrong. Most likely
-                            # a malformed link
-                            self._send_404()
-                            return
-                    else:
-                        # Trying to understand for which link we shall print
-                        # out stats.
-                        splitted = self.path[1:].split('/')
-                        try:
-                            self._show_link_stats(header_only, splitted[1])
-                            return
-                        except IndexError:
-                            # Something went wrong. Most likely there was a
-                            # malformed URL for accessing the stats.
-                            self._send_404()
-                            return
-            elif self.path == '/faq':
-                template_filename = self._get_config_template('faq')
-                text = read_template(
-                        template_filename,
-                        title=SERVER_NAME,
-                        header=SERVER_NAME,)
-            # Any other page
-            else:
-                # First check, whether we want to have a real redirect
-                # or just an info
-                request_path = self.path
-                if self.path.startswith('/show/'):
-                    request_path = self.path[5:]
-                    show = True
-                elif self.path.startswith('/s/'):
-                    request_path = self.path[2:]
-                    show = True
-                else:
-                    show = False
-                # Assuming, if there is anything else than an
-                # alphanumeric character after the starting /, it's
-                # not a valid hash at all
-                if request_path[1:].isalnum():
-                    try:
-                        result = self._db.get_link_from_db(request_path[1:])
-                        blocked = self._db.is_hash_blocked(request_path[1:])
-                    except YuDbError:
-                        self._send_database_problem(header_only)
+            try:
+                parsed_path = urlparse(self.path)
+                params = dict([p.split('=') for p in parsed_path[4].split('&')])
+                if params['addurl']:
+                    tmp = self._insert_url_to_db(params['addurl'])
+                    if tmp and tmp < 0:
+                        self._send_database_problem()
                         return
-                    if result and blocked == None:
-                        if show == True:
-                            template_filename = self._get_config_template('showpage')
-                            url = "/" + request_path[1:]
-                            new_url = '<p><a href="%(url)s">%(result)s</a><p>' % \
-                                      {'result':result, 'url':url}
-                            stats = self._db.get_statistics_for_hash(request_path[1:])
-                            text = read_template(
-                                        template_filename,
-                                        title=SERVER_NAME,
-                                        header=SERVER_NAME,
-                                        msg=new_url,
-                                        stat=stats,
-                                        statspage="/stats/" + request_path[1:])
-                        else:
-                            self._db.add_logentry_to_database(request_path[1:])
-                            self._send_301(result)
-                            return
-                    elif blocked:
+                    blocked = self._db.is_hash_blocked(tmp)
+                    if blocked:
                         template_filename = self._get_config_template('blocked')
                         text = read_template(
                                     template_filename,
                                     title=SERVER_NAME,
                                     header=SERVER_NAME,
                                     comment=blocked[3])
+                    elif tmp:
+                        template_filename = self._get_config_template('return')
+                        text = read_template(
+                                template_filename,
+                                title='%s - Short URL Result' % SERVER_NAME,
+                                header='new URL',
+                                path = tmp,
+                                hostname = self.server.hostname)
+                    else:
+                        # There was a general issue with URL
+                        template_filename = self._get_config_template('homepage')
+                        text = read_template(
+                            template_filename,
+                            title=SERVER_NAME,
+                            header=SERVER_NAME,
+                            msg='''<p class="warning">Please check your input.</p>''')
+            except YuDbError:
+                self._send_database_problem(header_only)
+                return
+            except:
+                if self.path in ('/', '/URLRequest'):
+                    template_filename = self._get_config_template('homepage')
+                    text = read_template(
+                            template_filename,
+                            title=SERVER_NAME,
+                            header=SERVER_NAME,
+                            msg='')
+                elif self.path.startswith('/stats') or self.path.endswith('+'):
+                    if self.path == '/stats':
+                        # Doing general statistics here
+                        # Let's hope this page is not getting to popular ....
+                        # Create a new stats objekt which is fetching data in background
+                        self._show_general_stats(header_only)
+                        return
+                    else:
+                        # Check whether we do have the + or the stats kind of URL
+                        if self.path.endswith('+'):
+                            # Well I guess this is the proof you can write
+                            # real ugly code in Python too.
+                            try:
+                                if self.path.startswith('/show/'):
+                                    request_path = self.path[6:]
+                                elif self.path.startswith('/s/'):
+                                    request_path = self.path[3:]
+                                elif self.path.startswith('/stats/'):
+                                    request_path = self.path[7:]
+                                else:
+                                    request_path = self.path[1:]
+                                self._show_link_stats(header_only,
+                                    request_path[:request_path.rfind('+') ])
+                                return
+                            except:
+                                # Oopps. Something went wrong. Most likely
+                                # a malformed link
+                                self._send_404()
+                                return
+                        else:
+                            # Trying to understand for which link we shall print
+                            # out stats.
+                            splitted = self.path[1:].split('/')
+                            try:
+                                self._show_link_stats(header_only, splitted[1])
+                                return
+                            except IndexError:
+                                # Something went wrong. Most likely there was a
+                                # malformed URL for accessing the stats.
+                                self._send_404()
+                                return
+                elif self.path == '/faq':
+                    template_filename = self._get_config_template('faq')
+                    text = read_template(
+                            template_filename,
+                            title=SERVER_NAME,
+                            header=SERVER_NAME,)
+                # Any other page
+                else:
+                    # First check, whether we want to have a real redirect
+                    # or just an info
+                    request_path = self.path
+                    if self.path.startswith('/show/'):
+                        request_path = self.path[5:]
+                        show = True
+                    elif self.path.startswith('/s/'):
+                        request_path = self.path[2:]
+                        show = True
+                    else:
+                        show = False
+                    # Assuming, if there is anything else than an
+                    # alphanumeric character after the starting /, it's
+                    # not a valid hash at all
+                    if request_path[1:].isalnum():
+                        try:
+                            result = self._db.get_link_from_db(request_path[1:])
+                            blocked = self._db.is_hash_blocked(request_path[1:])
+                        except YuDbError:
+                            self._send_database_problem(header_only)
+                            return
+                        if result and blocked == None:
+                            if show == True:
+                                template_filename = self._get_config_template('showpage')
+                                url = "/" + request_path[1:]
+                                new_url = '<p><a href="%(url)s">%(result)s</a><p>' % \
+                                          {'result':result, 'url':url}
+                                stats = self._db.get_statistics_for_hash(request_path[1:])
+                                text = read_template(
+                                            template_filename,
+                                            title=SERVER_NAME,
+                                            header=SERVER_NAME,
+                                            msg=new_url,
+                                            stat=stats,
+                                            statspage="/stats/" + request_path[1:])
+                            else:
+                                self._db.add_logentry_to_database(request_path[1:])
+                                self._send_301(result)
+                                return
+                        elif blocked:
+                            template_filename = self._get_config_template('blocked')
+                            text = read_template(
+                                        template_filename,
+                                        title=SERVER_NAME,
+                                        header=SERVER_NAME,
+                                        comment=blocked[3])
+                        else:
+                            self._send_404(header_only)
+                            return
                     else:
                         self._send_404(header_only)
                         return
-                else:
-                    self._send_404(header_only)
-                    return
-
         self._send_response(text, 200, header_only)
 
     #----------------------------------------------------------------------
