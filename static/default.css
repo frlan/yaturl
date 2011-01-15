@@ -92,8 +92,9 @@ BODY, HTML {
 }
 
 #main a{
-	color: lightgray;
+	color: white;
 	font-weight: bold;
+	text-decoration: none;
 }
 
 #main p{
