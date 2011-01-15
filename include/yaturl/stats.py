@@ -142,6 +142,13 @@ class YuStats:
         """
         return self._db.get_date_of_first_entry('link')[0]
 
+    #-------------------------------------------------------------------
+    def update_stats(self):
+        """
+        Public method to perform update on stats date
+        """
+        self._update()
+
 
 class YuLinkStats:
     """

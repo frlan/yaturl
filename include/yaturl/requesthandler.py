@@ -398,6 +398,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         | **param** header_only (bool)
         """
+        self.server.stats.update_stats()
         template_filename = self._get_config_template('stats')
         text = read_template(
                     template_filename,
