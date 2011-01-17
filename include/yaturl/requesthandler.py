@@ -391,7 +391,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         return short
 
-#------------------------------------------------------------------------
+    #-------------------------------------------------------------------
     def _show_general_stats(self, header_only=False):
         """
         Prints a page with some serice wide statistics.
@@ -427,7 +427,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         else:
             self._send_internal_server_error(header_only)
 
-#------------------------------------------------------------------------
+    #-------------------------------------------------------------------
     def _show_link_stats(self, header_only=False, shorthash=None):
         """
         Shows a page with some statistics for a short URL
