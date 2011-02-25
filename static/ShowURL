@@ -12,8 +12,8 @@
 
 <body>
     <div id="container">
-        <div id="header"><span>Show target URL</span></div>
-        <div id="main">
+	<div id="header"><span>Show target URL</span></div>
+	<div id="main">
 	  <p>Please enter a short URL. The target URL of the entered
 	  short URL will be displayed on the next site.
 	  Please enter only the characters after the slash of a
@@ -29,6 +29,7 @@
 	    <a href="/ContactUs">Contact Us</a> &nbsp;&nbsp;
 	    <a href="/About">About</a> &nbsp;&nbsp;
 	    <a href="/faq">F.A.Q.</a> &nbsp;&nbsp;
+	    <a href="/stats">Stats</a> &nbsp;&nbsp;
 	    <a href="/">Home</a></span>
 	</div>
 
