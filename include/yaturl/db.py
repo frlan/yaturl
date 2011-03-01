@@ -61,7 +61,14 @@ class YuDb(object):
         self._hostname = config.get('database', 'host')
         self._port = config.getint('database', 'port')
         self._database = config.get('database', 'database')
-        self._min_url_length = config.getint('main', 'min_url_length')
+        if config.has_option:
+            self._min_url_length = config.getint('main', 'min_url_length')
+            if self._min_url_length < 1:
+                self._min_url_length = 4
+        else:
+            self._min_url_length = 4
+
+
         self._conn = None
         self.logger = logger
 
