@@ -7,6 +7,7 @@ staticdocumentroot: static/
 log_ip_activated: false
 #user: yaturl
 thread_watch_timeout: 300
+min_url_length: 4
 
 [http]
 host: 0.0.0.0

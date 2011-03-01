@@ -61,6 +61,7 @@ class YuDb(object):
         self._hostname = config.get('database', 'host')
         self._port = config.getint('database', 'port')
         self._database = config.get('database', 'database')
+        self.min_url_length = config.getint('main', 'min_url_length')
         self._conn = None
         self.logger = logger
 
@@ -309,7 +310,7 @@ class YuDb(object):
         | **param** link (str)
         | **return** short_hash (str)
         """
-        for i in range(4, len(url_hash)):
+        for i in range(self.min_url_length, len(url_hash)):
             short = url_hash[:i]
             try:
                 conn, cursor = self._get_connection()
