@@ -255,7 +255,7 @@ def main():
             else:
                 errorlog.info('Template %s seems to be missing. '
                               'Aborting startup' % (template))
-                # Maybe shutdown can be done a bit nicer.   
+                # Maybe shutdown can be done a bit nicer.
                 exit(1)
 
     server_threads = create_server_threads(config, errorlog, accesslog)
