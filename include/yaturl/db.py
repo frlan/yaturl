@@ -20,6 +20,7 @@
 # MA 02110-1301, USA.
 
 from yaturl.constants import MYSQL_CONNECTION_POOL_SIZE
+from MySQLdb import DatabaseError
 import sqlalchemy.pool as pool
 import MySQLdb as MySQLdb_orig
 # proxy MySQLdb module to enable SQLAlchemy's connection pooling
@@ -32,13 +33,13 @@ from MySQLdb.constants.ER import DUP_ENTRY
 from MySQLdb.constants.CR import SERVER_GONE_ERROR, SERVER_LOST
 
 
-class YuDbError(MySQLdb.DatabaseError):
+class YuDbError(DatabaseError):
     """
     Generic database error
     """
     #----------------------------------------------------------------------
     def __init__(self, msg):
-        super(YuDbError, self).__init__()
+        DatabaseError.__init__(self)
         self._msg = msg
 
     #----------------------------------------------------------------------
@@ -60,6 +61,14 @@ class YuDb(object):
         self._hostname = config.get('database', 'host')
         self._port = config.getint('database', 'port')
         self._database = config.get('database', 'database')
+        if config.has_option:
+            self._min_url_length = config.getint('main', 'min_url_length')
+            if self._min_url_length < 1:
+                self._min_url_length = 4
+        else:
+            self._min_url_length = 4
+
+
         self._conn = None
         self.logger = logger
 
@@ -164,6 +173,29 @@ class YuDb(object):
             self.logger.warn('Database error: %s' % e)
             raise YuDbError(str(e))
 
+    #-------------------------------------------------------------------
+    def get_link_details(self, shorthash):
+        """
+        Returns a list with complete details of given link.
+        """
+        try:
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT `link`.`link_id`,
+                                     `link`.`link_shorthash`,
+                                     `link`.`link_hash`,
+                                     `link`.`link_link`,
+                                     `link`.`link_comment`,
+                                     `link`.`entry_date`
+                         FROM `link`
+                         WHERE `link`.`link_shorthash` = %s  LIMIT 1 ''', (shorthash))
+            result = cursor.fetchone()
+            cursor.close()
+            if result:
+                return result
+        except MySQLdb.DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError(str(e))
+
     #----------------------------------------------------------------------
     def get_link_from_db(self, url_hash):
         """
@@ -176,7 +208,7 @@ class YuDb(object):
             cursor = self._get_connection()[1]
             cursor.execute('''SELECT `link`.`link_link`
                          FROM `link`
-                         WHERE `link`.`link_shorthash` = %s LIMIT 1''', (url_hash))
+                         WHERE `link`.`link_shorthash` = %s  LIMIT 1 ''', (url_hash))
             result = cursor.fetchone()
             cursor.close()
             if result:
@@ -206,21 +238,40 @@ class YuDb(object):
         except MySQLdb.DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDbError(str(e))
+    #-------------------------------------------------------------------
+    def get_link_creation_timestamp(self, shorthash):
+        """
+        Return the creation timestamp of the link based on its shorthash
+
+        | **param** shorthash (str)
+        | **return** timestamp (datetime)
+        """
+        try:
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT `link`.`entry_date`
+                         FROM `link`
+                         WHERE `link`.`link_shorthash` = %s''', (shorthash))
+            result = cursor.fetchone()
+            cursor.close()
+            return result
+        except MySQLdb.DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError(str(e))
 
     #-------------------------------------------------------------------
-    def is_shorthash_in_db(self, short):
+    def is_shorthash_in_db(self, shorthash):
         """
         Checks whether a shorthash is stored in the database. If so,
         it returns the link ID of the database entry.
 
-        | **param** short (str)
+        | **param** shorthash (str)
         | **return** link_id (int)
         """
         try:
             cursor = self._get_connection()[1]
             cursor.execute('''SELECT `link`.`link_id`
                          FROM `link`
-                         WHERE `link`.`link_shorthash` = %s''', (short))
+                         WHERE `link`.`link_shorthash` = %s''', (shorthash))
             result = cursor.fetchone()
             cursor.close()
             if result:
@@ -230,6 +281,34 @@ class YuDb(object):
             raise YuDbError(str(e))
 
     #-------------------------------------------------------------------
+    def is_hash_blocked(self, shorthash):
+        """
+        Checks whether given (short) hash is marked as blocked and is returning
+        some data about. If its not blocked, its just returning none.
+
+        | **param** shorthash (str)
+        | **return** list with link_id, shorthash, entry_date and comment
+        """
+        if not shorthash:
+            return None
+        try:
+            cursor = self._get_connection()[1]
+            cursor.execute('''SELECT `block`.`link_id`,
+                                     `link`.`link_shorthash`,
+                                     `block`.`entry_date`, `comment`
+                              FROM `link`, `block`
+                              WHERE `link`.`link_shorthash` = %s
+                              AND `link`.`link_id` = `block`.`link_id`; ''', (shorthash))
+            result = cursor.fetchone()
+            cursor.close()
+            if result:
+                return result
+            else:
+                return None
+        except MySQLdb.DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDbError(str(e))
+    #-------------------------------------------------------------------
     def add_link_to_db(self, url_hash, link):
         """
         Takes the given hash and link and put it into database.
@@ -238,7 +317,7 @@ class YuDb(object):
         | **param** link (str)
         | **return** short_hash (str)
         """
-        for i in range(4, len(url_hash)):
+        for i in range(self._min_url_length, len(url_hash)):
             short = url_hash[:i]
             try:
                 conn, cursor = self._get_connection()
@@ -259,37 +338,239 @@ class YuDb(object):
                     self.logger.warn('Database error: %s' % e)
                     raise YuDbError(str(e))
     #-------------------------------------------------------------------
-    
-    def add_logentry_to_database(self, hash):
+
+    def add_logentry_to_database(self, shorthash):
         """
-        Creates a log entry inside DB for a given hash. 
-        
+        Creates a log entry inside DB for a given hash.
+
         | **param** hash (str)
         """
         try:
             conn, cursor = self._get_connection()
-            cursor.execute("""INSERT INTO `accesslog`
-                     (`hash`) VALUES (%s)""",(hash))
+            cursor.execute("""INSERT into `access_log` (link_id)
+                SELECT link_id
+                FROM link
+                WHERE link_shorthash = (%s)""",(shorthash))
             conn.commit()
             cursor.close()
-        except MySQLdb.DatabaseError, e:
+        except MySQLdb.DatabaseError:
+            pass
+
+    #-------------------------------------------------------------------
+    def add_blockentry(self, shorthash, comment):
+        """
+        Mark a link as blocked.
+
+        | **param** shorthash (str) -- short hash of link
+        | **comment** comment (str) -- Reason why link has been blocked
+        """
+        try:
+            conn, cursor = self._get_connection()
+            cursor.execute("""INSERT INTO block( `link_id` , `comment` )
+                              VALUES (
+                                (
+                                    SELECT `link`.`link_id`
+                                    FROM `link`
+                                    WHERE `link`.`link_shorthash` = %s
+                                ),%s);""" % (shorthash, comment))
+            conn.commit()
+            cursor.close()
+        except MySQLdb.DatabaseError:
             pass
     #-------------------------------------------------------------------
-    def get_statistics_for_hash(self, hash):
+    def get_statistics_for_hash(self, shorthash):
         """
-        Returns the number of calls for a particular hash 
-            
+        Returns the number of calls for a particular hash
+
         | **param** hash (str)
         | **return** number of usages (int)
         """
         try:
             conn, cursor = self._get_connection()
-            cursor.execute("""SELECT count(hash)
-                              FROM accesslog
-                              WHERE hash = (%s)""",(hash))
-            conn.commit()
+            # Is this real a nice way in terms of memory usage at DB?
+            cursor.execute("""SELECT count(access_time)
+                              FROM access_log left join link on (access_log.link_id = link.link_id)
+                              WHERE link.link_shorthash = (%s);""",(shorthash))
+            # Is SELECT count(access_time)
+            #    FROM access_log, link
+            #    WHERE access_log.link_id = link.link_id
+            #    AND link.link_shorthash = (%s);
+            # maybe better?
             result = cursor.fetchone()
             cursor.close()
             return result[0]
-        except MySQLdb.DatabaseError, e:
+        except MySQLdb.DatabaseError:
             pass
+    #-------------------------------------------------------------------
+    def get_statistics_for_general_redirects(self, time_range):
+        """
+        Returns the number of redirects inside a give time range.
+
+        | **param** time_range (str)
+        | **return** number of redirects (int)
+        """
+        queries = ({
+            'today'     :   """SELECT CURDATE( ) , count(`access_log_id`)
+                            FROM `access_log`
+                            WHERE date(`access_time`) = CURDATE( );""",
+            'this_year' :   """SELECT COUNT(`access_log_id`)
+                            FROM `access_log`
+                            WHERE YEAR(`access_time`) = YEAR(CURDATE());""",
+            'this_week' :   """SELECT COUNT(`access_log_id`)
+                            FROM `access_log`
+                            WHERE WEEK(`access_time`) = WEEK(CURDATE());""",
+            'this_month':   """SELECT COUNT(`access_log_id`)
+                            FROM `access_log`
+                            WHERE MONTH(`access_time`) = MONTH(CURDATE());""",
+            'per_week'  :   """SELECT YEAR(`access_time`), WEEK(`access_time`),
+                            COUNT(`access_log_id`)
+                            FROM `access_log`
+                            GROUP BY YEAR(`access_time`), WEEK(`access_time`);""",
+            'per_hour' :    """SELECT HOUR( `access_time` ) , COUNT( `access_log_id` )
+                            FROM `access_log`
+                            WHERE `access_time` > '0000-00-00 00:00:00'
+                            GROUP BY HOUR( `access_time`);""",
+            'per_dow'   :   """SELECT DAYOFWEEK(`access_time`), COUNT(`access_log_id`)
+                            FROM `access_log`
+                            WHERE `access_time` > '0000-00-00 00:00:00'
+                            GROUP BY DAYOFWEEK(`access_time`);""",
+            'per_dom'   :   """SELECT DAYOFMONTH(`access_time`), COUNT(`access_log_id`)
+                            FROM `access_log`
+                            WHERE `access_time` > '0000-00-00 00:00:00'
+                            GROUP BY DAYOFMONTH(`access_time`);""",
+            'all'       :   """SELECT COUNT(`access_log_id`)
+                            FROM `access_log` WHERE 1;"""})
+        try:
+            conn, cursor = self._get_connection()
+            cursor.execute(queries[time_range])
+            result = cursor.fetchall()
+            cursor.close()
+            if time_range in ('per_week', 'per_hour', 'per_dom', 'per_dow'):
+                return result
+            else:
+                return result[0]
+        except MySQLdb.DatabaseError:
+            return None
+        except KeyError:
+            return None
+
+    #-------------------------------------------------------------------
+    def get_statistics_for_general_links(self, time_range):
+        """
+        Returns the number of added links inside a give time range.
+
+        | **param** time_range (str)
+        | **return** number of new links (int)
+        """
+        queries = ({
+            'today'     :   """SELECT CURDATE() , count(`link_id`)
+                            FROM `link`
+                            WHERE date(`entry_date`) = CURDATE();""",
+            'this_year' :   """SELECT count(`link_id`)
+                            FROM `link`
+                            WHERE YEAR(`entry_date`) = YEAR(CURDATE());""",
+            'this_week' :   """SELECT COUNT(`link_id`)
+                            FROM `link`
+                            WHERE WEEK(`entry_date`) = WEEK(CURDATE());""",
+            'this_month' :  """SELECT COUNT(`link_id`)
+                            FROM `link`
+                            WHERE MONTH(`entry_date`) = MONTH(CURDATE());""",
+            'per_week'  :   """SELECT YEAR(`entry_date`), WEEK(`entry_date`),
+                            COUNT(`link_id`)
+                            FROM `link`
+                            GROUP BY YEAR(`entry_date`), WEEK(`entry_date`);""",
+            'per_hour'  :   """SELECT HOUR(`entry_date`) , COUNT(`link_id`)
+                            FROM `link`
+                            WHERE `entry_date` > '0000-00-00 00:00:00'
+                            GROUP BY HOUR(`entry_date`);""",
+            'per_dow'   :   """SELECT DAYOFWEEK(`entry_date`), COUNT(`link_id`)
+                            FROM `link`
+                            WHERE `entry_date` > '0000-00-00 00:00:00'
+                            GROUP BY DAYOFWEEK(`entry_date`);""",
+            'per_dom'   :   """SELECT DAYOFMONTH(`entry_date`), COUNT(`link_id`)
+                            FROM `link`
+                            WHERE `entry_date` > '0000-00-00 00:00:00'
+                            GROUP BY DAYOFMONTH(`entry_date`);""",
+            'all'       :   """SELECT COUNT(`link_id`)
+                            FROM `link` WHERE 1;"""})
+        try:
+            conn, cursor = self._get_connection()
+            cursor.execute(queries[time_range])
+            result = cursor.fetchall()
+            cursor.close()
+            if time_range in ('per_week', 'per_hour', 'per_dom', 'per_dow'):
+                return result
+            else:
+                return result[0]
+        except MySQLdb.DatabaseError:
+            return None
+        except KeyError:
+            return None
+    #-------------------------------------------------------------------
+    def get_date_of_first_entry(self, stats_type, shorthash = None):
+        """
+        Returns the timestampe of first logged link or redirect
+
+        | **param** stats_type (str)
+        | **param** shorthash (str) (only needed in combination with
+        |           stats_type == hashredirect
+        | **return** timestamp (datetime)
+        """
+        queries = ({
+            'link'          : """SELECT MIN( `entry_date` )
+                                 FROM `link`
+                                 WHERE `entry_date` > '0000-00-00 00:00:00';""",
+            'redirect'      : """SELECT MIN(`access_time`)
+                                 FROM `access_log`
+                                 WHERE `access_time` > '0000-00-00 00:00:00';""",
+            'hashredirect'  : """SELECT MIN(`access_time`)
+                                 FROM `access_log`, `link`
+                                 WHERE `access_log`.`link_id` = `link`.`link_id`
+                                 AND `link`.`link_shorthash` = '%s';"""})
+        try:
+            conn, cursor = self._get_connection()
+            if stats_type == 'hashredirect':
+                cursor.execute(queries[stats_type] % shorthash)
+            else:
+                cursor.execute(queries[stats_type])
+            result = cursor.fetchone()
+            cursor.close()
+            return result
+        except MySQLdb.DatabaseError:
+            return None
+        except KeyError:
+            return None
+#----------------------------------------------------------------------
+    def get_date_of_last_entry(self, stats_type, shorthash = None):
+        """
+        Returns the timestampe of last logged link or redirect
+
+        | **param** stats_type (str)
+        | **param** shorthash (str) (only needed in combination with
+        |           stats_type == hashredirect
+        | **return** timestamp (datetime)
+        """
+        queries = ({
+            'link'          : """SELECT MAX( `entry_date` )
+                                 FROM `link`
+                                 WHERE `entry_date` > '0000-00-00 00:00:00';""",
+            'redirect'      : """SELECT MAX(`access_time`)
+                                 FROM `access_log`
+                                 WHERE `access_time` > '0000-00-00 00:00:00';""",
+            'hashredirect'  : """SELECT MAX(`access_time`)
+                                 FROM `access_log`, `link`
+                                 WHERE `access_log`.`link_id` = `link`.`link_id`
+                                 AND `link`.`link_shorthash` = '%s';"""})
+        try:
+            conn, cursor = self._get_connection()
+            if stats_type == 'hashredirect':
+                cursor.execute(queries[stats_type] % shorthash)
+            else:
+                cursor.execute(queries[stats_type])
+            result = cursor.fetchone()
+            cursor.close()
+            return result
+        except MySQLdb.DatabaseError:
+            return None
+        except KeyError:
+            return None

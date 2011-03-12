@@ -65,4 +65,3 @@ def sanitize_path(path):
         path = path[0:query_string_start]
     # sanitize path
     return os.path.normpath(path)
-

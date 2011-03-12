@@ -52,7 +52,8 @@ class YuServer(ThreadingMixIn, HTTPServer):
         self.errorlog = errorlog
         self.accesslog = accesslog
         self.hostname = hostname
-        self.resolve_clients = config.get('http', 'resolve_clients')
+        self.resolve_clients = config.getboolean('http', 'resolve_clients')
+        self.log_ip_activated = config.getboolean('main', 'log_ip_activated')
         self._shutdown = Event()
 
     #----------------------------------------------------------------------
@@ -64,4 +65,3 @@ class YuServer(ThreadingMixIn, HTTPServer):
     #----------------------------------------------------------------------
     def shutdown(self):
         self._shutdown.set()
-

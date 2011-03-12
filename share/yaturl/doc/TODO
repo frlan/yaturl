@@ -13,5 +13,10 @@
 	* Some graphics for link statistics
 * General:
 	* Refactor and restructure some code, especially requesthandler.py
+		* Refactor function for sending responses to clean up a bit the mess
 	* Add a REST API or something similar for social networks
-	* Adding a link list available via short URL 
+	* Adding a link list available via short URL
+	* Add a RSS for general NEWS
+	* i18n/l10n for templates and output
+	* Add option to complete disable logging
+	* Add precalculating of statistic data

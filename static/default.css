@@ -92,16 +92,33 @@ BODY, HTML {
 }
 
 #main a{
-	color: lightgray;
+	color: white;
 	font-weight: bold;
+	text-decoration: none;
 }
 
 #main p{
+	padding-left: 1em;
 	padding-top: 1em;
 }
 
 #main h1{
 	padding-top: 1em;
+}
+
+#main h2{
+	padding-top: 1em;
+}
+
+.plainlist {
+	list-style-type:none;
+	margin-left:1em;
+	margin-top:0.5em;
+}
+
+.yaturllist {
+	margin-top: 0.5em;
+	margin-left:2.5em;
 }
 
 .warning {
