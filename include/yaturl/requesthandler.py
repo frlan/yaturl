@@ -49,6 +49,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server):
         self._db = YuDatabase()
         self._logger = get_logger()
+        self._header_only = False
         BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 
     #----------------------------------------------------------------------
@@ -173,7 +174,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     #-------------------------------------------------------------------
-    def _send_response(self, content, code=200, header_only=False):
+    def _send_response(self, content, code=200):
         """
         This function is to be intended to consolidate the
         sending responses to on function.
@@ -182,18 +183,17 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         | **param** content - text of page (str)
         | **param** code - response code e.g. 404 (int)
-        | **param** header_only - whether only headers should be send (bool)
         """
         if content:
             self._send_head(content, code)
-            if header_only == False:
+            if not self._header_only:
                 try:
                     self.wfile.write(content)
                 except socket.error:
                     # clients like to stop reading after they got a 404
                     pass
         else:
-            self._send_internal_server_error(header_only)
+            self._send_internal_server_error()
 
     #-------------------------------------------------------------------
     def _send_301(self, new_url):
@@ -211,11 +211,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self._send_internal_server_error()
 
     #----------------------------------------------------------------------
-    def _send_404(self, header_only=False):
+    def _send_404(self):
         """
         Send HTTP status code 404
-
-        | **param** header_only (bool)
         """
         template_filename = self._get_config_template('404')
         text = read_template(
@@ -223,14 +221,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 title='%s - 404' % SERVER_NAME,
                 header='404 &mdash; Page not found',
                 URL="Nothing")
-        self._send_response(text, 404, header_only)
+        self._send_response(text, 404)
 
     #----------------------------------------------------------------------
-    def _send_internal_server_error(self, header_only=False):
+    def _send_internal_server_error(self):
         """
         Send HTTP status code 500
-
-        | **param** header_only (bool)
         """
         template_filename = self._get_config_template('500')
         text = read_template(
@@ -241,11 +237,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             # fallback to hard-coded template
             text = TEMPLATE_500
         self._send_head(text, 500)
-        if header_only == False:
+        if not self._header_only:
             self.wfile.write(text)
 
     #----------------------------------------------------------------------
-    def _send_database_problem(self, header_only=False):
+    def _send_database_problem(self):
         """
         Send HTTP status code 500 due to a database connection error
 
@@ -260,7 +256,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self._send_internal_server_error()
             return
         self._send_head(text, 500)
-        if header_only == False:
+        if not self._header_only:
             self.wfile.write(text)
 
     #----------------------------------------------------------------------
@@ -398,7 +394,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         return short
 
     #-------------------------------------------------------------------
-    def _show_general_stats(self, header_only=False):
+    def _show_general_stats(self):
         """
         Prints a page with some serice wide statistics.
 
@@ -425,17 +421,17 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 )
         if text:
             self._send_head(text, 200)
-            if header_only == False:
+            if not self._header_only:
                 try:
                     self.wfile.write(text)
                 except socket.error:
                     # clients like to stop reading after they got a 404
                     pass
         else:
-            self._send_internal_server_error(header_only)
+            self._send_internal_server_error()
 
     #-------------------------------------------------------------------
-    def _show_link_stats(self, header_only=False, shorthash=None):
+    def _show_link_stats(self, shorthash=None):
         """
         Shows a page with some statistics for a short URL
 
@@ -445,7 +441,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         # First doing some basis input validation as we don't want to
         # get fucked by the Jesus
         if shorthash == None or not shorthash.isalnum():
-            self._send_404(header_only)
+            self._send_404()
             return
         else:
             blocked = self._db.is_hash_blocked(shorthash)
@@ -456,7 +452,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         title=SERVER_NAME,
                         header=SERVER_NAME,
                         comment=blocked[3])
-                self._send_response(text, 200, header_only)
+                self._send_response(text, 200)
 
             link_stats = YuLinkStats(shorthash)
             # Only proceed if there is a address behind the link,
@@ -476,17 +472,30 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         FIRST_REDIRECT=link_stats.first_redirect,
                         LAST_REDIRECT=link_stats.last_redirect,
                         NUMBER_OF_REDIRECTS=link_stats.number_of_redirects)
-                self._send_response(text, 200, header_only)
+                self._send_response(text, 200)
             else:
-                self._send_404(header_only)
+                self._send_404()
                 return
 
     #----------------------------------------------------------------------
-    def do_GET(self, header_only=False):
+    def do_GET(self):
         """
         GET HTTP request entry point
+        """
+        self._try_to_process_request(self._handle_get_request)
 
-        | **param** header_only (bool)
+    #----------------------------------------------------------------------
+    def _try_to_process_request(self, method):
+        try:
+            method()
+        except Exception, e:
+            self._logger.error(u'An unhandled error occurred: %s' % e, exc_info=True)
+            self._send_internal_server_error()
+
+    #----------------------------------------------------------------------
+    def _handle_get_request(self):
+        """
+        GET HTTP request entry point
         """
         # Homepage and other path ending with /
         # Needs to be extended later with things like FAQ etc.
@@ -533,7 +542,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             header=SERVER_NAME,
                             msg='''<p class="warning">Please check your input.</p>''')
             except YuDatabaseError:
-                self._send_database_problem(header_only)
+                self._send_database_problem()
                 return
             except:
                 if self.path in ('/', '/URLRequest'):
@@ -548,7 +557,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         # Doing general statistics here
                         # Let's hope this page is not getting to popular ....
                         # Create a new stats objekt which is fetching data in background
-                        self._show_general_stats(header_only)
+                        self._show_general_stats()
                         return
                     else:
                         # Check whether we do have the + or the stats kind of URL
@@ -564,8 +573,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                     request_path = self.path[7:]
                                 else:
                                     request_path = self.path[1:]
-                                self._show_link_stats(header_only,
-                                    request_path[:request_path.rfind('+') ])
+                                self._show_link_stats(request_path[:request_path.rfind('+') ])
                                 return
                             except:
                                 # Oopps. Something went wrong. Most likely
@@ -577,7 +585,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             # out stats.
                             splitted = self.path[1:].split('/')
                             try:
-                                self._show_link_stats(header_only, splitted[1])
+                                self._show_link_stats(splitted[1])
                                 return
                             except IndexError:
                                 # Something went wrong. Most likely there was a
@@ -611,7 +619,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             result = self._db.get_link_from_db(request_path[1:])
                             blocked = self._db.is_hash_blocked(request_path[1:])
                         except YuDatabaseError:
-                            self._send_database_problem(header_only)
+                            self._send_database_problem()
                             return
                         if result and blocked == None:
                             if show == True:
@@ -639,15 +647,22 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                         header=SERVER_NAME,
                                         comment=blocked[3])
                         else:
-                            self._send_404(header_only)
+                            self._send_404()
                             return
                     else:
-                        self._send_404(header_only)
+                        self._send_404()
                         return
-        self._send_response(text, 200, header_only)
+        self._send_response(text, 200)
 
     #----------------------------------------------------------------------
     def do_POST(self):
+        """
+        POST HTTP request entry point
+        """
+        self._try_to_process_request(self._handle_post_request)
+
+    #----------------------------------------------------------------------
+    def _handle_post_request(self):
         """
         POST HTTP request entry point
         """
@@ -656,7 +671,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 headers=self.headers,
                 environ={'REQUEST_METHOD':'POST'})
 
-        if self.path == "/URLRequest":
+        if self.path == '/URLRequest':
             # First we check, whether the formular has been filled by
             # something behaving like a bot
             if form.has_key('URL'):
@@ -743,7 +758,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 try:
                     result = self._db.get_link_from_db(short_url)
                 except YuDatabaseError:
-                    self._send_database_problem(header_only=False)
+                    self._send_database_problem()
                     return
                 template_filename = self._get_config_template('showpage')
                 if result:
@@ -771,6 +786,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             return
 
         self._send_response(text, 200)
+
     #----------------------------------------------------------------------
     def do_HEAD(self):
         """
@@ -778,4 +794,14 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         the same as the do_GET at the moment w/o sending the real
         data.... As so, we only need to call do_GET with parameter.
         """
-        self.do_GET(header_only=True)
+        self._try_to_process_request(self._handle_head_request)
+
+    #----------------------------------------------------------------------
+    def _handle_head_request(self):
+        """
+        First attempt to implement HEAD response which is pretty much
+        the same as the do_GET at the moment w/o sending the real
+        data.... As so, we only need to call do_GET with parameter.
+        """
+        self._header_only = True
+        self._handle_get_request()
