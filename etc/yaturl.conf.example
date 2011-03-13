@@ -26,6 +26,8 @@ password: pw
 host: 127.0.0.1
 port: 3306
 database: db_name
+pool_size: 5
+max_overflow: 5
 
 [templates]
 path = share/yaturl/templates/

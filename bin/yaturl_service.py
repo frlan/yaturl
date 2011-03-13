@@ -24,6 +24,7 @@
 from yaturl.thread import YuServerThread
 from yaturl.server import YuServer
 from yaturl.console.manager import ConsoleManager
+from yaturl.database.database import YuDatabase
 from ConfigParser import SafeConfigParser
 from optparse import OptionParser
 from signal import signal, SIGINT, SIGTERM
@@ -257,6 +258,9 @@ def main():
                               'Aborting startup' % (template))
                 # Maybe shutdown can be done a bit nicer.
                 exit(1)
+
+    # set up database
+    YuDatabase.init_connection_pool(config)
 
     server_threads = create_server_threads(config, errorlog, accesslog)
 

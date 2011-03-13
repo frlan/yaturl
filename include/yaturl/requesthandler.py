@@ -27,7 +27,8 @@ import time
 from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
 from urlparse import urlsplit, urlunsplit, urlparse
-from yaturl.db import YuDbError, YuDb
+from yaturl.database.database import YuDatabase
+from yaturl.database.error import YuDatabaseError
 from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPES
 from yaturl.helpers import sanitize_path, read_template
 from yaturl.stats import YuStats, YuLinkStats
@@ -43,12 +44,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def __init__(self, request, client_address, server):
-        self._db = YuDb(server.config, server.errorlog)
+        self._db = YuDatabase(server.config, server.errorlog)
         BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 
     #----------------------------------------------------------------------
     def __del__(self):
-        del self._db
+        self._db.close()
 
     #----------------------------------------------------------------------
     def _get_config_value(self, section, key):
@@ -357,13 +358,13 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             # Begin the response
             try:
                 result = self._db.is_hash_in_db(link_hash)
-            except YuDbError:
+            except YuDatabaseError:
                 # self._send_database_problem()
                 return -1
             if not result:
                 try:
                     short = self._db.add_link_to_db(link_hash, url_new)
-                except YuDbError:
+                except YuDatabaseError:
                     # self._send_database_problem()
                     return -1
             else:
@@ -382,7 +383,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_mail('Collision on SHA found',
                             '%s vs %s' % (url_new, url), self._get_config_value('email', 'toemail'))
                         return -2
-                except YuDbError:
+                except YuDatabaseError:
                     return -1
         else:
             # If there is an issue with the URL given, we want to send over a
@@ -398,6 +399,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         | **param** header_only (bool)
         """
+
         stat = YuStats(self.server)
         template_filename = self._get_config_template('stats')
         text = read_template(
@@ -525,7 +527,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             title=SERVER_NAME,
                             header=SERVER_NAME,
                             msg='''<p class="warning">Please check your input.</p>''')
-            except YuDbError:
+            except YuDatabaseError:
                 self._send_database_problem(header_only)
                 return
             except:
@@ -603,7 +605,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         try:
                             result = self._db.get_link_from_db(request_path[1:])
                             blocked = self._db.is_hash_blocked(request_path[1:])
-                        except YuDbError:
+                        except YuDatabaseError:
                             self._send_database_problem(header_only)
                             return
                         if result and blocked == None:
@@ -735,7 +737,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             if short_url != None and short_url.isalnum():
                 try:
                     result = self._db.get_link_from_db(short_url)
-                except YuDbError:
+                except YuDatabaseError:
                     self._send_database_problem(header_only=False)
                     return
                 template_filename = self._get_config_template('showpage')

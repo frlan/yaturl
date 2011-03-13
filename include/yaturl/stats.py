@@ -19,7 +19,7 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-from yaturl.db import YuDb
+from yaturl.database.database import YuDatabase
 import time
 
 class YuStats:
@@ -27,7 +27,7 @@ class YuStats:
     A class to represent some statistic data for yaturl
     """
     def __init__(self, server):
-        self._db = YuDb(server.config, server.errorlog)
+        self._db = YuDatabase(server.config, server.errorlog)
         self._update()
 
     #-------------------------------------------------------------------
@@ -155,7 +155,7 @@ class YuLinkStats:
     Class to represent the link specific stats
     """
     def __init__(self, server, shorthash):
-        self._db = YuDb(server.config, server.errorlog)
+        self._db = YuDatabase(server.config, server.errorlog)
         if shorthash is not None and self._db is not None:
             link_details = self._db.get_link_details(shorthash)
             if link_details:

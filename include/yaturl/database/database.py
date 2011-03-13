@@ -19,48 +19,24 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
-from yaturl.constants import MYSQL_CONNECTION_POOL_SIZE
-from MySQLdb import DatabaseError
-import sqlalchemy.pool as pool
-import MySQLdb as MySQLdb_orig
-# proxy MySQLdb module to enable SQLAlchemy's connection pooling
-MySQLdb = pool.manage(MySQLdb_orig,
-    pool_size=MYSQL_CONNECTION_POOL_SIZE,
-    max_overflow=5,
-    echo=True)
-
+from yaturl.database.error import YuDatabaseError
+from yaturl.database.pool import factor_database_connection_pool
 from MySQLdb.constants.ER import DUP_ENTRY
-from MySQLdb.constants.CR import SERVER_GONE_ERROR, SERVER_LOST
+from MySQLdb import DatabaseError
 
 
-class YuDbError(DatabaseError):
-    """
-    Generic database error
-    """
-    #----------------------------------------------------------------------
-    def __init__(self, msg):
-        DatabaseError.__init__(self)
-        self._msg = msg
-
-    #----------------------------------------------------------------------
-    def __str__(self):
-        return u"Database Error: %s" % self._msg
-
-
-
-class YuDb(object):
+########################################################################
+class YuDatabase(object):
     """
     Very simple wrapper class around MySQLdb for convenience.
     """
+
+    connection_pool = None
+
     #----------------------------------------------------------------------
     def __init__(self, config, logger):
-        # we don't check whether the config has this item, it is an
-        # error if it is missing
-        self._user = config.get('database', 'user')
-        self._passwd = config.get('database', 'password')
-        self._hostname = config.get('database', 'host')
-        self._port = config.getint('database', 'port')
-        self._database = config.get('database', 'database')
+        self._conn = None
+        self.logger = logger
         if config.has_option:
             self._min_url_length = config.getint('main', 'min_url_length')
             if self._min_url_length < 1:
@@ -68,25 +44,9 @@ class YuDb(object):
         else:
             self._min_url_length = 4
 
-
-        self._conn = None
-        self.logger = logger
-
     #----------------------------------------------------------------------
     def __del__(self):
-        self._close()
-
-    #----------------------------------------------------------------------
-    def _close(self):
-        """
-        Safely close the database connection if it exists.
-        """
-        if self._conn:
-            try:
-                self._conn.close()
-            except MySQLdb.DatabaseError:
-                pass
-            self._conn = None
+        self.close()
 
     #----------------------------------------------------------------------
     def _open(self):
@@ -95,26 +55,8 @@ class YuDb(object):
 
         | **return** conn (SafeMySQLConnection)
         """
-        retry_count = MYSQL_CONNECTION_POOL_SIZE
-        while retry_count > 0:
-            try:
-                conn = MySQLdb.connect(host=self._hostname, db=self._database, user=self._user,
-                    passwd=self._passwd,
-                    port=self._port, use_unicode=True, charset='utf8',
-                    init_command='SET TRANSACTION ISOLATION LEVEL READ COMMITTED')
-                conn.cursor().execute('SET time_zone = "+00:00";')
-            except MySQLdb.DatabaseError, e:
-                if e.args and (e.args[0] == SERVER_GONE_ERROR or e.args[0] == SERVER_LOST) and \
-                        retry_count > 0:
-                    retry_count -= 1
-                    # try again by requesting another connection from the pool
-                    continue
-                else:
-                    self.logger.warn('Database error: %s' % e)
-                    raise YuDbError(str(e))
-            break
-
-        return conn
+        connection = self.connection_pool.connect()
+        return connection
 
     #----------------------------------------------------------------------
     def _get_connection(self):
@@ -128,6 +70,28 @@ class YuDb(object):
 
         cursor = self._conn.cursor()
         return (self._conn, cursor)
+
+    #----------------------------------------------------------------------
+    @classmethod
+    def init_connection_pool(cls, config):
+        cls.connection_pool = factor_database_connection_pool(config)
+
+    #----------------------------------------------------------------------
+    @classmethod
+    def get_connection_pool(cls):
+        return cls.connection_pool
+
+    #-------------------------------------------------------------------------
+    def close(self):
+        """
+        Safely close the database connection if it exists.
+        """
+        if self._conn:
+            try:
+                self._conn.close()
+            except DatabaseError:
+                pass
+            self._conn = None
 
     #-------------------------------------------------------------------------
     def get_short_for_hash_from_db(self, url_hash):
@@ -148,9 +112,9 @@ class YuDb(object):
             cursor.close()
             if result:
                 return result[0]
-        except MySQLdb.DatabaseError, e:
+        except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError(str(e))
+            raise YuDatabaseError(str(e))
 
     #----------------------------------------------------------------------
     def get_link_from_db_by_complete_hash(self, url_hash):
@@ -169,9 +133,9 @@ class YuDb(object):
             cursor.close()
             if result:
                 return result[0]
-        except MySQLdb.DatabaseError, e:
+        except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError(str(e))
+            raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
     def get_link_details(self, shorthash):
@@ -192,9 +156,9 @@ class YuDb(object):
             cursor.close()
             if result:
                 return result
-        except MySQLdb.DatabaseError, e:
+        except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError(str(e))
+            raise YuDatabaseError(str(e))
 
     #----------------------------------------------------------------------
     def get_link_from_db(self, url_hash):
@@ -213,9 +177,9 @@ class YuDb(object):
             cursor.close()
             if result:
                 return result[0]
-        except MySQLdb.DatabaseError, e:
+        except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError(str(e))
+            raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
     def is_hash_in_db(self, url_hash):
@@ -235,9 +199,9 @@ class YuDb(object):
             cursor.close()
             if result:
                 return result[0]
-        except MySQLdb.DatabaseError, e:
+        except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError(str(e))
+            raise YuDatabaseError(str(e))
     #-------------------------------------------------------------------
     def get_link_creation_timestamp(self, shorthash):
         """
@@ -254,9 +218,9 @@ class YuDb(object):
             result = cursor.fetchone()
             cursor.close()
             return result
-        except MySQLdb.DatabaseError, e:
+        except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError(str(e))
+            raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
     def is_shorthash_in_db(self, shorthash):
@@ -276,9 +240,9 @@ class YuDb(object):
             cursor.close()
             if result:
                 return result[0]
-        except MySQLdb.DatabaseError, e:
+        except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError(str(e))
+            raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
     def is_hash_blocked(self, shorthash):
@@ -305,9 +269,9 @@ class YuDb(object):
                 return result
             else:
                 return None
-        except MySQLdb.DatabaseError, e:
+        except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
-            raise YuDbError(str(e))
+            raise YuDatabaseError(str(e))
     #-------------------------------------------------------------------
     def add_link_to_db(self, url_hash, link):
         """
@@ -328,7 +292,7 @@ class YuDb(object):
                 conn.commit()
                 cursor.close()
                 return short
-            except MySQLdb.DatabaseError, e:
+            except DatabaseError, e:
                 if e.args and e.args[0] == DUP_ENTRY:
                     if e[1].endswith("key 2"):
                         return self.get_short_for_hash_from_db(url_hash)
@@ -336,7 +300,7 @@ class YuDb(object):
                         break
                 else:
                     self.logger.warn('Database error: %s' % e)
-                    raise YuDbError(str(e))
+                    raise YuDatabaseError(str(e))
     #-------------------------------------------------------------------
 
     def add_logentry_to_database(self, shorthash):
@@ -353,7 +317,7 @@ class YuDb(object):
                 WHERE link_shorthash = (%s)""",(shorthash))
             conn.commit()
             cursor.close()
-        except MySQLdb.DatabaseError:
+        except DatabaseError:
             pass
 
     #-------------------------------------------------------------------
@@ -375,7 +339,7 @@ class YuDb(object):
                                 ),%s);""" % (shorthash, comment))
             conn.commit()
             cursor.close()
-        except MySQLdb.DatabaseError:
+        except DatabaseError:
             pass
     #-------------------------------------------------------------------
     def get_statistics_for_hash(self, shorthash):
@@ -399,7 +363,7 @@ class YuDb(object):
             result = cursor.fetchone()
             cursor.close()
             return result[0]
-        except MySQLdb.DatabaseError:
+        except DatabaseError:
             pass
     #-------------------------------------------------------------------
     def get_statistics_for_general_redirects(self, time_range):
@@ -449,7 +413,7 @@ class YuDb(object):
                 return result
             else:
                 return result[0]
-        except MySQLdb.DatabaseError:
+        except DatabaseError:
             return None
         except KeyError:
             return None
@@ -502,7 +466,7 @@ class YuDb(object):
                 return result
             else:
                 return result[0]
-        except MySQLdb.DatabaseError:
+        except DatabaseError:
             return None
         except KeyError:
             return None
@@ -536,7 +500,7 @@ class YuDb(object):
             result = cursor.fetchone()
             cursor.close()
             return result
-        except MySQLdb.DatabaseError:
+        except DatabaseError:
             return None
         except KeyError:
             return None
@@ -570,7 +534,7 @@ class YuDb(object):
             result = cursor.fetchone()
             cursor.close()
             return result
-        except MySQLdb.DatabaseError:
+        except DatabaseError:
             return None
         except KeyError:
             return None

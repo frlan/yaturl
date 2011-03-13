@@ -22,7 +22,7 @@
 
 
 from yaturl import start_time
-from yaturl.db import MySQLdb
+from yaturl.database.database import YuDatabase
 from threading import enumerate as thread_enumerate
 from math import floor
 from os import getloadavg, getpid
@@ -97,8 +97,8 @@ class SystemMonitor(object):
 
         | **return** status (str)
         """
-        connection_pool = MySQLdb.get_pool()
-        return connection_pool.status()
+        connection_pool = YuDatabase.get_connection_pool()
+        return connection_pool.status() if connection_pool else None
 
     #----------------------------------------------------------------------
     def get_uptime(self):
