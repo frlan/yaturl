@@ -140,7 +140,7 @@ class TelnetInteractiveConsoleServer(object):
         self.server_sock.listen(5) # backlog a few connections
 
         while not self.has_exit:
-            rl = select.select(self.client_sockets.keys() + [self.server_sock], [], [], 5.0)[0]
+            rl = select.select(self.client_sockets.keys() + [self.server_sock], [], [], 1.0)[0]
             if self.server_sock in rl:
                 rl.remove(self.server_sock) # we process others as normal
                 client, _addr = self.server_sock.accept() # accept the connection
