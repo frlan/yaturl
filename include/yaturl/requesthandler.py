@@ -793,7 +793,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         """
         First attempt to implement HEAD response which is pretty much
         the same as the do_GET at the moment w/o sending the real
-        data.... As so, we only need to call do_GET with parameter.
+        data....
         """
         self._try_to_process_request(self._handle_head_request)
 
@@ -802,7 +802,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         """
         First attempt to implement HEAD response which is pretty much
         the same as the do_GET at the moment w/o sending the real
-        data.... As so, we only need to call do_GET with parameter.
+        data....
         """
         self._header_only = True
         self._handle_get_request()
