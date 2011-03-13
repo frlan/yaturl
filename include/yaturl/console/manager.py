@@ -20,7 +20,7 @@
 # MA 02110-1301, USA.
 
 
-
+from yaturl.helpers.logger import get_error_logger
 from yaturl.console.server import TelnetInteractiveConsoleServer
 from yaturl.console.monitor import SystemMonitor
 
@@ -32,12 +32,12 @@ class ConsoleManager(object):
     """
 
     #----------------------------------------------------------------------
-    def __init__(self, host, port, logger):
+    def __init__(self, host, port):
         """"""
         self._host = host
         self._port = port
         self._locals = None
-        self._logger = logger
+        self._logger = get_error_logger()
         self._telnet_server = TelnetInteractiveConsoleServer(
             self._host, self._port, self._locals, self._logger)
 

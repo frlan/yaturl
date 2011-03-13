@@ -33,7 +33,7 @@ class YuServer(ThreadingMixIn, HTTPServer):
     """
 
     #----------------------------------------------------------------------
-    def __init__(self, config, errorlog, accesslog):
+    def __init__(self, config):
         host = config.get('http', 'host')
         port = config.getint('http', 'port')
         HTTPServer.__init__(self, (host, port), YuRequestHandler)
@@ -49,8 +49,6 @@ class YuServer(ThreadingMixIn, HTTPServer):
 
         # store important information here to be able to access it in the request handler
         self.config = config
-        self.errorlog = errorlog
-        self.accesslog = accesslog
         self.hostname = hostname
         self.resolve_clients = config.getboolean('http', 'resolve_clients')
         self.log_ip_activated = config.getboolean('main', 'log_ip_activated')

@@ -21,6 +21,7 @@
 
 from yaturl.database.error import YuDatabaseError
 from yaturl.database.pool import factor_database_connection_pool
+from yaturl.helpers.logger import get_error_logger
 from MySQLdb.constants.ER import DUP_ENTRY
 from MySQLdb import DatabaseError
 
@@ -34,8 +35,8 @@ class YuDatabase(object):
     connection_pool = None
 
     #----------------------------------------------------------------------
-    def __init__(self, config, logger):
-        self.logger = logger
+    def __init__(self, config):
+        self.logger = get_error_logger()
         self._conn = None
         self._min_url_length = None
         self._set_min_url_lenth(config)

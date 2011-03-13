@@ -32,6 +32,7 @@ from yaturl.database.error import YuDatabaseError
 from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPES
 from yaturl.helpers.path import sanitize_path
 from yaturl.helpers.template import read_template
+from yaturl.helpers.logger import get_access_logger, get_error_logger
 from yaturl.stats import YuStats, YuLinkStats
 
 
@@ -45,7 +46,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def __init__(self, request, client_address, server):
-        self._db = YuDatabase(server.config, server.errorlog)
+        self._db = YuDatabase(server.config)
+        self._logger = get_error_logger()
         BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 
     #----------------------------------------------------------------------
@@ -144,7 +146,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             useragent='"%s"' % useragent
         )
         msg_format = '%(client)s %(identity)s %(user)s [%(timestr)s] %(request)s %(referrer)s %(useragent)s'
-        self.server.accesslog.info(msg_format % values)
+        access_logger = get_access_logger()
+        access_logger.info(msg_format % values)
 
     #----------------------------------------------------------------------
     def _send_head(self, text, code):
@@ -279,7 +282,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             smtp_conn.sendmail(msg['From'], [msg['To']], msg.as_string())
             smtp_conn.quit()
         except (socket.error, SMTPException), e:
-            self.server.errorlog.warn('Mail could not be sent (%s)' % e)
+            self._logger.warn('Mail could not be sent (%s)' % e)
             return False
         return True
 
@@ -401,7 +404,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         | **param** header_only (bool)
         """
 
-        stat = YuStats(self.server)
+        stat = YuStats(self.server.config)
         template_filename = self._get_config_template('stats')
         text = read_template(
                     template_filename,
@@ -454,7 +457,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         comment=blocked[3])
                 self._send_response(text, 200, header_only)
 
-            link_stats = YuLinkStats(self.server, shorthash)
+            link_stats = YuLinkStats(self.server.config, shorthash)
             # Only proceed if there is a address behind the link,
             # else sending a 404
             if link_stats.link_address:

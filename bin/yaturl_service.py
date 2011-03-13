@@ -25,6 +25,7 @@ from yaturl.thread import YuServerThread
 from yaturl.server import YuServer
 from yaturl.console.manager import ConsoleManager
 from yaturl.database.database import YuDatabase
+from yaturl.helpers.logger import get_error_logger
 from ConfigParser import SafeConfigParser
 from optparse import OptionParser
 from signal import signal, SIGINT, SIGTERM
@@ -57,11 +58,6 @@ def setup_options(base_dir, parser):
         dest='daemonize',
         default=True,
         help=u'stay in foreground, do not daemonize')
-
-
-#----------------------------------------------------------------------
-def get_error_logger():
-    return logging.getLogger('errorlog')
 
 
 #----------------------------------------------------------------------
@@ -149,7 +145,7 @@ def create_server_threads(config, errorlog, accesslog):
             return None
         host = config.get('telnet', 'host')
         port = config.getint('telnet', 'port')
-        console_manager = ConsoleManager(host, port, errorlog)
+        console_manager = ConsoleManager(host, port)
         telnet_server_thread = YuServerThread(
             target=console_manager.serve_forever,
             name='Telnet Console Server',
@@ -158,7 +154,7 @@ def create_server_threads(config, errorlog, accesslog):
         return console_manager
 
     def create_http_server():
-        http_server = YuServer(config, errorlog, accesslog)
+        http_server = YuServer(config)
         http_server_thread = YuServerThread(
             target=http_server.serve_forever,
             name='HTTP Server',
