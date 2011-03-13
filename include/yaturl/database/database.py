@@ -19,6 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 
+from yaturl import config
 from yaturl.database.error import YuDatabaseError
 from yaturl.database.pool import factor_database_connection_pool
 from yaturl.helpers.logger import get_error_logger
@@ -35,14 +36,14 @@ class YuDatabase(object):
     connection_pool = None
 
     #----------------------------------------------------------------------
-    def __init__(self, config):
+    def __init__(self):
         self.logger = get_error_logger()
         self._conn = None
         self._min_url_length = None
-        self._set_min_url_lenth(config)
+        self._set_min_url_lenth()
 
     #----------------------------------------------------------------------
-    def _set_min_url_lenth(self, config):
+    def _set_min_url_lenth(self):
         if config.has_option('main', 'min_url_length'):
             self._min_url_length = config.getint('main', 'min_url_length')
 
@@ -78,8 +79,8 @@ class YuDatabase(object):
 
     #----------------------------------------------------------------------
     @classmethod
-    def init_connection_pool(cls, config):
-        cls.connection_pool = factor_database_connection_pool(config)
+    def init_connection_pool(cls):
+        cls.connection_pool = factor_database_connection_pool()
 
     #----------------------------------------------------------------------
     @classmethod

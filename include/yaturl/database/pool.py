@@ -23,13 +23,14 @@
 from MySQLdb import OperationalError, connect
 from MySQLdb.constants.CR import SERVER_GONE_ERROR, SERVER_LOST
 from sqlalchemy.pool import QueuePool
+from yaturl import config
 
 
 ########################################################################
 class ConnectionCreator(object):
 
     #----------------------------------------------------------------------
-    def __init__(self, config):
+    def __init__(self):
         self._user = config.get('database', 'user')
         self._passwd = config.get('database', 'password')
         self._hostname = config.get('database', 'host')
@@ -84,8 +85,8 @@ class FreshConnectionQueuePool(QueuePool):
 
 
 #----------------------------------------------------------------------
-def factor_database_connection_pool(config):
-    creator = ConnectionCreator(config)
+def factor_database_connection_pool():
+    creator = ConnectionCreator()
     pool_size = config.getint('database', 'pool_size')
     max_overflow = config.getint('database', 'max_overflow')
 

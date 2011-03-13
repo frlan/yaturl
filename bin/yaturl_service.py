@@ -21,12 +21,13 @@
 # MA 02110-1301, USA.
 
 
-from yaturl.thread import YuServerThread
-from yaturl.server import YuServer
+from yaturl import config
 from yaturl.console.manager import ConsoleManager
 from yaturl.database.database import YuDatabase
 from yaturl.helpers.logger import get_error_logger
-from ConfigParser import SafeConfigParser
+from yaturl.server import YuServer
+from yaturl.thread import YuServerThread
+import yaturl.constants
 from optparse import OptionParser
 from signal import signal, SIGINT, SIGTERM
 import daemon
@@ -35,7 +36,6 @@ import logging
 import os
 import pwd
 import sys
-import yaturl.constants
 from threading import Event
 
 
@@ -106,7 +106,7 @@ def is_service_running(pid_file_path):
 
 
 #----------------------------------------------------------------------
-def setup_logging(config, name, fmt):
+def setup_logging(name, fmt):
     """
     Set up logging
 
@@ -126,7 +126,7 @@ def setup_logging(config, name, fmt):
 
 
 #----------------------------------------------------------------------
-def create_server_threads(config, errorlog, accesslog):
+def create_server_threads(errorlog, accesslog):
 
     def set_console_manager_locals():
         locals_ = dict(
@@ -154,7 +154,7 @@ def create_server_threads(config, errorlog, accesslog):
         return console_manager
 
     def create_http_server():
-        http_server = YuServer(config)
+        http_server = YuServer()
         http_server_thread = YuServerThread(
             target=http_server.serve_forever,
             name='HTTP Server',
@@ -205,7 +205,6 @@ def main():
     arg_options = option_parser.parse_args()[0]
 
     # configuration
-    config = SafeConfigParser()
     if not os.path.exists(arg_options.config):
         raise RuntimeError(u'Configuration file does not exist')
     config.read(arg_options.config)
@@ -233,8 +232,8 @@ def main():
     thread_watch_timeout = config.getint('main', 'thread_watch_timeout')
 
     # (error) logging
-    accesslog = setup_logging(config, 'accesslog', '%(message)s')
-    errorlog = setup_logging(config, 'errorlog',
+    accesslog = setup_logging('accesslog', '%(message)s')
+    errorlog = setup_logging('errorlog',
         '%(asctime)s: (%(funcName)s():%(lineno)d): %(levelname)s: %(message)s')
     errorlog.info('Application starts up')
 
@@ -255,9 +254,9 @@ def main():
                 exit(1)
 
     # set up database
-    YuDatabase.init_connection_pool(config)
+    YuDatabase.init_connection_pool()
 
-    server_threads = create_server_threads(config, errorlog, accesslog)
+    server_threads = create_server_threads(errorlog, accesslog)
 
     # start server threads
     for server_thread in server_threads:

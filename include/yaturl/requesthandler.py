@@ -27,6 +27,7 @@ import time
 from smtplib import SMTP, SMTPException
 from email.mime.text import MIMEText
 from urlparse import urlsplit, urlunsplit, urlparse
+from yaturl import config
 from yaturl.database.database import YuDatabase
 from yaturl.database.error import YuDatabaseError
 from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPES
@@ -46,7 +47,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
     #----------------------------------------------------------------------
     def __init__(self, request, client_address, server):
-        self._db = YuDatabase(server.config)
+        self._db = YuDatabase()
         self._logger = get_error_logger()
         BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 
@@ -63,7 +64,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         | **param** key (str)
         | **return** value (str)
         """
-        return self.server.config.get(section, key)
+        return config.get(section, key)
 
     #----------------------------------------------------------------------
     def _get_config_template(self, key):
@@ -404,7 +405,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         | **param** header_only (bool)
         """
 
-        stat = YuStats(self.server.config)
+        stat = YuStats()
         template_filename = self._get_config_template('stats')
         text = read_template(
                     template_filename,
@@ -457,7 +458,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         comment=blocked[3])
                 self._send_response(text, 200, header_only)
 
-            link_stats = YuLinkStats(self.server.config, shorthash)
+            link_stats = YuLinkStats(shorthash)
             # Only proceed if there is a address behind the link,
             # else sending a 404
             if link_stats.link_address:

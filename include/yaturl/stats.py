@@ -26,8 +26,8 @@ class YuStats:
     """
     A class to represent some statistic data for yaturl
     """
-    def __init__(self, config):
-        self._db = YuDatabase(config)
+    def __init__(self):
+        self._db = YuDatabase()
         self._update()
 
     #-------------------------------------------------------------------
@@ -154,8 +154,8 @@ class YuLinkStats:
     """
     Class to represent the link specific stats
     """
-    def __init__(self, config, shorthash):
-        self._db = YuDatabase(config)
+    def __init__(self, shorthash):
+        self._db = YuDatabase()
         if shorthash is not None and self._db is not None:
             link_details = self._db.get_link_details(shorthash)
             if link_details:
