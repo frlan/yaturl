@@ -578,6 +578,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             except:
                                 # Oopps. Something went wrong. Most likely
                                 # a malformed link
+                                # TODO raise a (yet to be written) FileNotFoundException
                                 self._send_404()
                                 return
                         else:
