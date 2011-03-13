@@ -21,29 +21,6 @@
 
 
 import os
-from constants import FOOTER, HEADER
-
-
-#----------------------------------------------------------------------
-def read_template(filename, title, header, **values):
-    """
-    Read the template content from the given filename and replace containing
-    template wildcards with the given title, header and the values dictionary.
-
-    | **param** filename (str)
-    | **param** title (str)
-    | **param** header (str)
-    | **param** values (dict)
-    | **return** template_text (str)
-    """
-    head = HEADER % (title, header)
-    try:
-        filep = open(filename, 'r')
-        result = head + filep.read() % values
-        filep.close()
-        return result + FOOTER
-    except IOError:
-        return ''
 
 
 #----------------------------------------------------------------------

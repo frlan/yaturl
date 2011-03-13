@@ -30,7 +30,8 @@ from urlparse import urlsplit, urlunsplit, urlparse
 from yaturl.database.database import YuDatabase
 from yaturl.database.error import YuDatabaseError
 from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPES
-from yaturl.helpers import sanitize_path, read_template
+from yaturl.helpers.path import sanitize_path
+from yaturl.helpers.template import read_template
 from yaturl.stats import YuStats, YuLinkStats
 
 
