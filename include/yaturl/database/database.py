@@ -35,13 +35,17 @@ class YuDatabase(object):
 
     #----------------------------------------------------------------------
     def __init__(self, config, logger):
-        self._conn = None
         self.logger = logger
-        if config.has_option:
+        self._conn = None
+        self._min_url_length = None
+        self._set_min_url_lenth(config)
+
+    #----------------------------------------------------------------------
+    def _set_min_url_lenth(self, config):
+        if config.has_option('main', 'min_url_length'):
             self._min_url_length = config.getint('main', 'min_url_length')
-            if self._min_url_length < 1:
-                self._min_url_length = 4
-        else:
+
+        if not self._min_url_length or self._min_url_length < 1:
             self._min_url_length = 4
 
     #----------------------------------------------------------------------
