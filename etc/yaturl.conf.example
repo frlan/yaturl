@@ -1,8 +1,6 @@
 [main]
 charset: UTF8
 pid_file_path: run/yaturl.pid
-accesslog: log/access.log
-errorlog: log/error.log
 staticdocumentroot: static/
 log_ip_activated: false
 #user: yaturl
@@ -35,3 +33,69 @@ path = share/yaturl/templates/
 [email]
 fromemail: example@example.org
 toemail: example@example.org
+
+
+# loggers
+[loggers]
+keys: root,errorlog,accesslog
+
+[logger_root]
+name: yaturl
+level: DEBUG
+handlers:
+propagate: 1
+qualname: root
+
+[logger_accesslog]
+name: accesslog
+level: DEBUG
+handlers: file_accesslog
+propagate: 1
+qualname: accesslog
+
+[logger_errorlog]
+name: errorlog
+level: DEBUG
+handlers: console,file_errorlog,file_debug
+propagate: 1
+qualname: yaturl
+
+# handlers
+[handlers]
+keys: console,file_accesslog,file_errorlog,file_debug
+
+[handler_console]
+class: StreamHandler
+level: NOTSET
+formatter: complete
+args: (sys.stdout,)
+
+[handler_file_accesslog]
+class: FileHandler
+level: DEBUG
+formatter: accesslog
+args: ('log/access.log', 'a')
+
+[handler_file_errorlog]
+class: FileHandler
+level: WARN
+formatter: errorlog
+args: ('log/error.log', 'a')
+
+[handler_file_debug]
+class: FileHandler
+level: DEBUG
+formatter: complete
+args: ('log/debug.log', 'a')
+
+[formatters]
+keys: accesslog,complete,errorlog
+
+[formatter_accesslog]
+format: %(message)s
+
+[formatter_errorlog]
+format: %(asctime)s: (%(funcName)s():%(lineno)d): %(levelname)s: %(message)s
+
+[formatter_complete]
+format: %(asctime)s %(name)-10s (%(funcName)s():%(lineno)d) %(levelname)+8s %(message)s

@@ -25,8 +25,8 @@ import logging
 
 
 #----------------------------------------------------------------------
-def get_error_logger():
-    return logging.getLogger('errorlog')
+def get_logger():
+    return logging.getLogger('yaturl')
 
 
 #----------------------------------------------------------------------

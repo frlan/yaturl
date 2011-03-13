@@ -15,3 +15,12 @@
         missingok
         compress
 }
+
+/opt/projects/yaturl/log/debug.log {
+        weekly
+        rotate 12
+        copytruncate
+        notifempty
+        missingok
+        compress
+}

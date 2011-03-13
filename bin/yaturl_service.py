@@ -24,7 +24,7 @@
 from yaturl import config
 from yaturl.console.manager import ConsoleManager
 from yaturl.database.database import YuDatabase
-from yaturl.helpers.logger import get_error_logger
+from yaturl.helpers.logger import get_access_logger, get_logger
 from yaturl.server import YuServer
 from yaturl.thread import YuServerThread
 import yaturl.constants
@@ -33,6 +33,7 @@ from signal import signal, SIGINT, SIGTERM
 import daemon
 import errno
 import logging
+import logging.config
 import os
 import pwd
 import sys
@@ -62,7 +63,7 @@ def setup_options(base_dir, parser):
 
 #----------------------------------------------------------------------
 def shutdown():
-    logger = get_error_logger()
+    logger = get_logger()
     logger.info(u'Initiating shutdown')
     shutdown_event.set()
 
@@ -72,7 +73,7 @@ def signal_handler(signum, frame):
     """
     On SIGTERM and SIGINT, trigger shutdown
     """
-    logger = get_error_logger()
+    logger = get_logger()
     logger.info(u'Received signal %s' % signum)
     shutdown()
 
@@ -106,32 +107,17 @@ def is_service_running(pid_file_path):
 
 
 #----------------------------------------------------------------------
-def setup_logging(name, fmt):
-    """
-    Set up logging
-
-    | **param** confg (SafeConfigParser)
-    | **param** name (str)
-    | **param** fmt (str)
-    | **return** logger (logging.Logger)
-    """
-    logger = logging.getLogger(name)
-    handler = logging.FileHandler(config.get('main', name))
-    formatter = logging.Formatter(fmt)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
-
-    return logger
+def setup_logging(options):
+    logging.config.fileConfig(options.config)
 
 
 #----------------------------------------------------------------------
-def create_server_threads(errorlog, accesslog):
+def create_server_threads(logger, accesslog):
 
     def set_console_manager_locals():
         locals_ = dict(
             config=config,
-            errorlog=errorlog,
+            logger=logger,
             accesslog=accesslog,
             http_server=http_server,
             telnet_server=console_manager.get_telnet_server(),
@@ -174,7 +160,7 @@ def create_server_threads(errorlog, accesslog):
 #----------------------------------------------------------------------
 def watch_running_threads(running_threads, timeout=300):
     # watch running threads
-    logger = get_error_logger()
+    logger = get_logger()
     while not shutdown_event.isSet():
         for server_thread in running_threads:
             if not server_thread.isAlive():
@@ -231,11 +217,11 @@ def main():
 
     thread_watch_timeout = config.getint('main', 'thread_watch_timeout')
 
-    # (error) logging
-    accesslog = setup_logging('accesslog', '%(message)s')
-    errorlog = setup_logging('errorlog',
-        '%(asctime)s: (%(funcName)s():%(lineno)d): %(levelname)s: %(message)s')
-    errorlog.info('Application starts up')
+    # logging
+    setup_logging(arg_options)
+    accesslog = get_access_logger()
+    logger = get_logger()
+    logger.info('Application starts up')
 
     # handle signals
     signal(SIGINT,  signal_handler)
@@ -246,9 +232,9 @@ def main():
         for template in yaturl.constants.TEMPLATENAMES:
             tmp_path = config.get('templates', 'path') + template
             if os.path.exists(tmp_path):
-                errorlog.info('Template %s seems to be available. Good.' % (template))
+                logger.info('Template %s seems to be available. Good.' % (template))
             else:
-                errorlog.info('Template %s seems to be missing. '
+                logger.info('Template %s seems to be missing. '
                               'Aborting startup' % (template))
                 # Maybe shutdown can be done a bit nicer.
                 exit(1)
@@ -256,21 +242,21 @@ def main():
     # set up database
     YuDatabase.init_connection_pool()
 
-    server_threads = create_server_threads(errorlog, accesslog)
+    server_threads = create_server_threads(logger, accesslog)
 
     # start server threads
     for server_thread in server_threads:
         server_thread.start()
-        errorlog.info('%s started' % server_thread.getName())
+        logger.info('%s started' % server_thread.getName())
 
     watch_running_threads(server_threads, thread_watch_timeout)
 
-    errorlog.info(u'Shutdown')
+    logger.info(u'Shutdown')
 
     # cleanup
     logging.shutdown()
 
-    return 0
+    exit(0)
 
 
 if __name__ == "__main__":

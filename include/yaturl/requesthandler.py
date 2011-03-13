@@ -33,7 +33,7 @@ from yaturl.database.error import YuDatabaseError
 from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_TYPES
 from yaturl.helpers.path import sanitize_path
 from yaturl.helpers.template import read_template
-from yaturl.helpers.logger import get_access_logger, get_error_logger
+from yaturl.helpers.logger import get_access_logger, get_logger
 from yaturl.stats import YuStats, YuLinkStats
 
 
@@ -48,7 +48,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
     #----------------------------------------------------------------------
     def __init__(self, request, client_address, server):
         self._db = YuDatabase()
-        self._logger = get_error_logger()
+        self._logger = get_logger()
         BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 
     #----------------------------------------------------------------------
