@@ -120,7 +120,6 @@ def setup_logging(config, name, fmt):
     | **return** logger (logging.Logger)
     """
     logger = logging.getLogger(name)
-    # TODO maybe use (Timed)RotatingFileHandler
     handler = logging.FileHandler(config.get('main', name))
     formatter = logging.Formatter(fmt)
     handler.setFormatter(formatter)
