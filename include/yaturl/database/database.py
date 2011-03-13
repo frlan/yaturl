@@ -202,6 +202,7 @@ class YuDatabase(object):
         except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDatabaseError(str(e))
+
     #-------------------------------------------------------------------
     def get_link_creation_timestamp(self, shorthash):
         """
@@ -272,6 +273,7 @@ class YuDatabase(object):
         except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDatabaseError(str(e))
+
     #-------------------------------------------------------------------
     def add_link_to_db(self, url_hash, link):
         """
@@ -301,6 +303,7 @@ class YuDatabase(object):
                 else:
                     self.logger.warn('Database error: %s' % e)
                     raise YuDatabaseError(str(e))
+
     #-------------------------------------------------------------------
 
     def add_logentry_to_database(self, shorthash):
@@ -341,6 +344,7 @@ class YuDatabase(object):
             cursor.close()
         except DatabaseError:
             pass
+
     #-------------------------------------------------------------------
     def get_statistics_for_hash(self, shorthash):
         """
@@ -365,6 +369,7 @@ class YuDatabase(object):
             return result[0]
         except DatabaseError:
             pass
+
     #-------------------------------------------------------------------
     def get_statistics_for_general_redirects(self, time_range):
         """
@@ -470,6 +475,7 @@ class YuDatabase(object):
             return None
         except KeyError:
             return None
+
     #-------------------------------------------------------------------
     def get_date_of_first_entry(self, stats_type, shorthash = None):
         """
@@ -504,6 +510,7 @@ class YuDatabase(object):
             return None
         except KeyError:
             return None
+
 #----------------------------------------------------------------------
     def get_date_of_last_entry(self, stats_type, shorthash = None):
         """
