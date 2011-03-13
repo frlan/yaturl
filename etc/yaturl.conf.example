@@ -37,12 +37,12 @@ toemail: example@example.org
 
 # loggers
 [loggers]
-keys: root,errorlog,accesslog
+keys: root,accesslog
 
 [logger_root]
 name: yaturl
 level: DEBUG
-handlers:
+handlers: console,file_errorlog,file_debug
 propagate: 1
 qualname: root
 
@@ -53,12 +53,6 @@ handlers: file_accesslog
 propagate: 1
 qualname: accesslog
 
-[logger_errorlog]
-name: errorlog
-level: DEBUG
-handlers: console,file_errorlog,file_debug
-propagate: 1
-qualname: yaturl
 
 # handlers
 [handlers]
