@@ -65,17 +65,18 @@ class YuDatabase(object):
         return connection
 
     #----------------------------------------------------------------------
-    def _get_connection(self):
+    def _get_cursor(self):
         """
-        Return the existing connection or open a new one
+        Return a new cursor of the current connection.
+        If there is no current connection, a new one is established, i.e. pulled from the pool.
 
-        | **return** connection, cursor (SafeMySQLConnection, MySQLdb.Cursor)
+        | **return** cursor (MySQLdb.Cursor)
         """
         if not self._conn:
             self._conn = self._open()
 
         cursor = self._conn.cursor()
-        return (self._conn, cursor)
+        return cursor
 
     #----------------------------------------------------------------------
     @classmethod
@@ -100,6 +101,13 @@ class YuDatabase(object):
             self._conn = None
 
     #-------------------------------------------------------------------------
+    def commit(self):
+        """
+        Commit the current transaction
+        """
+        self._conn.commit()
+
+    #-------------------------------------------------------------------------
     def get_short_for_hash_from_db(self, url_hash):
         """
         Checks, whether a short hash is already stored in the
@@ -110,7 +118,7 @@ class YuDatabase(object):
         | **return** short_hash (str)
         """
         try:
-            cursor = self._get_connection()[1]
+            cursor = self._get_cursor()
             cursor.execute('''SELECT `link`.`link_shorthash`
                          FROM `link`
                          WHERE `link`.`link_hash` = %s LIMIT 1''', (url_hash))
@@ -131,7 +139,7 @@ class YuDatabase(object):
         | **return** url (str)
         """
         try:
-            cursor = self._get_connection()[1]
+            cursor = self._get_cursor()
             cursor.execute('''SELECT `link`.`link_link`
                          FROM `link`
                          WHERE `link`.`link_hash` = %s LIMIT 1''', (url_hash))
@@ -149,7 +157,7 @@ class YuDatabase(object):
         Returns a list with complete details of given link.
         """
         try:
-            cursor = self._get_connection()[1]
+            cursor = self._get_cursor()
             cursor.execute('''SELECT `link`.`link_id`,
                                      `link`.`link_shorthash`,
                                      `link`.`link_hash`,
@@ -175,7 +183,7 @@ class YuDatabase(object):
         | **return** url (str)
         """
         try:
-            cursor = self._get_connection()[1]
+            cursor = self._get_cursor()
             cursor.execute('''SELECT `link`.`link_link`
                          FROM `link`
                          WHERE `link`.`link_shorthash` = %s  LIMIT 1 ''', (url_hash))
@@ -197,7 +205,7 @@ class YuDatabase(object):
         | **return** link_id (int)
         """
         try:
-            cursor = self._get_connection()[1]
+            cursor = self._get_cursor()
             cursor.execute('''SELECT `link`.`link_id`
                          FROM `link`
                          WHERE `link`.`link_hash` = %s''', (url_hash))
@@ -218,7 +226,7 @@ class YuDatabase(object):
         | **return** timestamp (datetime)
         """
         try:
-            cursor = self._get_connection()[1]
+            cursor = self._get_cursor()
             cursor.execute('''SELECT `link`.`entry_date`
                          FROM `link`
                          WHERE `link`.`link_shorthash` = %s''', (shorthash))
@@ -239,7 +247,7 @@ class YuDatabase(object):
         | **return** link_id (int)
         """
         try:
-            cursor = self._get_connection()[1]
+            cursor = self._get_cursor()
             cursor.execute('''SELECT `link`.`link_id`
                          FROM `link`
                          WHERE `link`.`link_shorthash` = %s''', (shorthash))
@@ -263,7 +271,7 @@ class YuDatabase(object):
         if not shorthash:
             return None
         try:
-            cursor = self._get_connection()[1]
+            cursor = self._get_cursor()
             cursor.execute('''SELECT `block`.`link_id`,
                                      `link`.`link_shorthash`,
                                      `block`.`entry_date`, `comment`
@@ -292,12 +300,12 @@ class YuDatabase(object):
         for i in range(self._min_url_length, len(url_hash)):
             short = url_hash[:i]
             try:
-                conn, cursor = self._get_connection()
+                cursor = self._get_cursor()
                 cursor.execute("""INSERT INTO `link`
                          (`link_shorthash`,`link_hash`,`link_link`)
                          VALUES (%s, %s, %s)""",
                          (short, url_hash, link))
-                conn.commit()
+                self.commit()
                 cursor.close()
                 return short
             except DatabaseError, e:
@@ -319,12 +327,12 @@ class YuDatabase(object):
         | **param** hash (str)
         """
         try:
-            conn, cursor = self._get_connection()
+            cursor = self._get_cursor()
             cursor.execute("""INSERT into `access_log` (link_id)
                 SELECT link_id
                 FROM link
                 WHERE link_shorthash = (%s)""",(shorthash))
-            conn.commit()
+            self.commit()
             cursor.close()
         except DatabaseError:
             pass
@@ -338,7 +346,7 @@ class YuDatabase(object):
         | **comment** comment (str) -- Reason why link has been blocked
         """
         try:
-            conn, cursor = self._get_connection()
+            cursor = self._get_cursor()
             cursor.execute("""INSERT INTO block( `link_id` , `comment` )
                               VALUES (
                                 (
@@ -346,7 +354,7 @@ class YuDatabase(object):
                                     FROM `link`
                                     WHERE `link`.`link_shorthash` = %s
                                 ),%s);""" % (shorthash, comment))
-            conn.commit()
+            self.commit()
             cursor.close()
         except DatabaseError:
             pass
@@ -360,7 +368,7 @@ class YuDatabase(object):
         | **return** number of usages (int)
         """
         try:
-            conn, cursor = self._get_connection()
+            cursor = self._get_cursor()
             # Is this real a nice way in terms of memory usage at DB?
             cursor.execute("""SELECT count(access_time)
                               FROM access_log left join link on (access_log.link_id = link.link_id)
@@ -416,7 +424,7 @@ class YuDatabase(object):
             'all'       :   """SELECT COUNT(`access_log_id`)
                             FROM `access_log` WHERE 1;"""})
         try:
-            conn, cursor = self._get_connection()
+            cursor = self._get_cursor()
             cursor.execute(queries[time_range])
             result = cursor.fetchall()
             cursor.close()
@@ -469,7 +477,7 @@ class YuDatabase(object):
             'all'       :   """SELECT COUNT(`link_id`)
                             FROM `link` WHERE 1;"""})
         try:
-            conn, cursor = self._get_connection()
+            cursor = self._get_cursor()
             cursor.execute(queries[time_range])
             result = cursor.fetchall()
             cursor.close()
@@ -504,7 +512,7 @@ class YuDatabase(object):
                                  WHERE `access_log`.`link_id` = `link`.`link_id`
                                  AND `link`.`link_shorthash` = '%s';"""})
         try:
-            conn, cursor = self._get_connection()
+            cursor = self._get_cursor()
             if stats_type == 'hashredirect':
                 cursor.execute(queries[stats_type] % shorthash)
             else:
@@ -539,7 +547,7 @@ class YuDatabase(object):
                                  WHERE `access_log`.`link_id` = `link`.`link_id`
                                  AND `link`.`link_shorthash` = '%s';"""})
         try:
-            conn, cursor = self._get_connection()
+            cursor = self._get_cursor()
             if stats_type == 'hashredirect':
                 cursor.execute(queries[stats_type] % shorthash)
             else:
