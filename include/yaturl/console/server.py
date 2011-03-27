@@ -34,7 +34,6 @@ class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
 
     #----------------------------------------------------------------------
     def set_locals(self, locals_):
-        """"""
         if not self._running:
             self.locals_ = locals_
         else:
