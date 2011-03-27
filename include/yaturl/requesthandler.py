@@ -575,10 +575,12 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                     request_path = self.path[1:]
                                 self._show_link_stats(request_path[:request_path.rfind('+') ])
                                 return
-                            except:
+                            except Exception, e:
                                 # Oopps. Something went wrong. Most likely
                                 # a malformed link
                                 # TODO raise a (yet to be written) FileNotFoundException
+                                self._logger.warning(
+                                    u'An exception occurred: %s' % unicode(e), exc_info=True)
                                 self._send_404()
                                 return
                         else:
