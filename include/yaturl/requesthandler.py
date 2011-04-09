@@ -528,8 +528,18 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                     comment=blocked[3])
                     elif tmp:
                         template_filename = self._get_config_template('return')
-                        text = read_template(
+                        if tmp == '1337':
+                            text = read_template(
                                 template_filename,
+                                message = "<p>Hey, you are 1337!</p>",
+                                title='%s - Short URL Result' % SERVER_NAME,
+                                header='new URL',
+                                path = tmp,
+                                hostname = self.server.hostname)
+                        else:
+                            text = read_template(
+                                template_filename,
+                                message = None,
                                 title='%s - Short URL Result' % SERVER_NAME,
                                 header='new URL',
                                 path = tmp,
@@ -702,12 +712,24 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                     comment=blocked[3])
                     else:
                         template_filename = self._get_config_template('return')
-                        text = read_template(
-                                template_filename,
-                                title='%s - Short URL Result' % SERVER_NAME,
-                                header='new URL',
-                                path = tmp,
-                                hostname = self.server.hostname)
+                        if tmp == '1337':
+                            template_filename = self._get_config_template('return')
+                            text = read_template(
+                                    template_filename,
+                                    message = "<p>Hey, you are 1337!</p>",
+                                    title='%s - Short URL Result' % SERVER_NAME,
+                                    header='new URL',
+                                    path = tmp,
+                                    hostname = self.server.hostname)
+                        else:
+                            template_filename = self._get_config_template('return')
+                            text = read_template(
+                                    template_filename,
+                                    message = None,
+                                    title='%s - Short URL Result' % SERVER_NAME,
+                                    header='new URL',
+                                    path = tmp,
+                                    hostname = self.server.hostname)
                 else:
                     # There was a general issue with URL
                     template_filename = self._get_config_template('homepage')
