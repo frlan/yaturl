@@ -334,8 +334,9 @@ class YuDatabase(object):
                 WHERE link_shorthash = (%s)""",(shorthash))
             self.commit()
             cursor.close()
-        except DatabaseError:
-            pass
+        except DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
     def add_blockentry(self, shorthash, comment):
@@ -356,8 +357,9 @@ class YuDatabase(object):
                                 ),%s);""" % (shorthash, comment))
             self.commit()
             cursor.close()
-        except DatabaseError:
-            pass
+        except DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
     def get_statistics_for_hash(self, shorthash):
@@ -381,8 +383,9 @@ class YuDatabase(object):
             result = cursor.fetchone()
             cursor.close()
             return result[0]
-        except DatabaseError:
-            pass
+        except DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
     def get_statistics_for_general_redirects(self, time_range):
