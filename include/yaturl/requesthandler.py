@@ -34,6 +34,7 @@ from yaturl.constants import SERVER_NAME, SERVER_VERSION, TEMPLATE_500, CONTENT_
 from yaturl.helpers.path import sanitize_path
 from yaturl.helpers.template import read_template
 from yaturl.helpers.logger import get_access_logger, get_logger
+from yaturl.helpers.stringformater import format_none
 from yaturl.stats import YuStats, YuLinkStats
 
 
@@ -407,17 +408,17 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     template_filename,
                     title=SERVER_NAME,
                     header=SERVER_NAME,
-                    number_of_links=stat.links_all,
-                    number_of_redirects=stat.redirect_all,
-                    number_of_redirects_today = stat.redirect_today,
-                    number_of_redirects_this_week = stat.redirect_this_week,
-                    number_of_redirects_this_month = stat.redirect_this_month,
-                    number_of_redirects_this_year = stat.redirect_this_year,
-                    number_of_url_today = stat.links_today,
-                    number_of_url_this_week = stat.links_this_week,
-                    number_of_url_this_month = stat.links_this_month,
-                    number_of_url_this_year = stat.links_this_year,
-                    date_of_first_redirect = stat.date_of_first_redirect,
+                    number_of_links=format_none(stat.links_all),
+                    number_of_redirects=format_none(stat.redirect_all),
+                    number_of_redirects_today = format_none(stat.redirect_today),
+                    number_of_redirects_this_week = format_none(stat.redirect_this_week),
+                    number_of_redirects_this_month = format_none(stat.redirect_this_month),
+                    number_of_redirects_this_year = format_none(stat.redirect_this_year),
+                    number_of_url_today = format_none(stat.links_today),
+                    number_of_url_this_week = format_none(stat.links_this_week),
+                    number_of_url_this_month = format_none(stat.links_this_month),
+                    number_of_url_this_year = format_none(stat.links_this_year),
+                    date_of_first_redirect = format_none(stat.date_of_first_redirect),
                 )
         if text:
             self._send_head(text, 200)
