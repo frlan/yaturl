@@ -20,7 +20,8 @@
 #       MA 02110-1301, USA.
 
 from yaturl.database.database import YuDatabase
-import time
+from time import time
+
 
 class YuStats(object):
     """
@@ -49,7 +50,7 @@ class YuStats(object):
         """
         Updates the values of the stats object.
         """
-        self.create_time_stamp = time.clock()
+        self.create_time_stamp = time()
         self.links_today = self._get_links_from_db_today()
         self.links_this_week = self._get_links_from_db_this_week()
         self.links_this_month = self._get_links_from_db_this_month()
