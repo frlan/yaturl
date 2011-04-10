@@ -179,7 +179,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         """
         This function is to be intended to consolidate the
         sending responses to on function.
-        TODO: Synch with self.send_response() function which is
+        TODO: Sync with self.send_response() function which is
               already talking with HTTPServer-interface.
 
         | **param** content - text of page (str)
@@ -531,7 +531,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         if tmp == '1337':
                             text = read_template(
                                 template_filename,
-                                message = "<p>Hey, you are 1337!</p>",
+                                message = '<p>Hey, you are 1337!</p>',
                                 title='%s - Short URL Result' % SERVER_NAME,
                                 header='new URL',
                                 path = tmp,
