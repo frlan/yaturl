@@ -27,6 +27,20 @@ class YuStats:
     A class to represent some statistic data for yaturl
     """
     def __init__(self):
+        self.create_time_stamp = None
+        self.links_today = None
+        self.links_this_week = None
+        self.links_this_month = None
+        self.links_this_year = None
+        self.links_all = None
+        self.redirect_today = None
+        self.redirect_this_week = None
+        self.redirect_this_month = None
+        self.redirect_this_year = None
+        self.redirect_per_week = None
+        self.redirect_all = None
+        self.date_of_first_redirect = None
+        self.date_of_first_link = None
         self._db = YuDatabase()
         self._update()
 
