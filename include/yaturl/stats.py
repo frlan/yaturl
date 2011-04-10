@@ -22,7 +22,7 @@
 from yaturl.database.database import YuDatabase
 import time
 
-class YuStats:
+class YuStats(object):
     """
     A class to represent some statistic data for yaturl
     """
@@ -202,7 +202,7 @@ class YuStats:
         self._update()
 
 
-class YuLinkStats:
+class YuLinkStats(object):
     """
     Class to represent the link specific stats
     """
