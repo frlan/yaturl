@@ -175,6 +175,27 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     #-------------------------------------------------------------------
+    def _send_return_page(self, shorthash):
+        """
+        Send the result page for a new created short URL.
+
+        | **param** shorthash - new shorthash for URL
+        """
+        template_filename = self._get_config_template('return')
+        if shorthash == '1337':
+            messagetext = '<p>Hey, you are 1337!</p>'
+        else:
+            messagetext = ''
+        text = read_template(
+                    template_filename,
+                    message = messagetext,
+                    title='%s - Short URL Result' % SERVER_NAME,
+                    header='new URL',
+                    path = shorthash,
+                    hostname = self.server.hostname)
+        self._send_response(text, 200)
+
+    #-------------------------------------------------------------------
     def _send_response(self, content, code=200):
         """
         This function is to be intended to consolidate the
@@ -527,23 +548,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                     header=SERVER_NAME,
                                     comment=blocked[3])
                     elif tmp:
-                        template_filename = self._get_config_template('return')
-                        if tmp == '1337':
-                            text = read_template(
-                                template_filename,
-                                message = '<p>Hey, you are 1337!</p>',
-                                title='%s - Short URL Result' % SERVER_NAME,
-                                header='new URL',
-                                path = tmp,
-                                hostname = self.server.hostname)
-                        else:
-                            text = read_template(
-                                template_filename,
-                                message = '',
-                                title='%s - Short URL Result' % SERVER_NAME,
-                                header='new URL',
-                                path = tmp,
-                                hostname = self.server.hostname)
+                        self._send_return_page(tmp)
+                        return
                     else:
                         # There was a general issue with URL
                         template_filename = self._get_config_template('homepage')
@@ -711,25 +717,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                     header=SERVER_NAME,
                                     comment=blocked[3])
                     else:
-                        template_filename = self._get_config_template('return')
-                        if tmp == '1337':
-                            template_filename = self._get_config_template('return')
-                            text = read_template(
-                                    template_filename,
-                                    message = "<p>Hey, you are 1337!</p>",
-                                    title='%s - Short URL Result' % SERVER_NAME,
-                                    header='new URL',
-                                    path = tmp,
-                                    hostname = self.server.hostname)
-                        else:
-                            template_filename = self._get_config_template('return')
-                            text = read_template(
-                                    template_filename,
-                                    message = '',
-                                    title='%s - Short URL Result' % SERVER_NAME,
-                                    header='new URL',
-                                    path = tmp,
-                                    hostname = self.server.hostname)
+                        self._send_return_page(tmp)
+                        return
                 else:
                     # There was a general issue with URL
                     template_filename = self._get_config_template('homepage')
