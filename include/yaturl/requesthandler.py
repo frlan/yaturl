@@ -539,7 +539,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         else:
                             text = read_template(
                                 template_filename,
-                                message = None,
+                                message = '',
                                 title='%s - Short URL Result' % SERVER_NAME,
                                 header='new URL',
                                 path = tmp,
@@ -725,7 +725,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                             template_filename = self._get_config_template('return')
                             text = read_template(
                                     template_filename,
-                                    message = None,
+                                    message = '',
                                     title='%s - Short URL Result' % SERVER_NAME,
                                     header='new URL',
                                     path = tmp,
