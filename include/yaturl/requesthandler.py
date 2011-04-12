@@ -175,6 +175,22 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     #-------------------------------------------------------------------
+    def _send_blocked_page(self, reason):
+        """
+        Send a block page which tells the user that the URL has been
+        blocked for some reason.
+
+        | **param** reason Reason, why page has been blocked (str)
+        """
+        template_filename = self._get_config_template('blocked')
+        text = read_template(
+                    template_filename,
+                    title=SERVER_NAME,
+                    header=SERVER_NAME,
+                    comment=reason)
+        self._send_response(text, 200)
+
+    #-------------------------------------------------------------------
     def _send_return_page(self, shorthash):
         """
         Send the result page for a new created short URL.
@@ -468,14 +484,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         else:
             blocked = self._db.is_hash_blocked(shorthash)
             if blocked:
-                template_filename = self._get_config_template('blocked')
-                text = read_template(
-                        template_filename,
-                        title=SERVER_NAME,
-                        header=SERVER_NAME,
-                        comment=blocked[3])
-                self._send_response(text, 200)
-
+                self._send_blocked_page(blocked[3])
+                return
             link_stats = YuLinkStats(shorthash)
             # Only proceed if there is a address behind the link,
             # else sending a 404
@@ -541,12 +551,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         return
                     blocked = self._db.is_hash_blocked(tmp)
                     if blocked:
-                        template_filename = self._get_config_template('blocked')
-                        text = read_template(
-                                    template_filename,
-                                    title=SERVER_NAME,
-                                    header=SERVER_NAME,
-                                    comment=blocked[3])
+                        self._send_blocked_page(blocked[3])
+                        return
                     elif tmp:
                         self._send_return_page(tmp)
                         return
@@ -660,12 +666,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                 self._send_301(result)
                                 return
                         elif blocked:
-                            template_filename = self._get_config_template('blocked')
-                            text = read_template(
-                                        template_filename,
-                                        title=SERVER_NAME,
-                                        header=SERVER_NAME,
-                                        comment=blocked[3])
+                            self._send_blocked_page(blocked[3])
+                            return
                         else:
                             self._send_404()
                             return
@@ -710,12 +712,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         self._send_database_problem()
                         return
                     elif blocked:
-                        template_filename = self._get_config_template('blocked')
-                        text = read_template(
-                                    template_filename,
-                                    title=SERVER_NAME,
-                                    header=SERVER_NAME,
-                                    comment=blocked[3])
+                        self._send_blocked_page(blocked[3])
+                        return
                     else:
                         self._send_return_page(tmp)
                         return
