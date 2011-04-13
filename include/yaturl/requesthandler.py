@@ -173,6 +173,20 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", size)
         self.end_headers()
+    #-------------------------------------------------------------------
+    def _send_homepage(self, message = ''):
+        """
+        Sends the default startpage.
+
+        |**param** message (str) Optional message that should appear on startpage
+        """
+        template_filename = self._get_config_template('homepage')
+        text = read_template(
+            template_filename,
+            title=SERVER_NAME,
+            header=SERVER_NAME,
+            msg=message)
+        self._send_response(text, 200)
 
     #-------------------------------------------------------------------
     def _send_blocked_page(self, reason):
@@ -558,23 +572,15 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         return
                     else:
                         # There was a general issue with URL
-                        template_filename = self._get_config_template('homepage')
-                        text = read_template(
-                            template_filename,
-                            title=SERVER_NAME,
-                            header=SERVER_NAME,
-                            msg='''<p class="warning">Please check your input.</p>''')
+                        self._send_homepage('''<p class="warning">Please check your input.</p>''')
+                        return
             except YuDatabaseError:
                 self._send_database_problem()
                 return
             except:
                 if self.path in ('/', '/URLRequest'):
-                    template_filename = self._get_config_template('homepage')
-                    text = read_template(
-                            template_filename,
-                            title=SERVER_NAME,
-                            header=SERVER_NAME,
-                            msg='')
+                    self._send_homepage()
+                    return
                 elif self.path.startswith('/stats') or self.path.endswith('+'):
                     if self.path == '/stats':
                         # Doing general statistics here
@@ -697,12 +703,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             # First we check, whether the formular has been filled by
             # something behaving like a bot
             if form.has_key('URL'):
-                template_filename = self._get_config_template('homepage')
-                text = read_template(
-                    template_filename,
-                    title=SERVER_NAME,
-                    header=SERVER_NAME,
-                    msg='<p class="warning">Please check your input</p>')
+                self._send_homepage('<p class="warning">Please check your input</p>')
+                return
             else:
                 url = form['real_URL'].value if form.has_key('real_URL') else None
                 tmp = self._insert_url_to_db(url)
@@ -719,12 +721,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         return
                 else:
                     # There was a general issue with URL
-                    template_filename = self._get_config_template('homepage')
-                    text = read_template(
-                        template_filename,
-                        title=SERVER_NAME,
-                        header=SERVER_NAME,
-                        msg='''<p class="warning">Please check your input.</p>''')
+                    self._send_homepage('''<p class="warning">Please check your input.</p>''')
+                    return
         elif self.path == '/ContactUs':
             if form.has_key('URL'):
                 # Here we might have a bot who likes to send the webmaster some spam
