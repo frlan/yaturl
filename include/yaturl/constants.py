@@ -25,7 +25,7 @@ SERVER_NAME = 'yatURL.net'
 SERVER_VERSION = '1.0'
 
 TEMPLATENAMES = ['404', '500', 'contactUsResult', 'databaseerror',
-'homepage', 'return', 'showpage', 'stats', 'statsLink', 'faq']
+'homepage', 'return', 'showpage', 'stats', 'statsLink']
 
 CONTENT_TYPES = ({
     '.css':'text/css',
