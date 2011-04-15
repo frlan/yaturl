@@ -543,8 +543,6 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         """
         GET HTTP request entry point
         """
-        # Homepage and other path ending with /
-        # Needs to be extended later with things like FAQ etc.
         docroot = self._get_config_value('main', 'staticdocumentroot')
         local_path = sanitize_path(self.path)
         path = docroot + local_path
