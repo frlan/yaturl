@@ -74,6 +74,7 @@ BODY, HTML {
 /* element styles for input field */
 #main input {
 	font-size: 1.2em;
+	margin: 3px;
 }
 
 #main textarea{
@@ -93,6 +94,7 @@ BODY, HTML {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 }
+
 #main input.button:hover {
 	background-color: #132F15;
 	border-color:white black black white;
