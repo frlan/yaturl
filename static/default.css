@@ -81,12 +81,25 @@ BODY, HTML {
 	font-size: 1.2em;
 }
 
-#main INPUT button {
-	background: black;
-	color: white;
-	border: none;
+#main input.button{
+	border-color:white black black white;
+	border-style:solid;
+	border-width:1px;
+	background-color: green;
+	padding: 1px;
+	color: black;
+	font-weight: bold;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 }
-
+#main input.button:hover {
+	background-color: #132F15;
+	border-color:white black black white;
+	border-style:solid;
+	border-width:1px;
+	color: white;
+}
 #URL{
 	display:none!important;
 }
