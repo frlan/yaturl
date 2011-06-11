@@ -21,7 +21,7 @@
 	  <em>abcde</em>.</p>
 	  <form action="/Show" method="post">
 	    <p><input name="ShortURL" type="text" size="50"/>
-	      <input type="submit" value="Submit"/></p>
+	      <input class="button" type="submit" value="Submit"/></p>
 	  </form>
 	  <p>
 	</div>
