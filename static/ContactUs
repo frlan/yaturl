@@ -17,13 +17,16 @@
             <form action="/ContactUs" method="post">
                 <table>
                     <tr>
-                        <td>Your email:</td><td><input name="email" type="text" size="50"/> </td>
+                        <td>Your email:</td>
+                        <td><input name="email" type="text" size="50"/> </td>
                     </tr>
                     <tr>
-                        <td>Subject:</td><td><input name="subject" type="text" size="50"/> </td>
+                        <td>Subject:</td>
+                        <td><input name="subject" type="text" size="50"/> </td>
                     </tr>
                     <tr>
-                        <td>Your request:</td><td><textarea name="request" cols="50" rows="10"></textarea> </td>
+                        <td>Your request:</td>
+                        <td><textarea name="request" cols="50" rows="10"></textarea> </td>
                     </tr>
                 </table>
 
