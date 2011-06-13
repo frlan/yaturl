@@ -22,5 +22,5 @@
 				<li>New entries this year: %(number_of_url_this_year)s</li>
 			</ul>
 			<p></p>
-			<p>*: First day of week is Sunday</p>
+			<p>* First day of week is Sunday</p>
 		</div>
