@@ -86,7 +86,7 @@ BODY, HTML {
 	border-color:white black black white;
 	border-style:solid;
 	border-width:1px;
-	background-color: green;
+	background-color: orange;
 	padding: 1px;
 	color: black;
 	font-weight: bold;
@@ -96,12 +96,9 @@ BODY, HTML {
 }
 
 #main input.button:hover {
-	background-color: #132F15;
-	border-color:white black black white;
-	border-style:solid;
-	border-width:1px;
 	color: white;
 }
+
 #URL{
 	display:none!important;
 }
