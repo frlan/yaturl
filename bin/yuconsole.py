@@ -24,7 +24,6 @@
 
 import sys
 from telnetlib import Telnet
-import rlcompleter
 import readline
 import __main__
 
