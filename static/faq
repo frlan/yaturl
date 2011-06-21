@@ -29,6 +29,15 @@
 					<li>Used browser (user-agent, via logfiles)</li>
 				</ul>
 				<p>We do not store any IP-addresses or other personal data.</p>
+
+			<h2><a name="donating"></a>How to donate?</h2>
+				<p>You can donate in many different ways:</p>
+				<ul class="yaturllist">
+					<li>Use the service and spread the world</li>
+					<li>Give <a href="/ContactUs">feedback</a></li>
+					<li><a href="/About#license">Create patches</a> for
+					features or bugs if you can do so</li>
+				</ul>
 		</div>
 
 			<div id="footer"><span><a href="/ContactUs">Contact Us</a>
