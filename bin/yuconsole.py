@@ -28,6 +28,7 @@ import rlcompleter
 import readline
 import __main__
 
+TELNET_TIMEOUT = 30
 
 
 ########################################################################
@@ -35,7 +36,7 @@ class TelnetClient(object):
 
     #----------------------------------------------------------------------
     def __init__(self, host, port):
-        self._client = Telnet(host, port)
+        self._client = Telnet(host, port, timeout=TELNET_TIMEOUT)
         self._prompts = dict(default='>>> ', continous='... ')
         self._prompt_default = self._prompts['default']
         self._prompt_continous = self._prompts['continous']
@@ -73,7 +74,7 @@ class TelnetClient(object):
         'real' locals.
         """
         self._client.write('locals().keys()')
-        received_data = self._client.read_until(self._prompt_default)
+        received_data = self._client.read_until(self._prompt_default, timeout=TELNET_TIMEOUT)
         received_data = received_data[:-4]
         keys = eval(received_data)
         for key in keys:
@@ -82,7 +83,7 @@ class TelnetClient(object):
 
     #----------------------------------------------------------------------
     def _get_initial_prompt(self):
-        received_data = self._client.read_until(self._prompt_default)
+        received_data = self._client.read_until(self._prompt_default, timeout=TELNET_TIMEOUT)
         if sys.stdin.isatty():
             sys.stdout.write(received_data[:-4])
             # do some magic for auto completion
