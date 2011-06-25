@@ -12,6 +12,11 @@
 	* Add support for cookies e.g. to switch and save used CSS file
 	* Some graphics for link statistics
 * General:
+	* Installation script for database etc.
+	* Documentation
+		* Class documentation
+		* Documentation for configuration
+		* Features ala telnet console
 	* Refactor and restructure some code, especially requesthandler.py
 		* Refactor function for sending responses to clean up a bit the mess
 	* Add a REST API or something similar for social networks
