@@ -345,6 +345,8 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         """
         url_split = urlsplit(url)
         try:
+            if url_split.netloc is not None and url_split.netloc.find(" ") > 0:
+                return None
             decoded_netloc = url_split.netloc.decode("utf-8").encode("idna")
             url_parts = (
                 url_split.scheme,
@@ -400,6 +402,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 url = 'http://%s' % (url)
 
             url_new = self._split_url(url)
+
+            if url_new == None:
+                return None
 
             link_hash = self._get_hash(url_new)
 
