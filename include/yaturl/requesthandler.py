@@ -345,7 +345,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         """
         url_split = urlsplit(url)
         try:
-            decoded_netloc = url_split.netloc.decode("utf-8 ").encode("idna")
+            decoded_netloc = url_split.netloc.decode("utf-8").encode("idna")
             url_parts = (
                 url_split.scheme,
                 decoded_netloc,
