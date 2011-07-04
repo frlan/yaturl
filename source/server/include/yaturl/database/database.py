@@ -175,6 +175,25 @@ class YuDatabase(object):
             raise YuDatabaseError(str(e))
 
     #----------------------------------------------------------------------
+    def get_all_links_from_db(self):
+        """
+        Fetches all links from database.
+        Use with care as this might will create a lot of database traffic.
+
+        | **param** url_hash (str)
+        | **return** url (str)
+        """
+        try:
+            cursor = self._get_cursor()
+            cursor.execute('''SELECT * FROM `link`''')
+            result = cursor.fetchall()
+            cursor.close()
+            if result:
+                return result
+        except DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDatabaseError(str(e))
+    #----------------------------------------------------------------------
     def get_link_from_db(self, url_hash):
         """
         Fetches the link from database based on given url_hash
