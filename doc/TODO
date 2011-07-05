@@ -25,3 +25,4 @@
 	* i18n/l10n for templates and output
 	* Add option to complete disable logging
 	* Add precalculating of statistic data
+	* Python 3.x support
