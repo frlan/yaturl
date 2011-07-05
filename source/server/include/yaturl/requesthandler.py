@@ -35,7 +35,8 @@ from yaturl.helpers.path import sanitize_path
 from yaturl.helpers.template import read_template
 from yaturl.helpers.logger import get_access_logger, get_logger
 from yaturl.helpers.stringformater import format_none
-from yaturl.stats.stats import YuStats, YuLinkStats
+from yaturl.stats.stats import YuStats
+from yaturl.stats.linkstats import YuLinkStats
 
 
 class YuRequestHandler(BaseHTTPRequestHandler):
