@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS `access_log` (
   `access_log_id` int(10) unsigned NOT NULL auto_increment,
   `link_id` bigint(20) unsigned NOT NULL,
   `access_time` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `del_time` timestamp NULL DEFAULT NULL,
   PRIMARY KEY  (`access_log_id`),
   KEY `link_id` (`link_id`),
   KEY `access_time` (`access_time`)
