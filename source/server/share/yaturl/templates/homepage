@@ -1,8 +1,17 @@
 		<div id="main">
-			<p>Please insert the URL here:</p>
+			<p><label for="real_URL" accesskey="U">
+				Please insert the <span class="accesskey">U</span>RL here:</label></p>
 			%(msg)s
 				<form action="/URLRequest" method="post">
-					<p><input name="real_URL" type="text" size="50"/>
+					<p>
+						<input
+							id="real_URL"
+							name="real_URL"
+							type="url"
+							size="50"
+							required="required"
+							autofocus
+							placeholder="http://www.example.com/index.html#content" />
 					<input type="text" name="URL" id="URL"/>
 					<input class="button" type="submit" value="Submit URL"/></p>
 				</form>

@@ -17,20 +17,61 @@
             <form action="/ContactUs" method="post">
                 <table>
                     <tr>
-                        <td>Your email:</td>
-                        <td><input name="email" type="text" size="50"/> </td>
+                        <td>
+							<label for="email" accesskey="e">
+								Your <span class="accesskey">e</span>mail:
+							</label>
+						</td>
+                        <td>
+							<input
+								id="email"
+								name="email"
+								type="email"
+								size="50"
+								autofocus="autofocus"
+								placeholder="your.email@example.com"
+								required="required" />
+						</td>
                     </tr>
                     <tr>
-                        <td>Subject:</td>
-                        <td><input name="subject" type="text" size="50"/> </td>
+						<td>
+							<label for="subject" accesskey="s">
+								<span class="accesskey">S</span>ubject:
+							</label>
+						</td>
+                        <td>
+							<input
+								id="subject"
+								name="subject"
+								type="text"
+								size="50"
+								placeholder="Contact Subject"
+								required="required" />
+						</td>
                     </tr>
                     <tr>
-                        <td>Your request:</td>
-                        <td><textarea name="request" cols="50" rows="10"></textarea> </td>
+                        <td>
+							<label for="request" accesskey="r">
+								Your <span class="accesskey">r</span>equest:
+							</label>
+						</td>
+                        <td>
+							<textarea
+								id="request"
+								name="request"
+								cols="50"
+								rows="10"
+								required="required"></textarea>
+						</td>
                     </tr>
                 </table>
 
-                <p><input class="button" type="submit" value="Send request"/>
+                <p>
+					<input
+						id="submit"
+						class="button"
+						type="submit"
+						value="Send request" />
                 <input type="text" name="URL" id="URL"/></p>
             </form>
         </div>
