@@ -41,7 +41,7 @@
                 </label>
               </td>
               <td>
-                <textarea id="request" name="request" cols="50" rows="10" required="required" />
+                <textarea id="request" name="request" cols="50" rows="10" required="required" ></textarea>
               </td>
             </tr>
           </table>
