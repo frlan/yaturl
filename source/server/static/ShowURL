@@ -23,7 +23,6 @@
 	    <p><input name="ShortURL" type="text" size="50"/>
 	      <input class="button" type="submit" value="Submit"/></p>
 	  </form>
-	  <p>
 	</div>
 	<div id="footer"><span>
 	    <a href="/ContactUs">Contact Us</a> &nbsp;&nbsp;
