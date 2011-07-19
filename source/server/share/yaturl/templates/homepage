@@ -10,7 +10,7 @@
 							type="url"
 							size="50"
 							required="required"
-							autofocus
+							autofocus="autofocus"
 							placeholder="http://www.example.com/index.html#content" />
 					<input type="text" name="URL" id="URL"/>
 					<input class="button" type="submit" value="Submit URL"/></p>
