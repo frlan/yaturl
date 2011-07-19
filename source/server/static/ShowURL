@@ -11,26 +11,37 @@
 
 <body>
     <div id="container">
-	<div id="header"><span>Show target URL</span></div>
-	<div id="main">
-	  <p>Please enter a short URL. The target URL of the entered
-	  short URL will be displayed on the next site.
-	  Please enter only the characters after the slash of a
-	  short URL, e.g. <em>http://yaturl.net/abcde</em> gets
-	  <em>abcde</em>.</p>
-	  <form action="/Show" method="post">
-	    <p><input name="ShortURL" type="text" size="50"/>
-	      <input class="button" type="submit" value="Submit"/></p>
-	  </form>
-	</div>
-	<div id="footer"><span>
-	    <a href="/ContactUs">Contact Us</a> &nbsp;&nbsp;
-	    <a href="/About">About</a> &nbsp;&nbsp;
-	    <a href="/faq">F.A.Q.</a> &nbsp;&nbsp;
-	    <a href="/stats">Stats</a> &nbsp;&nbsp;
-	    <a href="/">Home</a></span>
-	</div>
-
+        <div id="header"><span>Show target URL</span></div>
+        <div id="main">
+          <p>Please enter a short URL. The target URL of the entered
+          short URL will be displayed on the next site.
+          Please enter only the characters after the slash of a
+          short URL, e.g. <em>http://yaturl.net/abcde</em> gets
+          <em>abcde</em>.</p>
+            <form action="/Show" method="post">
+                <p>
+                    <input
+                        id="ShortURL"
+                        name="ShortURL"
+                        type="url"
+                        size="50"
+                        required="required"
+                        autofocus="autofocus"
+                        placeholder="abcde" />
+                    <input type="text" name="URL" id="URL"/>
+                    <input class="button" type="submit" value="Submit"/>
+                </p>
+            </form>
+        </div>
+        <div id="footer">
+            <span>
+                <a href="/ContactUs">Contact Us</a> &nbsp;&nbsp;
+                <a href="/About">About</a> &nbsp;&nbsp;
+                <a href="/faq">F.A.Q.</a> &nbsp;&nbsp;
+                <a href="/stats">Stats</a> &nbsp;&nbsp;
+                <a href="/">Home</a>
+            </span>
+        </div>
     </div>
 </body>
 </html>
