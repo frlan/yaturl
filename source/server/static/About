@@ -28,7 +28,7 @@
 
             <p><a href="/">Home</a></p>
 
-            <h1>Development, License and Contribution/Donation <a name="license"></a></h1>
+            <h1 id="license">Development, License and Contribution/Donation</h1>
             <p>Yaturl.net is developed and can be reused under terms
             and conditions of GPLv2+. You can find the source code
             at <a href="http://git.uvena.de/yaturl/">git.uvena.de</a>.</p>
