@@ -39,9 +39,9 @@ TEMPLATE_500 = '''<!DOCTYPE html>
 
 <head>
     <title>yatURL.net - Internal server error</title>
-    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <meta charset="utf-8" />
     <meta name="generator" content="Geany 0.19.1" />
-    <link rel="stylesheet" href="/default.css" type="text/css" />
+    <link rel="stylesheet" href="/default.css" />
     <link rel="shortcut icon" href="/favicon.ico" />
 </head>
 
@@ -71,9 +71,9 @@ HEADER = '''<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 
 <head>
     <title>%s</title>
-    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <meta charset="utf-8" />
     <meta name="generator" content="Geany 0.19.1" />
-    <link rel="stylesheet" href="/default.css" type="text/css" />
+    <link rel="stylesheet" href="/default.css" />
     <link rel="shortcut icon" href="/favicon.ico" />
 </head>
 
