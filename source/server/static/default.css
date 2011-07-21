@@ -63,6 +63,12 @@ BODY, HTML {
 	text-decoration: none;
 }
 
+#footer SPAN A {
+	display: inline-block;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
 /* content area padding to find a nice place for the input field  */
 #main {
 	padding-right: 10%;

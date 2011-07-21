@@ -56,9 +56,9 @@ TEMPLATE_500 = '''<!DOCTYPE html>
 
 FOOTER = '''
             <div id="footer"><span><a href="/ContactUs">Contact Us</a>
-            &#xA0;&#xA0; <a href="/About">About</a> &#xA0;&#xA0;
-            <a href="/faq">F.A.Q.</a> &#xA0;&#xA0;
-            <a href="/stats">Stats</a> &#xA0;&#xA0;
+            <a href="/About">About</a>
+            <a href="/faq">F.A.Q.</a>
+            <a href="/stats">Stats</a>
             <a href="/">Home</a></span></div>
     </div>
 </body>
