@@ -35,10 +35,10 @@
         </div>
         <div id="footer">
             <span>
-                <a href="/ContactUs">Contact Us</a> &nbsp;&nbsp;
-                <a href="/About">About</a> &nbsp;&nbsp;
-                <a href="/faq">F.A.Q.</a> &nbsp;&nbsp;
-                <a href="/stats">Stats</a> &nbsp;&nbsp;
+                <a href="/ContactUs">Contact Us</a> &#xA0;&#xA0;
+                <a href="/About">About</a> &#xA0;&#xA0;
+                <a href="/faq">F.A.Q.</a> &#xA0;&#xA0;
+                <a href="/stats">Stats</a> &#xA0;&#xA0;
                 <a href="/">Home</a>
             </span>
         </div>
