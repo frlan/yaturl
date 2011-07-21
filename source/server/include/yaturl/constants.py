@@ -34,7 +34,7 @@ CONTENT_TYPES = ({
 })
 
 # we need to hard-code this one at least in case of the file cannot be found on disk
-TEMPLATE_500 = '''<!DOCTYPE HTML>
+TEMPLATE_500 = '''<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
