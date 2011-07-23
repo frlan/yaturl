@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS `link` (
   `link_link` varchar(4096) NOT NULL,
   `link_comment` varchar(255) default NULL,
   `entry_date` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `del_time` timestamp NULL DEFAULT NULL,
   PRIMARY KEY  (`link_id`),
   UNIQUE KEY `link_hash` (`link_hash`),
   UNIQUE KEY `link_shorthash` (`link_shorthash`)
