@@ -319,7 +319,6 @@ class YuDatabase(object):
                     raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
-
     def add_logentry_to_database(self, shorthash):
         """
         Creates a log entry inside DB for a given hash.
@@ -361,6 +360,23 @@ class YuDatabase(object):
             self.logger.warn('Database error: %s' % e)
             raise YuDatabaseError(str(e))
 
+    #-------------------------------------------------------------------
+    def mark_link_as_deleted(self, shothash):
+        """
+        Marks a link as deleted inside database
+
+        | **param** shothash (str)
+        """
+        try:
+            cursor = self._get_cursor()
+            cursor.execute("""UPDATE `link`.`deleted` ='Y', `link`.`del_time` = now()
+            FROM `link`
+            WHERE `link`.`link_shorthash` = %s """ % (shorthash))
+            self.commit()
+            cursor.close()
+        except DatabaseError, e:
+            self.logger.warn('Database error: %s' % e)
+            raise YuDatabaseError(str(e))
     #-------------------------------------------------------------------
     def get_statistics_for_hash(self, shorthash):
         """
