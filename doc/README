@@ -1,0 +1,10 @@
+yatURL - yat another tiny URL service
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Dependencies
+############
+
+	* Python >= 2.5
+		* mysqldb
+		* sqlalchemy
+	* MySQL 5 (or similar)
