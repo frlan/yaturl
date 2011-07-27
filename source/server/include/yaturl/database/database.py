@@ -369,9 +369,9 @@ class YuDatabase(object):
         """
         try:
             cursor = self._get_cursor()
-            cursor.execute("""UPDATE `link`.`deleted` ='Y', `link`.`del_time` = now()
-            FROM `link`
-            WHERE `link`.`link_shorthash` = %s """ % (shorthash))
+            cursor.execute("""UPDATE `link`
+                              SET `link`.`deleted` ='Y', `link`.`del_time` = now()
+                              WHERE `link`.`link_shorthash` = %s """ % (shorthash))
             self.commit()
             cursor.close()
         except DatabaseError, e:
