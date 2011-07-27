@@ -26,3 +26,7 @@
 	* Add option to complete disable logging
 	* Add precalculating of statistic data
 	* Python 3.x support
+	* Make most configuration options set by default so configuration file
+	  is only needed to overyride defaults.
+	* Refactor adding links using HTTP GET
+	* Refactor handling for requesting statistics
