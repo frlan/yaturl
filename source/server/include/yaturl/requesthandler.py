@@ -299,7 +299,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
 
         | **param** header_only (bool)
         """
-        template_filename = self._get_config_template('databaserror')
+        template_filename = self._get_config_template('databaseerror')
         text = read_template(
             template_filename,
             title='%s - Datebase error' % SERVER_NAME,
@@ -706,15 +706,19 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 url = form['real_URL'].value if form.has_key('real_URL') else None
                 tmp = self._insert_url_to_db(url)
                 if tmp:
-                    blocked = self._db.is_hash_blocked(tmp)
-                    if tmp < 0:
+                    try:
+                        blocked = self._db.is_hash_blocked(tmp)
+                        if tmp < 0:
+                            self._send_database_problem()
+                            return
+                        elif blocked:
+                            self._send_blocked_page(blocked[3])
+                            return
+                        else:
+                            self._send_return_page(tmp)
+                            return
+                    except YuDatabaseError:
                         self._send_database_problem()
-                        return
-                    elif blocked:
-                        self._send_blocked_page(blocked[3])
-                        return
-                    else:
-                        self._send_return_page(tmp)
                         return
                 else:
                     # There was a general issue with URL
