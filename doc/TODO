@@ -31,3 +31,4 @@
 	* Refactor adding links using HTTP GET
 	* Refactor handling for requesting statistics
 	* Adding tests
+	* Adding support for JSON
