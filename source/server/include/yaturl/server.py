@@ -22,6 +22,7 @@
 
 from BaseHTTPServer import HTTPServer
 from SocketServer import ThreadingMixIn
+from socket import AF_INET, AF_INET6
 from threading import Event
 from yaturl import config
 from yaturl.requesthandler import YuRequestHandler
@@ -37,6 +38,8 @@ class YuServer(ThreadingMixIn, HTTPServer):
     def __init__(self):
         host = config.get('http', 'host')
         port = config.getint('http', 'port')
+
+        self._set_address_family(host)
         HTTPServer.__init__(self, (host, port), YuRequestHandler)
 
         if config.has_option('http', 'hostname'):
@@ -53,6 +56,14 @@ class YuServer(ThreadingMixIn, HTTPServer):
         self.resolve_clients = config.getboolean('http', 'resolve_clients')
         self.log_ip_activated = config.getboolean('main', 'log_ip_activated')
         self._shutdown = Event()
+
+    #----------------------------------------------------------------------
+    def _set_address_family(self, host):
+        """Support IPv6"""
+        if ':' in host:
+            self.address_family = AF_INET6
+        else:
+            self.address_family = AF_INET
 
     #----------------------------------------------------------------------
     def serve_forever(self):
