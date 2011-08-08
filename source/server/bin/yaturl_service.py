@@ -152,7 +152,8 @@ def create_server_threads(logger, accesslog):
 
     http_server = create_http_server()
     console_manager = create_telnet_server()
-    set_console_manager_locals()
+    if console_manager:
+        set_console_manager_locals()
 
     return server_threads
 
