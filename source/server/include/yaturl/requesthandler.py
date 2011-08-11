@@ -577,6 +577,10 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                         # There was a general issue with URL
                         self._send_homepage('''<p class="warning">Please check your input.</p>''')
                         return
+                else:
+                    # There was a general issue with URL
+                    self._send_homepage('''<p class="warning">Please check your input.</p>''')
+                    return
             except YuDatabaseError:
                 self._send_database_problem()
                 return
