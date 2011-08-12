@@ -27,7 +27,7 @@ import console
 class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
 
     #----------------------------------------------------------------------
-    def __init__(self, host='127.0.0.1', port=7070, locals_=None, logger=None):
+    def __init__(self, host='127.0.0.1', port=7070, locals_=None, logger):
         super(TelnetInteractiveConsoleServer, self).__init__(host, port, locals_)
         self._logger = logger
         self._running = False
