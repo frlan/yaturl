@@ -72,6 +72,7 @@ class ConsoleManager(object):
 
     #----------------------------------------------------------------------
     def _start_telnet_server(self):
+        self._logger.debug(u'Telnet Console Server started')
         self._telnet_server.set_locals(self._locals)
         self._telnet_server.accept_interactions()
 
@@ -89,4 +90,5 @@ class ConsoleManager(object):
     #----------------------------------------------------------------------
     def shutdown(self):
         """Initiate shutdown of the telnet server"""
+        self._logger.debug(u'Telnet Console Server stopping')
         self._telnet_server.stop()
