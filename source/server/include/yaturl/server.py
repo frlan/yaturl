@@ -26,6 +26,7 @@ from socket import AF_INET, AF_INET6
 from threading import Event
 from yaturl import config
 from yaturl.requesthandler import YuRequestHandler
+from yaturl.helpers.logger import get_logger
 
 
 ########################################################################
@@ -35,7 +36,7 @@ class YuServer(ThreadingMixIn, HTTPServer):
     """
 
     #----------------------------------------------------------------------
-    def __init__(self):
+    def __init__(self, shutdown_event):
         host = config.get('http', 'host')
         port = config.getint('http', 'port')
 
@@ -55,7 +56,8 @@ class YuServer(ThreadingMixIn, HTTPServer):
         self.hostname = hostname
         self.resolve_clients = config.getboolean('http', 'resolve_clients')
         self.log_ip_activated = config.getboolean('main', 'log_ip_activated')
-        self._shutdown = Event()
+        self._shutdown = shutdown_event
+        self._logger = get_logger()
 
     #----------------------------------------------------------------------
     def _set_address_family(self, host):
@@ -67,10 +69,12 @@ class YuServer(ThreadingMixIn, HTTPServer):
 
     #----------------------------------------------------------------------
     def serve_forever(self):
+        self._logger.info(u'HTTP Server started')
         self.socket.settimeout(0.5)
         while not self._shutdown.isSet():
             self.handle_request()
 
     #----------------------------------------------------------------------
     def shutdown(self):
+        self._logger.debug(u'HTTP Server stopping')
         self._shutdown.set()

@@ -21,15 +21,16 @@
 
 
 import console
+from yaturl.helpers.logger import get_logger
 
 
 ########################################################################
 class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
 
     #----------------------------------------------------------------------
-    def __init__(self, host='127.0.0.1', port=7070, locals_=None, logger=None):
+    def __init__(self, host='127.0.0.1', port=7070, locals_=None):
         super(TelnetInteractiveConsoleServer, self).__init__(host, port, locals_)
-        self._logger = logger
+        self._logger = get_logger()
         self._running = False
 
     #----------------------------------------------------------------------
@@ -47,14 +48,10 @@ class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
     #----------------------------------------------------------------------
     def client_connect(self, client):
         address = client.getpeername()
-        if self._logger:
-            self._logger.info('Client "%s:%s" connected to telnet service' % address)
+        self._logger.info('Client "%s:%s" connected to telnet service' % address)
 
     #----------------------------------------------------------------------
     def client_disconnect(self, client):
         address = client.getpeername()
-        if self._logger:
-            self._logger.info('Client "%s:%s" disconnected from telnet service' % address)
-
-
+        self._logger.info('Client "%s:%s" disconnected from telnet service' % address)
 
