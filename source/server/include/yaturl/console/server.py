@@ -42,6 +42,7 @@ class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
     #----------------------------------------------------------------------
     def accept_interactions(self):
         self._running = True
+        self._logger.debug(u'Telnet Console Server started')
         super(TelnetInteractiveConsoleServer, self).accept_interactions()
 
     #----------------------------------------------------------------------
