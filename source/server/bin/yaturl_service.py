@@ -57,6 +57,7 @@ class YuBaseApp(object):
         self._options = None
         self._pid_file_path = None
         self._server_threads = list()
+        self._telnet_server_thread = None
         self._thread_watchdog_timeout = None
 
     #----------------------------------------------------------------------
@@ -196,11 +197,11 @@ class YuBaseApp(object):
 
     #----------------------------------------------------------------------
     def _start_telnet_server_manually(self):
-        if self._console_manager is not None:
+        if self._telnet_server_thread is not None and self._telnet_server_thread.isAlive():
             self._logger.warn(u'Telnet server is already running, ignoring the start request')
         else:
-            thread = self._create_telnet_server(mandatory=False)
-            thread.start()
+            self._telnet_server_thread = self._create_telnet_server(mandatory=False)
+            self._telnet_server_thread.start()
 
     #----------------------------------------------------------------------
     def _setup_database(self):
@@ -255,7 +256,8 @@ class YuBaseApp(object):
     #----------------------------------------------------------------------
     def _create_telnet_server_if_necessary(self):
         if config.getboolean('telnet', 'enable'):
-            self._create_telnet_server()
+            thread = self._create_telnet_server()
+            self._telnet_server_thread = thread
 
     #----------------------------------------------------------------------
     def _create_telnet_server(self, mandatory=True):
