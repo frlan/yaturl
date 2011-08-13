@@ -213,6 +213,21 @@ class YuBaseApp(object):
 
     #----------------------------------------------------------------------
     def start(self):
+        try:
+            self._try_to_start()
+        except Exception, e:
+            self._logger.error(u'An error occurred: %s' % e, exc_info=True)
+            # try to shutdown ourselves as clean as possible and just see how far it goes
+            try:
+                self.shutdown()
+            except:
+                pass
+            return 1
+        else:
+            return 0
+
+    #----------------------------------------------------------------------
+    def _try_to_start(self):
         # prepare
         self._create_http_server()
         self._create_telnet_server_if_necessary()
@@ -313,15 +328,11 @@ def main():
         app.setup()
     except Exception, e:
         print >> sys.stderr, u'Application Setup Error: %s' % unicode(e)
-        exit(1)
+        exit(2)
 
-    try:
-        app.start()
-    except Exception, e:
-        print >> sys.stderr, u'Application Startup Error: %s' % unicode(e)
-        exit(1)
+    exit_code = app.start()
 
-    exit(0)
+    exit(exit_code)
 
 
 if __name__ == "__main__":
