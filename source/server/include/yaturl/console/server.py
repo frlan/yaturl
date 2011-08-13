@@ -21,6 +21,7 @@
 
 
 import console
+from socket import error as SocketError
 from yaturl.helpers.logger import get_logger
 
 
@@ -44,6 +45,12 @@ class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
     def accept_interactions(self):
         self._running = True
         super(TelnetInteractiveConsoleServer, self).accept_interactions()
+        # this is a bug in TelnetInteractiveConsoleServer, the socket isn't close, so we do
+        # here until it is fixed upstream
+        try:
+            self.server_sock.close()
+        except SocketError:
+            pass
 
     #----------------------------------------------------------------------
     def client_connect(self, client):
