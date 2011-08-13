@@ -29,7 +29,7 @@ from yaturl.server import YuServer
 from yaturl.thread import YuServerThread
 from yaturl.constants import TEMPLATENAMES
 from optparse import OptionParser
-from signal import signal, SIGINT, SIGTERM
+from signal import signal, SIGINT, SIGTERM, SIGUSR1
 import daemon
 import errno
 import logging
@@ -182,11 +182,25 @@ class YuBaseApp(object):
     def _setup_signal_handler(self):
         signal(SIGINT,  self._signal_handler)
         signal(SIGTERM, self._signal_handler)
+        signal(SIGUSR1, self._signal_handler)
 
     #----------------------------------------------------------------------
     def _signal_handler(self, signum, frame):
         self._logger.info(u'Received signal %s' % signum)
-        self.shutdown()
+        if signum in (SIGINT, SIGTERM):
+            self.shutdown()
+        elif signum == SIGUSR1:
+            self._start_telnet_server_manually()
+        else:
+            raise RuntimeError(u'Unhandled signal received')
+
+    #----------------------------------------------------------------------
+    def _start_telnet_server_manually(self):
+        if self._console_manager is not None:
+            self._logger.warn(u'Telnet server is already running, ignoring the start request')
+        else:
+            thread = self._create_telnet_server(mandatory=False)
+            thread.start()
 
     #----------------------------------------------------------------------
     def _setup_database(self):
@@ -213,13 +227,15 @@ class YuBaseApp(object):
     def _create_http_server(self):
         self._http_server = YuServer(shutdown_event)
         target = self._http_server.serve_forever
-        self._create_server_thread(u'HTTP Server', target, self._http_server)
+        thread = self._create_server_thread(u'HTTP Server', target, self._http_server)
+        return thread
 
     #----------------------------------------------------------------------
-    def _create_server_thread(self, name, target, instance):
-        thread = YuServerThread(target=target, name=name, instance=instance)
+    def _create_server_thread(self, name, target, instance, mandatory=True):
+        thread = YuServerThread(target=target, name=name, instance=instance, mandatory=mandatory)
         # register this thread
         self._server_threads.append(thread)
+        return thread
 
     #----------------------------------------------------------------------
     def _create_telnet_server_if_necessary(self):
@@ -227,11 +243,13 @@ class YuBaseApp(object):
             self._create_telnet_server()
 
     #----------------------------------------------------------------------
-    def _create_telnet_server(self):
+    def _create_telnet_server(self, mandatory=True):
         self._console_manager = ConsoleManager()
         target = self._console_manager.serve_forever
-        self._create_server_thread('Telnet Console Server', target, self._console_manager)
+        thread = self._create_server_thread(
+            'Telnet Console Server', target, self._console_manager, mandatory)
         self._setup_console_manager_locals()
+        return thread
 
     #----------------------------------------------------------------------
     def _setup_console_manager_locals(self):
@@ -255,11 +273,20 @@ class YuBaseApp(object):
     def _start_thread_watchdog(self):
         """watch running threads, shutdown if there are no more running threads"""
         while not shutdown_event.isSet():
-            for server_thread in self._server_threads:
+            # copy the list to be able to modify it during iterating
+            running_threads = list(self._server_threads)
+            for server_thread in running_threads:
                 if not server_thread.isAlive():
                     thread_name = server_thread.getName()
-                    self._logger.error(u'Server thread "%s" died, shutting down' % thread_name)
-                    shutdown_event.set()
+                    if server_thread.is_mandatory():
+                        self._logger.error(u'Server thread "%s" died, shutting down' % thread_name)
+                        shutdown_event.set()
+                    else:
+                        self._logger.warn(
+                            u'Server thread "%s" died, removing it from the list of active threads'\
+                                % thread_name)
+                        self._server_threads.remove(server_thread)
+            # wait for next check
             shutdown_event.wait(self._thread_watchdog_timeout)
 
         # stop remaining threads

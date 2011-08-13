@@ -28,11 +28,17 @@ class YuServerThread(Thread):
     """"""
 
     #----------------------------------------------------------------------
-    def __init__(self, instance=None, **kwargs):
+    def __init__(self, instance=None, mandatory=True, **kwargs):
         self._instance = instance
+        self._mandatory = mandatory
         super(YuServerThread, self).__init__(**kwargs)
 
     #----------------------------------------------------------------------
     def shutdown(self):
         if self._instance:
             self._instance.shutdown()
+
+    #----------------------------------------------------------------------
+    def is_mandatory(self):
+        """Returns whether this thread is mandatory to be alive or not"""
+        return self._mandatory
