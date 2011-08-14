@@ -73,7 +73,7 @@ args: ('log/access.log', 'a')
 [handler_file_errorlog]
 class: FileHandler
 level: WARN
-formatter: errorlog
+formatter: complete
 args: ('log/error.log', 'a')
 
 [handler_file_debug]
@@ -83,13 +83,10 @@ formatter: complete
 args: ('log/debug.log', 'a')
 
 [formatters]
-keys: accesslog,complete,errorlog
+keys: accesslog,complete
 
 [formatter_accesslog]
 format: %(message)s
 
-[formatter_errorlog]
-format: %(asctime)s: (%(funcName)s():%(lineno)d): %(levelname)s: %(message)s
-
 [formatter_complete]
-format: %(asctime)s %(name)-10s (%(funcName)s():%(lineno)d) %(levelname)+8s %(message)s
+format: %(asctime)s %(threadName)-30s (%(funcName)+30s():%(lineno)-5d): %(levelname)+8s %(message)s
