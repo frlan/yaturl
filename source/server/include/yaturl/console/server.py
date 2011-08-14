@@ -21,7 +21,6 @@
 
 
 import console
-from socket import error as SocketError
 from yaturl.helpers.logger import get_logger
 
 
@@ -29,15 +28,15 @@ from yaturl.helpers.logger import get_logger
 class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
 
     #----------------------------------------------------------------------
-    def __init__(self, host='127.0.0.1', port=7070, locals_=None):
-        super(TelnetInteractiveConsoleServer, self).__init__(host, port, locals_)
+    def __init__(self, host='127.0.0.1', port=7070, locals=None):
+        super(TelnetInteractiveConsoleServer, self).__init__(host, port, locals)
         self._logger = get_logger()
         self._running = False
 
     #----------------------------------------------------------------------
-    def set_locals(self, locals_):
+    def set_locals(self, locals):
         if not self._running:
-            self.locals_ = locals_
+            self.locals = locals
         else:
             raise ValueError, 'Server already started'
 
@@ -45,12 +44,6 @@ class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
     def accept_interactions(self):
         self._running = True
         super(TelnetInteractiveConsoleServer, self).accept_interactions()
-        # this is a bug in TelnetInteractiveConsoleServer, the socket isn't close, so we do
-        # here until it is fixed upstream
-        try:
-            self.server_sock.close()
-        except SocketError:
-            pass
 
     #----------------------------------------------------------------------
     def client_connect(self, client):
