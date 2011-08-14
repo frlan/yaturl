@@ -30,7 +30,7 @@ class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
 
     #----------------------------------------------------------------------
     def __init__(self, host='127.0.0.1', port=7070, locals=None):
-        super(TelnetInteractiveConsoleServer, self).__init__(host, port, locals)
+        super(TelnetInteractiveConsoleServer, self).__init__(host, port, locals, select_timeout=0.5)
         self._logger = get_logger()
         self._running = False
 
