@@ -45,8 +45,7 @@ class TelnetClient(object):
     def _read_input(self):
         prompt = self._next_prompt if sys.stdin.isatty() else ''
         data_to_send = str(raw_input(prompt))
-        if not data_to_send:
-            data_to_send = '\n'
+        data_to_send += '\n'
         return data_to_send
 
     #----------------------------------------------------------------------
@@ -72,7 +71,7 @@ class TelnetClient(object):
         into the local main namespace to get them auto completed as they were
         'real' locals.
         """
-        self._client.write('locals().keys()')
+        self._client.write('locals().keys()\n')
         received_data = self._client.read_until(self._prompt_default, timeout=TELNET_TIMEOUT)
         received_data = received_data[:-4]
         keys = eval(received_data)
@@ -94,7 +93,7 @@ class TelnetClient(object):
     #----------------------------------------------------------------------
     def _run(self):
         self._get_initial_prompt()
-        while 1:
+        while True:
             if self._have_prompt():
                 data_to_send = self._read_input()
                 if data_to_send:
