@@ -20,8 +20,9 @@
 # MA 02110-1301, USA.
 
 
-import console
+from socket import error as SocketError
 from yaturl.helpers.logger import get_logger
+import console
 
 
 ########################################################################
@@ -47,11 +48,18 @@ class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
 
     #----------------------------------------------------------------------
     def client_connect(self, client):
-        address = client.getpeername()
+        address = self._get_client_address(client)
         self._logger.info('Client "%s:%s" connected to telnet service' % address)
 
     #----------------------------------------------------------------------
     def client_disconnect(self, client):
-        address = client.getpeername()
+        address = self._get_client_address(client)
         self._logger.info('Client "%s:%s" disconnected from telnet service' % address)
 
+    #----------------------------------------------------------------------
+    def _get_client_address(self, client):
+        try:
+            return client.getpeername()
+        except SocketError:
+            return u'unknown'
+        
