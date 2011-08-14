@@ -22,10 +22,11 @@
 
 
 
-import sys
 from telnetlib import Telnet
-import readline
 import __main__
+import readline
+import rlcompleter
+import sys
 
 TELNET_TIMEOUT = 30
 
