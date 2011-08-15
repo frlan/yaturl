@@ -125,8 +125,9 @@ class YuBaseApp(object):
     def _set_uid(self):
         if config.has_option('main', 'user'):
             name = config.get('main', 'user')
-            uid = pwd.getpwnam(name)[2]
-            os.setuid(uid)
+            if name:
+                uid = pwd.getpwnam(name)[2]
+                os.setuid(uid)
 
     #----------------------------------------------------------------------
     def _setup_logging(self):
