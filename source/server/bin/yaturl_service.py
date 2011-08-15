@@ -51,6 +51,7 @@ class YuBaseApp(object):
     def __init__(self):
         self._access_logger = None
         self._base_dir = None
+        self._config_files = None
         self._console_manager = None
         self._http_server = None
         self._logger = None
@@ -104,7 +105,13 @@ class YuBaseApp(object):
     def _setup_config(self):
         if not os.path.exists(self._options.config):
             raise RuntimeError(u'Configuration file does not exist')
-        config.read(self._options.config)
+        # build filename for local config to override default values
+        config_path, config_filename = os.path.split(self._options.config)
+        local_config_filename = u'%s-local%s' % os.path.splitext(config_filename)
+        local_config_path = os.path.join(config_path, local_config_filename)
+        # read config files
+        self._config_files = [self._options.config, local_config_path]
+        config.read(self._config_files)
 
     #----------------------------------------------------------------------
     def _check_templates(self):
@@ -123,7 +130,7 @@ class YuBaseApp(object):
 
     #----------------------------------------------------------------------
     def _setup_logging(self):
-        logging.config.fileConfig(self._options.config)
+        logging.config.fileConfig(self._config_files)
         self._access_logger = get_access_logger()
         self._logger = get_logger()
         self._logger.info('Application starts up')
