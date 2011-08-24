@@ -73,6 +73,7 @@ class YuBaseApp(object):
         self._check_already_running()
         self._write_pidfile()
         self._setup_logging()
+        self._setup_database()
         self._setup_thread_watchdog()
         self._setup_signal_handler()
 
