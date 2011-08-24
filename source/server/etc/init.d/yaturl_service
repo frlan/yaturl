@@ -14,10 +14,12 @@
 # Short-Description: Start the yaturl server
 ### END INIT INFO
 
-DAEMON=/opt/projects/yaturl/bin/yaturl_service.py
-PIDFILE=/opt/projects/yaturl/run/yaturl.pid
+
+BASEPATH=/opt/projects/yaturl
+DAEMON=$BASEPATH/bin/yaturl_service.py
+PIDFILE=$BASEPATH/run/yaturl.pid
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-PYTHONPATH="/opt/projects/yaturl/include:${PYTHONPATH}"
+PYTHONPATH="$BASEPATH/include:${PYTHONPATH}"
 LC_ALL="en_US.UTF-8"
 
 test -x "${DAEMON}" || exit 0
