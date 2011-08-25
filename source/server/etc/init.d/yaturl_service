@@ -44,7 +44,7 @@ test -x "${DAEMON}" || exit 0
 server_start () {
     log_begin_msg "Starting yaturl daemon"
     export LC_ALL PYTHONPATH
-    start-stop-daemon --start --pidfile "${PIDFILE}" --startas "${DAEMON}"
+    start-stop-daemon --start --pidfile "${PIDFILE}" --startas "${DAEMON}" -d "${BASEPATH}"
     log_end_msg "${?}"
 }
 
