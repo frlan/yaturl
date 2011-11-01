@@ -478,13 +478,13 @@ class YuDatabase(object):
             'this_week' :   """SELECT COUNT(`link_id`)
                             FROM `link`
                             WHERE
-                                WEEK(`entry_date`) = WEEK(CURDATE())
-                            AND YEAR('entry_date') = YEAR(CURDATE());""",
+                                YEAR(CURDATE()) = YEAR(`entry_date`)
+                            AND WEEK(CURDATE()) = WEEK(`entry_date`);""",
             'this_month' :  """SELECT COUNT(`link_id`)
                             FROM `link`
                             WHERE
-                                MONTH(`access_time`) = MONTH(CURDATE())
-                            AND YEAR(`access_time`) = YEAR(CURDATE());""",
+                                YEAR(CURDATE()) = YEAR(`entry_date`)
+                            AND MONTH(CURDATE()) = MONTH(`entry_date`);""",
             'per_week'  :   """SELECT YEAR(`entry_date`), WEEK(`entry_date`),
                             COUNT(`link_id`)
                             FROM `link`
