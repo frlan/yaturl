@@ -477,10 +477,14 @@ class YuDatabase(object):
                             WHERE YEAR(`entry_date`) = YEAR(CURDATE());""",
             'this_week' :   """SELECT COUNT(`link_id`)
                             FROM `link`
-                            WHERE WEEK(`entry_date`) = WEEK(CURDATE());""",
+                            WHERE
+                                WEEK(`entry_date`) = WEEK(CURDATE())
+                            AND YEAR('entry_date') = YEAR(CURDATE());""",
             'this_month' :  """SELECT COUNT(`link_id`)
                             FROM `link`
-                            WHERE MONTH(`entry_date`) = MONTH(CURDATE());""",
+                            WHERE
+                                MONTH(`access_time`) = MONTH(CURDATE())
+                            AND YEAR(`access_time`) = YEAR(CURDATE());""",
             'per_week'  :   """SELECT YEAR(`entry_date`), WEEK(`entry_date`),
                             COUNT(`link_id`)
                             FROM `link`
