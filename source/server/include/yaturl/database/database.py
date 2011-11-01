@@ -420,13 +420,13 @@ class YuDatabase(object):
                             WHERE YEAR(`access_time`) = YEAR(CURDATE());""",
             'this_week' :   """SELECT COUNT(`access_log_id`)
                             FROM `access_log`
-                            WHERE 
-								WEEK(`access_time`) = WEEK(CURDATE())
-							AND YEAR(`access_time`) = YEAR(CURDATE());""",
+                            WHERE
+                                WEEK(`access_time`) = WEEK(CURDATE())
+                            AND YEAR(`access_time`) = YEAR(CURDATE());""",
             'this_month':   """SELECT COUNT(`access_log_id`)
                             FROM `access_log`
-                            WHERE 
-								MONTH(`access_time`) = MONTH(CURDATE())
+                            WHERE
+                                MONTH(`access_time`) = MONTH(CURDATE())
                             AND YEAR(`access_time`) = YEAR(CURDATE());""",
             'per_week'  :   """SELECT YEAR(`access_time`), WEEK(`access_time`),
                             COUNT(`access_log_id`)
