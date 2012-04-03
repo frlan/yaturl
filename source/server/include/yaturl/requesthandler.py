@@ -333,7 +333,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             smtp_conn.sendmail(msg['From'], [msg['To']], msg.as_string())
             smtp_conn.quit()
         except (socket.error, SMTPException), e:
-            self._logger.warn('Mail could not be sent (%s)' % e)
+            self._logger.error('Mail could not be sent (%s)' % e)
             return False
         return True
 
@@ -630,7 +630,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                 # Oopps. Something went wrong. Most likely
                                 # a malformed link
                                 # TODO raise a (yet to be written) FileNotFoundException
-                                self._logger.warning(
+                                self._logger.error(
                                     u'An exception occurred: %s' % unicode(e), exc_info=True)
                                 self._send_404()
                                 return

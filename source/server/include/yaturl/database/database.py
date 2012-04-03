@@ -127,7 +127,7 @@ class YuDatabase(object):
             if result:
                 return result[0]
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #----------------------------------------------------------------------
@@ -148,7 +148,7 @@ class YuDatabase(object):
             if result:
                 return result[0]
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
@@ -171,7 +171,7 @@ class YuDatabase(object):
             if result:
                 return result
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #----------------------------------------------------------------------
@@ -192,7 +192,7 @@ class YuDatabase(object):
             if result:
                 return result[0]
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
@@ -214,7 +214,7 @@ class YuDatabase(object):
             if result:
                 return result[0]
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
@@ -234,7 +234,7 @@ class YuDatabase(object):
             cursor.close()
             return result
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
@@ -256,7 +256,7 @@ class YuDatabase(object):
             if result:
                 return result[0]
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
@@ -285,7 +285,7 @@ class YuDatabase(object):
             else:
                 return None
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
@@ -315,7 +315,7 @@ class YuDatabase(object):
                     if e[1].endswith("key 1"):
                         break
                 else:
-                    self.logger.warn('Database error: %s' % e)
+                    self.logger.error('Database error: %s' % e, exc_info=True)
                     raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
@@ -334,7 +334,7 @@ class YuDatabase(object):
             self.commit()
             cursor.close()
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
@@ -357,7 +357,7 @@ class YuDatabase(object):
             self.commit()
             cursor.close()
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
@@ -375,7 +375,7 @@ class YuDatabase(object):
             self.commit()
             cursor.close()
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
@@ -401,7 +401,7 @@ class YuDatabase(object):
             cursor.close()
             return result[0]
         except DatabaseError, e:
-            self.logger.warn('Database error: %s' % e)
+            self.logger.error('Database error: %s' % e, exc_info=True)
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
