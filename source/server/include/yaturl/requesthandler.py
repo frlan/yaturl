@@ -20,6 +20,7 @@
 # MA 02110-1301, USA.
 
 from BaseHTTPServer import BaseHTTPRequestHandler
+import errno
 import socket
 import cgi
 import hashlib
@@ -540,8 +541,21 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         try:
             method()
         except Exception, e:
-            self._logger.error(u'An unhandled error occurred: %s' % e, exc_info=True)
+            if self._exception_is_important(e):
+                self._logger.error(u'An unhandled error occurred: %s' % e, exc_info=True)
+            else:
+                self._logger.warn(u'An unhandled error occurred: %s' % e)
+            # send response
             self._send_internal_server_error()
+
+    #----------------------------------------------------------------------
+    def _exception_is_important(self, exception):
+        unimportant_error_codes = (errno.EPIPE, errno.ECONNRESET)
+        if isinstance(exception, socket.error) and exception.errno in unimportant_error_codes:
+            # don't attach stack trace to trivial exceptions like 'broken pipe'
+            return False
+        else:
+            return True
 
     #----------------------------------------------------------------------
     def _handle_get_request(self):
