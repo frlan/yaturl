@@ -39,13 +39,13 @@ from yaturl.helpers.stringformater import format_none
 from yaturl.stats import YuStats, YuLinkStats
 
 
+########################################################################
 class YuRequestHandler(BaseHTTPRequestHandler):
     """
     Custom request handler to process HEAD, GET and POST requests
     """
 
     server_version = '%s/%s' % (SERVER_NAME, SERVER_VERSION)
-
 
     #----------------------------------------------------------------------
     def __init__(self, request, client_address, server):
@@ -174,8 +174,9 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/html')
         self.send_header("Content-Length", size)
         self.end_headers()
+
     #-------------------------------------------------------------------
-    def _send_homepage(self, message = ''):
+    def _send_homepage(self, message=''):
         """
         Sends the default startpage.
 
@@ -219,11 +220,11 @@ class YuRequestHandler(BaseHTTPRequestHandler):
             messagetext = ''
         text = read_template(
                     template_filename,
-                    message = messagetext,
+                    message=messagetext,
                     title='%s - Short URL Result' % SERVER_NAME,
                     header='new URL',
-                    path = shorthash,
-                    hostname = self.server.hostname)
+                    path=shorthash,
+                    hostname=self.server.hostname)
         self._send_response(text, 200)
 
     #-------------------------------------------------------------------
@@ -467,15 +468,15 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                     header=SERVER_NAME,
                     number_of_links=format_none(stat.links_all),
                     number_of_redirects=format_none(stat.redirect_all),
-                    number_of_redirects_today = format_none(stat.redirect_today),
-                    number_of_redirects_this_week = format_none(stat.redirect_this_week),
-                    number_of_redirects_this_month = format_none(stat.redirect_this_month),
-                    number_of_redirects_this_year = format_none(stat.redirect_this_year),
-                    number_of_url_today = format_none(stat.links_today),
-                    number_of_url_this_week = format_none(stat.links_this_week),
-                    number_of_url_this_month = format_none(stat.links_this_month),
-                    number_of_url_this_year = format_none(stat.links_this_year),
-                    date_of_first_redirect = format_none(stat.date_of_first_redirect),
+                    number_of_redirects_today=format_none(stat.redirect_today),
+                    number_of_redirects_this_week=format_none(stat.redirect_this_week),
+                    number_of_redirects_this_month=format_none(stat.redirect_this_month),
+                    number_of_redirects_this_year=format_none(stat.redirect_this_year),
+                    number_of_url_today=format_none(stat.links_today),
+                    number_of_url_this_week=format_none(stat.links_this_week),
+                    number_of_url_this_month=format_none(stat.links_this_month),
+                    number_of_url_this_year=format_none(stat.links_this_year),
+                    date_of_first_redirect=format_none(stat.date_of_first_redirect),
                 )
         if text:
             self._send_head(text, 200)
@@ -513,7 +514,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 template_filename = self._get_config_template('statsLink')
                 url = "/" + shorthash
                 new_url = '<a href="%(url)s">%(result)s</a>' % \
-                            {'result':link_stats.link_address, 'url':url}
+                            {'result': link_stats.link_address, 'url': url}
                 # FIXME: Check for None on timestamps and replace it with something like Unknown.
                 text = read_template(
                         template_filename,
@@ -623,7 +624,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                     request_path = self.path[7:]
                                 else:
                                     request_path = self.path[1:]
-                                self._show_link_stats(request_path[:request_path.rfind('+') ])
+                                self._show_link_stats(request_path[:request_path.rfind('+')])
                                 return
                             except Exception, e:
                                 # Oopps. Something went wrong. Most likely
@@ -673,7 +674,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                                 template_filename = self._get_config_template('showpage')
                                 url = "/" + request_path[1:]
                                 new_url = '<p><a href="%(url)s">%(result)s</a></p>' % \
-                                          {'result':result, 'url':url}
+                                          {'result': result, 'url': url}
                                 stats = self._db.get_statistics_for_hash(request_path[1:])
                                 text = read_template(
                                             template_filename,
@@ -712,7 +713,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
         form = cgi.FieldStorage(
                 fp=self.rfile,
                 headers=self.headers,
-                environ={'REQUEST_METHOD':'POST'})
+                environ={'REQUEST_METHOD': 'POST'})
 
         if self.path == '/URLRequest':
             # First we check, whether the formular has been filled by
@@ -793,7 +794,7 @@ class YuRequestHandler(BaseHTTPRequestHandler):
                 template_filename = self._get_config_template('showpage')
                 if result:
                     new_url = '<p><a href="%(result)s">%(result)s</a></p>' % \
-                              {'result':result}
+                              {'result': result}
                 else:
                     new_url = '<p class="warning">No URL found for this string. Please double check your\
                                 <a href="/ShowURL">input and try again</a></p>'

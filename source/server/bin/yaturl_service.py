@@ -190,7 +190,7 @@ class YuBaseApp(object):
 
     #----------------------------------------------------------------------
     def _setup_signal_handler(self):
-        signal(SIGINT,  self._signal_handler)
+        signal(SIGINT, self._signal_handler)
         signal(SIGTERM, self._signal_handler)
         signal(SIGUSR1, self._signal_handler)
 

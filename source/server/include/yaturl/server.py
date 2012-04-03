@@ -23,7 +23,6 @@
 from BaseHTTPServer import HTTPServer
 from SocketServer import ThreadingMixIn
 from socket import AF_INET, AF_INET6
-from threading import Event
 from yaturl import config
 from yaturl.requesthandler import YuRequestHandler
 from yaturl.helpers.logger import get_logger

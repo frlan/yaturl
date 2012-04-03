@@ -330,7 +330,7 @@ class YuDatabase(object):
             cursor.execute("""INSERT into `access_log` (link_id)
                 SELECT link_id
                 FROM link
-                WHERE link_shorthash = (%s)""",(shorthash))
+                WHERE link_shorthash = (%s)""", (shorthash,))
             self.commit()
             cursor.close()
         except DatabaseError, e:
@@ -371,12 +371,13 @@ class YuDatabase(object):
             cursor = self._get_cursor()
             cursor.execute("""UPDATE `link`
                               SET `link`.`deleted` ='Y', `link`.`del_time` = now()
-                              WHERE `link`.`link_shorthash` = %s """ % (shorthash))
+                              WHERE `link`.`link_shorthash` = %s """ % (shorthash,))
             self.commit()
             cursor.close()
         except DatabaseError, e:
             self.logger.warn('Database error: %s' % e)
             raise YuDatabaseError(str(e))
+
     #-------------------------------------------------------------------
     def get_statistics_for_hash(self, shorthash):
         """
@@ -390,7 +391,7 @@ class YuDatabase(object):
             # Is this real a nice way in terms of memory usage at DB?
             cursor.execute("""SELECT count(access_time)
                               FROM access_log left join link on (access_log.link_id = link.link_id)
-                              WHERE link.link_shorthash = (%s);""",(shorthash))
+                              WHERE link.link_shorthash = (%s);""", (shorthash,))
             # Is SELECT count(access_time)
             #    FROM access_log, link
             #    WHERE access_log.link_id = link.link_id
@@ -412,13 +413,13 @@ class YuDatabase(object):
         | **return** number of redirects (int)
         """
         queries = ({
-            'today'     :   """SELECT CURDATE( ) , count(`access_log_id`)
+            'today':        """SELECT CURDATE( ) , count(`access_log_id`)
                             FROM `access_log`
                             WHERE date(`access_time`) = CURDATE( );""",
-            'this_year' :   """SELECT COUNT(`access_log_id`)
+            'this_year':    """SELECT COUNT(`access_log_id`)
                             FROM `access_log`
                             WHERE YEAR(`access_time`) = YEAR(CURDATE());""",
-            'this_week' :   """SELECT COUNT(`access_log_id`)
+            'this_week':    """SELECT COUNT(`access_log_id`)
                             FROM `access_log`
                             WHERE
                                 WEEK(`access_time`) = WEEK(CURDATE())
@@ -428,23 +429,23 @@ class YuDatabase(object):
                             WHERE
                                 MONTH(`access_time`) = MONTH(CURDATE())
                             AND YEAR(`access_time`) = YEAR(CURDATE());""",
-            'per_week'  :   """SELECT YEAR(`access_time`), WEEK(`access_time`),
+            'per_week':     """SELECT YEAR(`access_time`), WEEK(`access_time`),
                             COUNT(`access_log_id`)
                             FROM `access_log`
                             GROUP BY YEAR(`access_time`), WEEK(`access_time`);""",
-            'per_hour' :    """SELECT HOUR( `access_time` ) , COUNT( `access_log_id` )
+            'per_hour':     """SELECT HOUR( `access_time` ) , COUNT( `access_log_id` )
                             FROM `access_log`
                             WHERE `access_time` > '0000-00-00 00:00:00'
                             GROUP BY HOUR( `access_time`);""",
-            'per_dow'   :   """SELECT DAYOFWEEK(`access_time`), COUNT(`access_log_id`)
+            'per_dow':      """SELECT DAYOFWEEK(`access_time`), COUNT(`access_log_id`)
                             FROM `access_log`
                             WHERE `access_time` > '0000-00-00 00:00:00'
                             GROUP BY DAYOFWEEK(`access_time`);""",
-            'per_dom'   :   """SELECT DAYOFMONTH(`access_time`), COUNT(`access_log_id`)
+            'per_dom':      """SELECT DAYOFMONTH(`access_time`), COUNT(`access_log_id`)
                             FROM `access_log`
                             WHERE `access_time` > '0000-00-00 00:00:00'
                             GROUP BY DAYOFMONTH(`access_time`);""",
-            'all'       :   """SELECT COUNT(`access_log_id`)
+            'all':          """SELECT COUNT(`access_log_id`)
                             FROM `access_log` WHERE 1;"""})
         try:
             cursor = self._get_cursor()
@@ -469,39 +470,39 @@ class YuDatabase(object):
         | **return** number of new links (int)
         """
         queries = ({
-            'today'     :   """SELECT CURDATE() , count(`link_id`)
+            'today':        """SELECT CURDATE() , count(`link_id`)
                             FROM `link`
                             WHERE date(`entry_date`) = CURDATE();""",
-            'this_year' :   """SELECT count(`link_id`)
+            'this_year':    """SELECT count(`link_id`)
                             FROM `link`
                             WHERE YEAR(`entry_date`) = YEAR(CURDATE());""",
-            'this_week' :   """SELECT COUNT(`link_id`)
+            'this_week':    """SELECT COUNT(`link_id`)
                             FROM `link`
                             WHERE
                                 YEAR(CURDATE()) = YEAR(`entry_date`)
                             AND WEEK(CURDATE()) = WEEK(`entry_date`);""",
-            'this_month' :  """SELECT COUNT(`link_id`)
+            'this_month':   """SELECT COUNT(`link_id`)
                             FROM `link`
                             WHERE
                                 YEAR(CURDATE()) = YEAR(`entry_date`)
                             AND MONTH(CURDATE()) = MONTH(`entry_date`);""",
-            'per_week'  :   """SELECT YEAR(`entry_date`), WEEK(`entry_date`),
+            'per_week':     """SELECT YEAR(`entry_date`), WEEK(`entry_date`),
                             COUNT(`link_id`)
                             FROM `link`
                             GROUP BY YEAR(`entry_date`), WEEK(`entry_date`);""",
-            'per_hour'  :   """SELECT HOUR(`entry_date`) , COUNT(`link_id`)
+            'per_hour':     """SELECT HOUR(`entry_date`) , COUNT(`link_id`)
                             FROM `link`
                             WHERE `entry_date` > '0000-00-00 00:00:00'
                             GROUP BY HOUR(`entry_date`);""",
-            'per_dow'   :   """SELECT DAYOFWEEK(`entry_date`), COUNT(`link_id`)
+            'per_dow':      """SELECT DAYOFWEEK(`entry_date`), COUNT(`link_id`)
                             FROM `link`
                             WHERE `entry_date` > '0000-00-00 00:00:00'
                             GROUP BY DAYOFWEEK(`entry_date`);""",
-            'per_dom'   :   """SELECT DAYOFMONTH(`entry_date`), COUNT(`link_id`)
+            'per_dom':      """SELECT DAYOFMONTH(`entry_date`), COUNT(`link_id`)
                             FROM `link`
                             WHERE `entry_date` > '0000-00-00 00:00:00'
                             GROUP BY DAYOFMONTH(`entry_date`);""",
-            'all'       :   """SELECT COUNT(`link_id`)
+            'all':          """SELECT COUNT(`link_id`)
                             FROM `link` WHERE 1;"""})
         try:
             cursor = self._get_cursor()
@@ -518,7 +519,7 @@ class YuDatabase(object):
             return None
 
     #-------------------------------------------------------------------
-    def get_date_of_first_entry(self, stats_type, shorthash = None):
+    def get_date_of_first_entry(self, stats_type, shorthash=None):
         """
         Returns the timestampe of first logged link or redirect
 
@@ -528,13 +529,13 @@ class YuDatabase(object):
         | **return** timestamp (datetime)
         """
         queries = ({
-            'link'          : """SELECT MIN( `entry_date` )
+            'link':           """SELECT MIN( `entry_date` )
                                  FROM `link`
                                  WHERE `entry_date` > '0000-00-00 00:00:00';""",
-            'redirect'      : """SELECT MIN(`access_time`)
+            'redirect':       """SELECT MIN(`access_time`)
                                  FROM `access_log`
                                  WHERE `access_time` > '0000-00-00 00:00:00';""",
-            'hashredirect'  : """SELECT MIN(`access_time`)
+            'hashredirect':   """SELECT MIN(`access_time`)
                                  FROM `access_log`, `link`
                                  WHERE `access_log`.`link_id` = `link`.`link_id`
                                  AND `link`.`link_shorthash` = '%s';"""})
@@ -553,7 +554,7 @@ class YuDatabase(object):
             return None
 
 #----------------------------------------------------------------------
-    def get_date_of_last_entry(self, stats_type, shorthash = None):
+    def get_date_of_last_entry(self, stats_type, shorthash=None):
         """
         Returns the timestampe of last logged link or redirect
 
@@ -563,13 +564,13 @@ class YuDatabase(object):
         | **return** timestamp (datetime)
         """
         queries = ({
-            'link'          : """SELECT MAX( `entry_date` )
+            'link':           """SELECT MAX( `entry_date` )
                                  FROM `link`
                                  WHERE `entry_date` > '0000-00-00 00:00:00';""",
-            'redirect'      : """SELECT MAX(`access_time`)
+            'redirect':       """SELECT MAX(`access_time`)
                                  FROM `access_log`
                                  WHERE `access_time` > '0000-00-00 00:00:00';""",
-            'hashredirect'  : """SELECT MAX(`access_time`)
+            'hashredirect':   """SELECT MAX(`access_time`)
                                  FROM `access_log`, `link`
                                  WHERE `access_log`.`link_id` = `link`.`link_id`
                                  AND `link`.`link_shorthash` = '%s';"""})

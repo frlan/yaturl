@@ -23,6 +23,7 @@
 from MySQLdb import DatabaseError
 
 
+########################################################################
 class YuDatabaseError(DatabaseError):
     """
     Generic database error
@@ -35,4 +36,3 @@ class YuDatabaseError(DatabaseError):
     #----------------------------------------------------------------------
     def __str__(self):
         return u"Database Error: %s" % self._msg
-

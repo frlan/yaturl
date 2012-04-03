@@ -29,17 +29,17 @@ import console
 class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
 
     #----------------------------------------------------------------------
-    def __init__(self, host='127.0.0.1', port=7070, locals=None):
-        super(TelnetInteractiveConsoleServer, self).__init__(host, port, locals, select_timeout=0.5)
+    def __init__(self, host='127.0.0.1', port=7070, locals_=None):
+        super(TelnetInteractiveConsoleServer, self).__init__(host, port, locals_, select_timeout=0.5)
         self._logger = get_logger()
         self._running = False
 
     #----------------------------------------------------------------------
-    def set_locals(self, locals):
+    def set_locals(self, locals_):
         if not self._running:
-            self.locals = locals
+            self.locals = locals_
         else:
-            raise ValueError, 'Server already started'
+            raise ValueError(u'Server already started')
 
     #----------------------------------------------------------------------
     def accept_interactions(self):
@@ -62,4 +62,3 @@ class TelnetInteractiveConsoleServer(console.TelnetInteractiveConsoleServer):
             return client.getpeername()
         except SocketError:
             return u'unknown'
-        

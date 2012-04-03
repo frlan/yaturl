@@ -81,7 +81,7 @@ class FreshConnectionQueuePool(QueuePool):
         if connection and connection.connection:
             connection.connection.ping()
         else:
-            raise OperationalError, (SERVER_GONE_ERROR, 'Connection lost')
+            raise OperationalError((SERVER_GONE_ERROR, 'Connection lost'))
 
 
 #----------------------------------------------------------------------

@@ -23,7 +23,6 @@
 import logging
 
 
-
 #----------------------------------------------------------------------
 def get_logger():
     return logging.getLogger('yaturl')
@@ -32,4 +31,3 @@ def get_logger():
 #----------------------------------------------------------------------
 def get_access_logger():
     return logging.getLogger('accesslog')
-

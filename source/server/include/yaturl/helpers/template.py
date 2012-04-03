@@ -43,4 +43,3 @@ def read_template(filename, title, header, **values):
         return result + FOOTER
     except IOError:
         return ''
-

@@ -20,7 +20,6 @@
 # MA 02110-1301, USA.
 
 
-
 from yaturl import start_time
 from yaturl.database.database import YuDatabase
 from threading import enumerate as thread_enumerate

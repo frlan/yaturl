@@ -20,17 +20,16 @@
 # MA 02110-1301, USA.
 
 
-
-SERVER_NAME = 'yatURL.net'
-SERVER_VERSION = '1.0'
+SERVER_NAME = u'yatURL.net'
+SERVER_VERSION = u'1.0'
 
 TEMPLATENAMES = ['404', '500', 'contactUsResult', 'databaseerror',
 'homepage', 'return', 'showpage', 'stats', 'statsLink']
 
 CONTENT_TYPES = ({
-    '.css':'text/css',
-    '.ico':'image/vnd.microsoft.icon',
-    '.png':'image/png'
+    '.css': 'text/css',
+    '.ico': 'image/vnd.microsoft.icon',
+    '.png': 'image/png'
 })
 
 # we need to hard-code this one at least in case of the file cannot be found on disk

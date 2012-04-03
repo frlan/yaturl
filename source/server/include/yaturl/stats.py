@@ -23,6 +23,7 @@ from yaturl.database.database import YuDatabase
 from time import time
 
 
+########################################################################
 class YuStats(object):
     """
     A class to represent some statistic data for yaturl
@@ -104,6 +105,7 @@ class YuStats(object):
             return self._db.get_statistics_for_general_links('this_year')[0]
         except TypeError:
             return None
+
     #-------------------------------------------------------------------
     def _get_links_from_db_all(self):
         """

@@ -20,6 +20,7 @@
 # MA 02110-1301, USA.
 
 
+#----------------------------------------------------------------------
 def format_none(phrase):
     """
     Checks the given object against None and return "n/A" in case of.
