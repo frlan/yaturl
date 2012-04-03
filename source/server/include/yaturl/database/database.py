@@ -361,7 +361,7 @@ class YuDatabase(object):
             raise YuDatabaseError(str(e))
 
     #-------------------------------------------------------------------
-    def mark_link_as_deleted(self, shothash):
+    def mark_link_as_deleted(self, shorthash):
         """
         Marks a link as deleted inside database
 
