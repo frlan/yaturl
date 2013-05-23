@@ -35,3 +35,4 @@
 	* Rewrite using django
 	* Migration to use postgreSQL
 	* IPv4 AND IPv6-support at same time
+	* Support for HTTPS w/o proxy
